@@ -1,0 +1,168 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { getDb } from '../../lib/db/client';
+
+const db = getDb(Astro.locals);
+
+// Efficient aggregate counts
+const [usersRes, qrsRes, dynQrsRes, scansRes, landingRes, storageRes, subsRes, reportsRes] = await Promise.all([
+  db.prepare('SELECT COUNT(*) as total FROM users').all(),
+  db.prepare('SELECT COUNT(*) as total FROM qr_codes').all(),
+  db.prepare('SELECT COUNT(*) as total FROM qr_codes WHERE is_dynamic = 1').all(),
+  db.prepare('SELECT SUM(scans_count) as total FROM qr_codes').all(),
+  db.prepare("SELECT COUNT(*) as total FROM landing_pages WHERE status = 'published'").all(),
+  db.prepare('SELECT SUM(file_size) as total FROM qr_assets').all(),
+  db.prepare("SELECT COUNT(*) as total FROM subscriptions WHERE status IN ('active', 'trialing')").all(),
+  db.prepare("SELECT COUNT(*) as total FROM abuse_reports WHERE status = 'pending'").all(),
+]);
+
+const totalUsers = (usersRes.results?.[0] as any)?.total || 0;
+const totalQrs = (qrsRes.results?.[0] as any)?.total || 0;
+const dynamicQrs = (dynQrsRes.results?.[0] as any)?.total || 0;
+const totalScans = (scansRes.results?.[0] as any)?.total || 0;
+const publishedLanding = (landingRes.results?.[0] as any)?.total || 0;
+const storageBytes = (storageRes.results?.[0] as any)?.total || 0;
+const activeSubs = (subsRes.results?.[0] as any)?.total || 0;
+const pendingReports = (reportsRes.results?.[0] as any)?.total || 0;
+
+const storageMb = (storageBytes / (1024 * 1024)).toFixed(1);
+
+// Recent Users & QR codes
+const [recentUsersRes, recentQrsRes, recentAuditRes] = await Promise.all([
+  db.prepare('SELECT id, email, plan, status, created_at FROM users ORDER BY created_at DESC LIMIT 5').all(),
+  db.prepare('SELECT id, name, type, is_dynamic, scans_count, status, created_at FROM qr_codes ORDER BY created_at DESC LIMIT 5').all(),
+  db.prepare('SELECT * FROM admin_audit_logs ORDER BY created_at DESC LIMIT 5').all(),
+]);
+
+const recentUsers = recentUsersRes.results || [];
+const recentQrs = recentQrsRes.results || [];
+const recentAudits = recentAuditRes.results || [];
+---
+
+<AdminLayout title="Platform Overview" activeNav="overview">
+  <div class="space-y-8">
+    <!-- Top Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Platform Overview</h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">Real-time operational metrics across database, storage, and moderation queues.</p>
+      </div>
+      {pendingReports > 0 && (
+        <a href="/admin/abuse-reports" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-bold animate-pulse">
+          🚨 {pendingReports} Pending Abuse Reports &rarr;
+        </a>
+      )}
+    </div>
+
+    <!-- Metrics Grid -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Total Users</span>
+        <div class="text-2xl font-black text-white">{totalUsers}</div>
+      </div>
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Total QR Codes</span>
+        <div class="text-2xl font-black text-indigo-400">{totalQrs} <span class="text-xs text-slate-500 font-normal">({dynamicQrs} Dyn)</span></div>
+      </div>
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Total Scans</span>
+        <div class="text-2xl font-black text-emerald-400">{totalScans}</div>
+      </div>
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Landing Pages</span>
+        <div class="text-2xl font-black text-purple-400">{publishedLanding}</div>
+      </div>
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Active Paid Plans</span>
+        <div class="text-2xl font-black text-amber-400">{activeSubs}</div>
+      </div>
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Storage Used</span>
+        <div class="text-2xl font-black text-white">{storageMb} MB</div>
+      </div>
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Pending Abuse</span>
+        <div class="text-2xl font-black text-red-400">{pendingReports}</div>
+      </div>
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+        <span class="text-xs font-semibold text-slate-400 uppercase">System Status</span>
+        <div class="text-sm font-bold text-emerald-400 flex items-center gap-1.5 pt-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span> 100% Operational
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Tables Split Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Recent Users -->
+      <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-bold text-white uppercase tracking-wider">Recent Users</h2>
+          <a href="/admin/users" class="text-xs text-indigo-400 hover:underline">View All &rarr;</a>
+        </div>
+        <div class="divide-y divide-slate-800 text-xs">
+          {recentUsers.map((u: any) => (
+            <div class="py-3 flex items-center justify-between gap-2">
+              <div>
+                <a href={`/admin/users/${u.id}`} class="font-bold text-white hover:text-indigo-400 transition-colors">
+                  {u.email}
+                </a>
+                <div class="text-[10px] text-slate-500 font-mono">{u.id}</div>
+              </div>
+              <span class={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                u.plan === 'pro' || u.plan === 'business' ? 'bg-indigo-900/60 text-indigo-300' : 'bg-slate-800 text-slate-400'
+              }`}>
+                {u.plan}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Recent QR Codes -->
+      <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-bold text-white uppercase tracking-wider">Recent QR Codes</h2>
+          <a href="/admin/qr-codes" class="text-xs text-indigo-400 hover:underline">View All &rarr;</a>
+        </div>
+        <div class="divide-y divide-slate-800 text-xs">
+          {recentQrs.map((q: any) => (
+            <div class="py-3 flex items-center justify-between gap-2">
+              <div>
+                <div class="font-bold text-white">{q.name}</div>
+                <div class="text-[10px] text-slate-500 font-mono">{q.type} • {q.is_dynamic ? 'Dynamic' : 'Static'}</div>
+              </div>
+              <div class="text-right">
+                <span class="font-bold text-slate-300">{q.scans_count || 0} scans</span>
+                <div class="text-[10px] text-emerald-400">{q.status}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Audit Logs -->
+    <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-bold text-white uppercase tracking-wider">Recent Moderation &amp; Admin Actions</h2>
+        <a href="/admin/audit-logs" class="text-xs text-indigo-400 hover:underline">Full Audit Trail &rarr;</a>
+      </div>
+      {recentAudits.length === 0 ? (
+        <p class="text-xs text-slate-500">No moderation actions recorded yet.</p>
+      ) : (
+        <div class="divide-y divide-slate-800 text-xs">
+          {recentAudits.map((a: any) => (
+            <div class="py-3 flex items-center justify-between gap-4 font-mono">
+              <div class="flex items-center gap-3">
+                <span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 font-bold uppercase">{a.action}</span>
+                <span class="text-slate-400">{a.resource_type}: {a.resource_id}</span>
+              </div>
+              <span class="text-[11px] text-slate-500">{new Date(a.created_at).toLocaleTimeString()}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+</AdminLayout>

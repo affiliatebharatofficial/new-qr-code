@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is an Instagram QR Code Generator?';
+const overviewParagraphs = [
+  'An Instagram QR code generator creates a scannable 2D barcode that opens your Instagram profile, post, reel, or story filter directly inside the Instagram app on iOS and Android. When scanned by prospective followers, customers, or fans, the code bypasses manual handle searching and spelling errors, presenting an instant "Follow" button.',
+  'Promoting Instagram handles on physical print media (such as boutique storefront windows, product packaging, restaurant coasters, event badges, and business cards) often suffers from lost conversions when users mistype underscores, periods, or similar usernames. An Instagram QR code encodes direct deep links, bringing offline physical foot traffic straight into your digital follower base.',
+  'Our free generator enables visual customization matching your aesthetic, custom brand colors, Instagram logos, and instant Vector SVG or high-resolution PNG downloads for commercial print.'
+];
+
+const sectors = [
+  {
+    name: 'Fashion Boutiques & Apparel',
+    description: 'Print on shopping bags, receipts, and fitting room mirrors with a "Tag Us in Your Style" callout.',
+    benefit: 'Drives daily organic user-generated content and outfit tags.'
+  },
+  {
+    name: 'Restaurants, Cafes & Bakeries',
+    description: 'Place on tabletop tents and drink coasters encouraging patrons to share food photos on Instagram Stories.',
+    benefit: 'Generates viral local neighborhood visual word-of-mouth.'
+  },
+  {
+    name: 'Beauty Salons, Spas & Stylists',
+    description: 'Display on styling station mirrors showcasing before-and-after transformation galleries.',
+    benefit: 'Converts salon clients into long-term social followers and advocates.'
+  },
+  {
+    name: 'Content Creators & Influencers',
+    description: 'Include on fan meet-and-greet cards, event badges, and merchandise tags.',
+    benefit: 'Grows cross-platform audience following from live appearances.'
+  },
+  {
+    name: 'Artists, Photographers & Designers',
+    description: 'Embed on art exhibition placards, prints, and stickers linking to full visual portfolios.',
+    benefit: 'Connects gallery art lovers directly with the creator’s latest work.'
+  },
+  {
+    name: 'Fitness Trainers & Wellness Coaches',
+    description: 'Mount beside gym equipment and business cards linking to daily workout reels and meal tips.',
+    benefit: 'Engages fitness clients with daily motivational video content.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Enter Instagram Profile URL',
+    description: 'Type your Instagram username or paste your full profile link (e.g., https://instagram.com/yourhandle).'
+  },
+  {
+    title: '2. Customize Aesthetic & Colors',
+    description: 'Match your visual brand, select modern rounded dot patterns, and add an Instagram center icon.'
+  },
+  {
+    title: '3. Download & Print',
+    description: 'Export in scalable Vector SVG for retail signage and bags or high-DPI PNG for digital promotions.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Retail Shopping Bags',
+    description: 'Printed on shopping bag exteriors inviting shoppers to follow for new product drops.',
+    example: 'Apparel boutique gaining 400+ monthly Instagram followers from store foot traffic.'
+  },
+  {
+    title: 'Cafe Tabletop Coasters',
+    description: 'Tabletop coasters encouraging diners to tag the cafe in latte art photos.',
+    example: 'Specialty coffee roastery generating daily user-generated story tags.'
+  },
+  {
+    title: 'Salon Mirror Decals',
+    description: 'Transparent vinyl decals placed on styling mirrors for instant client scanning.',
+    example: 'Hair salon converting 60% of weekly clients into active followers.'
+  },
+  {
+    title: 'Merchandise Hangtags',
+    description: 'Attached to apparel and merch linking directly to community lookbooks.',
+    example: 'Streetwear brand launching exclusive drop announcements via Instagram.'
+  }
+];
+
+const tips = [
+  'Use Direct Handle URLs: Format your URL cleanly as https://instagram.com/yourhandle without extra tracking parameters for a simpler QR matrix.',
+  'Clear Action Callout: Always pair the QR code with clear text such as "Scan to follow our daily drops on Instagram".',
+  'High Contrast for Fast Scanning: Use dark modules on a light background for rapid camera capture in ambient lighting.',
+  'Vector SVG for Packaging: Export in SVG vector format when printing on custom retail boxes, poly-mailers, or shopping bags.',
+  'Test Across iOS and Android: Verify that scanning launches the native Instagram mobile app on both iPhone and Android.'
+];
+
+const technicalNotes = 'Standards Compliance: Generates standard Instagram web and app deep-linking URLs recognized natively across iOS and Android mobile cameras.';
+
+const faqs = [
+  {
+    question: 'How do users scan an Instagram QR code?',
+    answer: 'Users simply open their smartphone camera app, point it at the QR code, and tap the notification link on screen. The phone automatically opens your profile directly inside the Instagram app.'
+  },
+  {
+    question: 'Does the scanner need a special QR app to open Instagram?',
+    answer: 'No! Modern iPhones and Android smartphones have built-in QR readers in their native camera apps that open Instagram links automatically.'
+  },
+  {
+    question: 'Can I link the QR code to a specific Instagram Reel or Post?',
+    answer: 'Yes! You can paste the direct link to any specific Instagram Post, Reel, or Story highlight to direct viewers straight to individual content.'
+  },
+  {
+    question: 'Can I add the official Instagram logo to the QR code?',
+    answer: 'Yes. Switch to the Logo tab in the customization panel and select the Instagram icon or upload your own avatar. Error correction adjusts automatically.'
+  },
+  {
+    question: 'Do Instagram QR codes expire?',
+    answer: 'No. Static Instagram QR codes encode your profile URL permanently and have no expiration date. They remain active as long as your Instagram handle is live.'
+  },
+  {
+    question: 'Are there any fees or scan limits?',
+    answer: 'No. Generating and downloading your Instagram QR code is 100% free with unlimited scans forever.'
+  }
+];
+
+const relatedTools = [
+  { name: 'Social Media QR', slug: 'social-media-qr-code', description: 'Connect all your social profiles in one landing hub.' },
+  { name: 'URL QR Generator', slug: 'url-to-qr-code', description: 'Direct traffic to your website, blog, or store.' },
+  { name: 'Digital Business Card', slug: 'digital-business-card', description: 'Create complete contact profile cards for networking.' },
+  { name: 'Google Reviews QR', slug: 'google-reviews-qr-code', description: 'Collect 5-star Google customer reviews at checkout.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="Instagram QR Code Generator — Follow on Instagram QR"
+  description="Generate free Instagram QR codes for profiles, reels, and posts. Open direct in the Instagram app with 1 scan. Free vector SVG & PNG download."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="social"
+      headline="Instagram QR Code Generator"
+      subheadline="Let customers, fans, and followers open your Instagram profile and connect in a single camera scan."
+    />
+  </div>
+
+  <LandingContent
+    heading="Instagram Profile QR Code"
+    subheading="Grow your Instagram community directly from retail packaging, storefronts, and event marketing."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

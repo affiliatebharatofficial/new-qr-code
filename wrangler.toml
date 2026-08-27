@@ -1,0 +1,22 @@
+name = "qr-code-generator"
+main = "./dist/_worker.js/index.js"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "qr_generator_db"
+database_id = "329f39df-2ae3-4950-8442-769b34f8dbcb"
+
+[[r2_buckets]]
+binding = "STORAGE"
+bucket_name = "qr-assets"
+
+[vars]
+ENVIRONMENT = "production"
+JWT_SECRET = "production-secret-min-32-chars-long-qr-super-key"
+APP_URL = "https://example.com"

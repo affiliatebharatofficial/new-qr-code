@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is a WhatsApp QR Code Generator?';
+const overviewParagraphs = [
+  'A WhatsApp QR code generator creates a scannable 2D barcode that opens a direct chat conversation on WhatsApp or WhatsApp Business without requiring the user to save the phone number into their mobile address book first. You can also embed an optional pre-filled greeting or inquiry message that appears automatically in the user’s text input field when scanned.',
+  'Normally, starting a conversation with a new business on WhatsApp requires a tedious multi-step friction barrier: typing the international phone number, creating a new contact entry, naming the contact, syncing WhatsApp, and finally searching for the chat thread. A WhatsApp QR code encodes the official "https://wa.me/[number]?text=[message]" deep link format, launching the chat window immediately on mobile and WhatsApp Web.',
+  'By deploying WhatsApp QR codes on packaging, retail store counters, promotional flyers, invoices, and customer service kiosks, businesses dramatically increase lead conversion rates and provide instant support. Our generator is 100% free, private, client-side, and offers high-resolution PNG raster graphics and vector SVG exports for professional printing.'
+];
+
+const sectors = [
+  {
+    name: 'Local Retail & Boutiques',
+    description: 'Place counter display QR codes inviting customers to join exclusive VIP discount groups or check stock availability.',
+    benefit: 'Turns walk-in shoppers into active conversational messaging subscribers.'
+  },
+  {
+    name: 'Restaurants & Cloud Kitchens',
+    description: 'Print on takeaway menus and packaging for direct customer delivery orders, reservations, and catering inquiries.',
+    benefit: 'Avoids third-party delivery marketplace commissions on repeat direct orders.'
+  },
+  {
+    name: 'Real Estate & Property Management',
+    description: 'Attach to property listing flyers and open house signboards with pre-filled inquiries like "I want to schedule a viewing for Property #102".',
+    benefit: 'Connects interested buyers with agents instantly when interest is highest.'
+  },
+  {
+    name: 'Home Services & Contractors',
+    description: 'Print on quote folders, service vans, and estimate invoices for plumbers, electricians, and landscapers.',
+    benefit: 'Enables homeowners to snap and send photos of repair issues in seconds.'
+  },
+  {
+    name: 'Customer Support & Helpdesks',
+    description: 'Include in product user manuals and warranty cards for instant troubleshooting and live agent chat.',
+    benefit: 'Resolves customer questions rapidly, reducing call center volume.'
+  },
+  {
+    name: 'E-Commerce Brands',
+    description: 'Add to post-purchase package inserts for immediate returns, exchanges, or re-ordering support.',
+    benefit: 'Boosts post-purchase customer satisfaction and brand loyalty.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Enter WhatsApp Number',
+    description: 'Type your mobile phone number with the country code (digits only, no spaces or special characters).'
+  },
+  {
+    title: '2. Add Pre-filled Message (Optional)',
+    description: 'Type an initial greeting or product inquiry that pre-populates in the user\'s chat input box.'
+  },
+  {
+    title: '3. Download & Print',
+    description: 'Export in vector SVG for large format print displays or high-resolution PNG for digital marketing materials.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Checkout Counter Display Signs',
+    description: 'Acrylic tabletop signs near cash registers prompting customers to message for warranty registration or loyalty perks.',
+    example: 'Electronics store offering a digital warranty lookup via WhatsApp.'
+  },
+  {
+    title: 'Product Packaging Inserts',
+    description: 'Card inserts in delivery parcels encouraging direct customer feedback or quick re-orders.',
+    example: 'Artisan bakery including a "Message us to reorder" card in every pastry box.'
+  },
+  {
+    title: 'Local Service Fleet Vehicles',
+    description: 'Large rear-window vinyl graphics allowing nearby drivers at stoplights to initiate service estimates.',
+    example: 'Mobile auto detailer displaying a "WhatsApp for instant quote" QR on van doors.'
+  },
+  {
+    title: 'Event Booth Banners',
+    description: 'Banners at exhibitions capturing attendee inquiries directly into CRM-linked WhatsApp Business accounts.',
+    example: 'B2B software exhibitor generating qualified conference leads via direct chat.'
+  }
+];
+
+const tips = [
+  'Include International Country Code: Enter your number in international format (e.g. 15551234567 for US or 447123456789 for UK) without leading plus signs or dashes.',
+  'Craft Clear Pre-filled Messages: Use friendly, specific pre-filled text like "Hi, I\'d like to check availability for [Service]" to make it effortless for customers to press send.',
+  'High Contrast for Fast Scanning: Keep dark QR modules against a light background so smartphone cameras can scan from across a counter in low lighting.',
+  'WhatsApp Business Integration: Link the QR code to a WhatsApp Business account to enable automated away messages, business hours, and product catalogs.',
+  'Test Across WhatsApp Mobile & Web: Test your QR code on both mobile camera apps and WhatsApp Web desktop to ensure seamless deep-linking.'
+];
+
+const technicalNotes = 'Standards Compliance: Uses official "https://wa.me/[number]?text=[encoded_text]" deep-linking URI specification recognized globally by WhatsApp on iOS, Android, and Desktop.';
+
+const faqs = [
+  {
+    question: 'How do customers start a WhatsApp chat using a QR code?',
+    answer: 'When a customer scans the QR code with their smartphone camera, their phone automatically opens WhatsApp to a new chat with your specified phone number. If you configured a pre-filled message, it appears in their text bar ready to send.'
+  },
+  {
+    question: 'Does the customer need to save my phone number first?',
+    answer: 'No. The primary advantage of a WhatsApp QR code is that it completely bypasses the contact-saving step. Customers can message your business immediately without cluttering their phone contacts.'
+  },
+  {
+    question: 'How should I format the phone number for WhatsApp QR codes?',
+    answer: 'Enter the full phone number with country code, using numbers only (no plus signs, dashes, spaces, or brackets). For example, use 15551234567 for a US number or 919876543210 for an Indian number.'
+  },
+  {
+    question: 'Can I use this for both personal WhatsApp and WhatsApp Business?',
+    answer: 'Yes. The QR code format works identically for standard personal WhatsApp accounts, WhatsApp Business app accounts, and WhatsApp Cloud API corporate setups.'
+  },
+  {
+    question: 'Can I add a custom pre-filled message?',
+    answer: 'Yes. You can write any customized text such as "Hi, I would like to book an appointment" or "Hello, please send me your product catalog". The message will automatically appear in the customer\'s message input box.'
+  },
+  {
+    question: 'Do WhatsApp QR codes expire?',
+    answer: 'No. Static WhatsApp QR codes encode the direct chat link and do not expire. They remain valid permanently as long as your WhatsApp account remains active on that phone number.'
+  }
+];
+
+const relatedTools = [
+  { name: 'Phone QR Generator', slug: 'phone-qr-code-generator', description: 'Enable instant one-tap phone calls from print advertising.' },
+  { name: 'SMS QR Generator', slug: 'sms-qr-code-generator', description: 'Send pre-written SMS text messages directly to mobile phones.' },
+  { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Share full contact credentials directly to smartphone address books.' },
+  { name: 'URL QR Generator', slug: 'url-to-qr-code', description: 'Direct traffic to your website, landing page, or online store.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="WhatsApp QR Code Generator — Start Direct WhatsApp Chats"
+  description="Generate free WhatsApp QR codes with pre-filled text messages. Connect customers instantly without saving phone numbers. Free vector SVG & PNG."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="whatsapp"
+      headline="WhatsApp QR Code Generator"
+      subheadline="Let customers and leads start a direct WhatsApp conversation with your business in a single scan—no contact saving required."
+    />
+  </div>
+
+  <LandingContent
+    heading="WhatsApp Chat QR Code"
+    subheading="Eliminate contact-saving friction and engage customers directly on WhatsApp."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

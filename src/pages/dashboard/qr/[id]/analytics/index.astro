@@ -1,0 +1,317 @@
+---
+import DashboardLayout from '../../../../../layouts/DashboardLayout.astro';
+import { getCurrentUser } from '../../../../../lib/auth/jwt';
+import { getDb } from '../../../../../lib/db/client';
+
+const user = await getCurrentUser(Astro.request, Astro.locals);
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+const id = Astro.params.id;
+const db = getDb(Astro.locals);
+
+// Fetch QR details
+const qrRes = await db.prepare('SELECT * FROM qr_codes WHERE id = ?').bind(id).all();
+const qr = qrRes.results?.[0] as any;
+
+if (!qr) {
+  return Astro.redirect('/dashboard/qr');
+}
+
+// IDOR Protection
+if (qr.user_id !== user.id && user.role !== 'admin') {
+  return Astro.redirect('/dashboard/qr');
+}
+
+// Fetch Scans
+const scansRes = await db.prepare('SELECT * FROM qr_scans WHERE qr_id = ? ORDER BY scanned_at DESC').bind(id).all();
+const scans = scansRes.results || [];
+
+const now = Date.now();
+const oneDayAgo = now - 24 * 60 * 60 * 1000;
+const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
+
+let todayCount = 0;
+let last7dCount = 0;
+const uniqueIps = new Set<string>();
+
+const devicesMap: Record<string, number> = {};
+const countriesMap: Record<string, number> = {};
+const browsersMap: Record<string, number> = {};
+const osMap: Record<string, number> = {};
+
+// Build last 14 days timeline
+const days = 14;
+const timelineMap: Record<string, { dateStr: string; count: number }> = {};
+for (let i = days - 1; i >= 0; i--) {
+  const d = new Date(now - i * 24 * 60 * 60 * 1000);
+  const dateKey = d.toISOString().split('T')[0];
+  const displayDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  timelineMap[dateKey] = { dateStr: displayDate, count: 0 };
+}
+
+for (const s of scans) {
+  if (s.ip_hash) uniqueIps.add(s.ip_hash);
+  if (s.scanned_at >= oneDayAgo) todayCount++;
+  if (s.scanned_at >= sevenDaysAgo) last7dCount++;
+
+  const dateKey = new Date(s.scanned_at).toISOString().split('T')[0];
+  if (timelineMap[dateKey]) {
+    timelineMap[dateKey].count++;
+  }
+
+  const dev = s.device_type || 'Unknown';
+  devicesMap[dev] = (devicesMap[dev] || 0) + 1;
+
+  const c = s.country || 'Unknown';
+  countriesMap[c] = (countriesMap[c] || 0) + 1;
+
+  const b = s.browser || 'Unknown';
+  browsersMap[b] = (browsersMap[b] || 0) + 1;
+
+  const o = s.os || 'Unknown';
+  osMap[o] = (osMap[o] || 0) + 1;
+}
+
+const timeline = Object.values(timelineMap);
+const maxDailyCount = Math.max(...timeline.map((t) => t.count), 1);
+
+const topCountries = Object.entries(countriesMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+const topDevices = Object.entries(devicesMap).sort((a, b) => b[1] - a[1]);
+const topBrowsers = Object.entries(browsersMap).sort((a, b) => b[1] - a[1]);
+const topOs = Object.entries(osMap).sort((a, b) => b[1] - a[1]);
+
+const shortUrl = qr.short_code ? `https://qrcode.page/r/${qr.short_code}` : null;
+---
+
+<DashboardLayout title={`Analytics: ${qr.name}`} activeNav="qr">
+  <div class="space-y-8 max-w-5xl mx-auto">
+    <!-- Breadcrumb & Header -->
+    <div>
+      <a href={`/dashboard/qr/${qr.id}`} class="text-xs font-semibold text-slate-500 hover:text-indigo-600 flex items-center gap-1 mb-3">
+        &larr; Back to QR Details
+      </a>
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+              {qr.is_dynamic ? 'Dynamic QR' : 'Static QR'}
+            </span>
+            <span class={`px-2.5 py-0.5 rounded-lg text-xs font-bold uppercase tracking-wider ${
+              qr.status === 'active'
+                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
+                : 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800'
+            }`}>
+              {qr.status}
+            </span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-1">
+            {qr.name} Analytics
+          </h1>
+          {qr.destination && (
+            <p class="text-xs text-slate-500 mt-1 truncate max-w-lg">
+              Destination: <a href={qr.destination} target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline">{qr.destination}</a>
+            </p>
+          )}
+        </div>
+
+        {shortUrl && (
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              id="copy-short-url-btn"
+              data-url={shortUrl}
+              class="px-4 py-2.5 rounded-2xl text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-500 text-slate-800 dark:text-slate-200 shadow-sm transition-all cursor-pointer"
+            >
+              <span id="copy-btn-label">Copy Short URL</span>
+            </button>
+            <a
+              href={`/?edit=${qr.id}`}
+              class="px-4 py-2.5 rounded-2xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/20 transition-all"
+            >
+              Edit Destination
+            </a>
+          </div>
+        )}
+      </div>
+    </div>
+
+    <!-- Summary Metric Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
+        <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Scans</div>
+        <div class="text-3xl font-black text-slate-900 dark:text-white">{scans.length}</div>
+        <div class="text-[11px] text-slate-400">All-time scan events</div>
+      </div>
+
+      <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
+        <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Unique Scans</div>
+        <div class="text-3xl font-black text-indigo-600 dark:text-indigo-400">{uniqueIps.size}</div>
+        <div class="text-[11px] text-slate-400">Estimated unique devices</div>
+      </div>
+
+      <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
+        <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Today</div>
+        <div class="text-3xl font-black text-emerald-600 dark:text-emerald-400">{todayCount}</div>
+        <div class="text-[11px] text-slate-400">Scans in past 24 hours</div>
+      </div>
+
+      <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
+        <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Last 7 Days</div>
+        <div class="text-3xl font-black text-amber-600 dark:text-amber-400">{last7dCount}</div>
+        <div class="text-[11px] text-slate-400">Past 7 days volume</div>
+      </div>
+    </div>
+
+    {scans.length === 0 ? (
+      <div class="p-12 text-center rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+        <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        </div>
+        <h3 class="text-base font-bold text-slate-900 dark:text-white">No scans yet</h3>
+        <p class="text-xs text-slate-500 max-w-sm mx-auto">
+          Share your dynamic QR code on print flyers, posters, or packaging to start collecting real-time scan analytics.
+        </p>
+      </div>
+    ) : (
+      <>
+        <!-- Timeline Chart Card -->
+        <div class="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">Scan Activity (Last 14 Days)</h2>
+            <span class="text-xs font-semibold text-slate-500">Daily Breakdown</span>
+          </div>
+
+          <div class="h-44 flex items-end gap-2 pt-6 pb-2 px-2 border-b border-slate-100 dark:border-slate-800">
+            {timeline.map((point) => {
+              const heightPct = Math.max((point.count / maxDailyCount) * 100, 6);
+              return (
+                <div class="flex-1 flex flex-col items-center gap-1 group relative">
+                  <div class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {point.count}
+                  </div>
+                  <div
+                    style={`height: ${heightPct}%;`}
+                    class="w-full max-w-[28px] rounded-t-lg bg-indigo-500 group-hover:bg-indigo-600 transition-all shadow-xs"
+                  ></div>
+                  <span class="text-[9px] text-slate-400 whitespace-nowrap overflow-hidden text-ellipsis">
+                    {point.dateStr.split(' ')[1]}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <!-- Demographics Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Top Countries -->
+          <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">Top Countries</h2>
+            <div class="space-y-3">
+              {topCountries.map(([country, count]) => {
+                const pct = Math.round((count / scans.length) * 100);
+                return (
+                  <div class="space-y-1">
+                    <div class="flex justify-between text-xs font-bold text-slate-800 dark:text-slate-200">
+                      <span>{country}</span>
+                      <span class="text-slate-500">{count} ({pct}%)</span>
+                    </div>
+                    <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                      <div class="h-full bg-indigo-500 rounded-full" style={`width: ${pct}%`}></div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <!-- Device Breakdown -->
+          <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">Device Category</h2>
+            <div class="space-y-3">
+              {topDevices.map(([device, count]) => {
+                const pct = Math.round((count / scans.length) * 100);
+                return (
+                  <div class="space-y-1">
+                    <div class="flex justify-between text-xs font-bold text-slate-800 dark:text-slate-200 capitalize">
+                      <span>{device}</span>
+                      <span class="text-slate-500">{count} ({pct}%)</span>
+                    </div>
+                    <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                      <div class="h-full bg-emerald-500 rounded-full" style={`width: ${pct}%`}></div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <!-- Top Browsers -->
+          <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">Browsers</h2>
+            <div class="space-y-3">
+              {topBrowsers.map(([browser, count]) => {
+                const pct = Math.round((count / scans.length) * 100);
+                return (
+                  <div class="space-y-1">
+                    <div class="flex justify-between text-xs font-bold text-slate-800 dark:text-slate-200">
+                      <span>{browser}</span>
+                      <span class="text-slate-500">{count} ({pct}%)</span>
+                    </div>
+                    <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                      <div class="h-full bg-purple-500 rounded-full" style={`width: ${pct}%`}></div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <!-- Operating Systems -->
+          <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">Operating Systems</h2>
+            <div class="space-y-3">
+              {topOs.map(([os, count]) => {
+                const pct = Math.round((count / scans.length) * 100);
+                return (
+                  <div class="space-y-1">
+                    <div class="flex justify-between text-xs font-bold text-slate-800 dark:text-slate-200">
+                      <span>{os}</span>
+                      <span class="text-slate-500">{count} ({pct}%)</span>
+                    </div>
+                    <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                      <div class="h-full bg-amber-500 rounded-full" style={`width: ${pct}%`}></div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </>
+    )}
+  </div>
+</DashboardLayout>
+
+<script>
+  const copyBtn = document.getElementById('copy-short-url-btn');
+  const copyLabel = document.getElementById('copy-btn-label');
+
+  copyBtn?.addEventListener('click', async () => {
+    const url = copyBtn.getAttribute('data-url');
+    if (!url) return;
+    try {
+      await navigator.clipboard.writeText(url);
+      if (copyLabel) {
+        copyLabel.innerText = 'Copied!';
+        setTimeout(() => (copyLabel.innerText = 'Copy Short URL'), 2000);
+      }
+    } catch {
+      alert('Failed to copy URL.');
+    }
+  });
+</script>

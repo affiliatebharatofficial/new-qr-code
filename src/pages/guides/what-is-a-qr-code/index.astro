@@ -1,0 +1,103 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://qrcode.page/' },
+    { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://qrcode.page/guides' },
+    { '@type': 'ListItem', position: 3, name: 'What is a QR Code', item: 'https://qrcode.page/guides/what-is-a-qr-code' },
+  ],
+};
+
+const articleJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'What is a QR Code? Complete Beginner Guide & Technical Breakdown',
+  description: 'Understand how Quick Response codes store binary matrix data, error correction levels, and how smartphone cameras scan them.',
+  publisher: {
+    '@type': 'Organization',
+    name: 'QR Code Generator',
+    url: 'https://qrcode.page',
+  },
+};
+---
+
+<BaseLayout
+  title="What is a QR Code? Complete Beginner Guide & Anatomy"
+  description="Discover how Quick Response (QR) codes work, their 2D matrix structure, error correction levels, and why they are essential for modern connectivity."
+  canonical="https://qrcode.page/guides/what-is-a-qr-code"
+  jsonLd={[breadcrumbJsonLd, articleJsonLd]}
+>
+  <article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-8">
+    <!-- Breadcrumbs -->
+    <nav class="flex items-center gap-2 text-xs font-semibold text-slate-400" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-indigo-600">Home</a>
+      <span>/</span>
+      <a href="/guides" class="hover:text-indigo-600">Guides</a>
+      <span>/</span>
+      <span class="text-slate-600 dark:text-slate-300 truncate">What is a QR Code?</span>
+    </nav>
+
+    <!-- Header -->
+    <header class="space-y-3">
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+        What is a QR Code? Complete Beginner Guide &amp; Technical Breakdown
+      </h1>
+      <p class="text-xs text-slate-400 font-mono">Updated August 2026 • 4 min read</p>
+    </header>
+
+    <!-- Content Body -->
+    <div class="prose prose-slate dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed space-y-6 text-slate-700 dark:text-slate-300">
+      <p>
+        A <strong>QR code</strong> (short for <em>Quick Response code</em>) is a two-dimensional matrix barcode invented in 1994 by Denso Wave. Unlike traditional one-dimensional UPC barcodes that hold information horizontally, QR codes store data both horizontally and vertically. This allows them to encode hundreds of times more data in a fraction of the physical space.
+      </p>
+
+      <h2 class="text-lg font-bold text-slate-900 dark:text-white pt-4">The Anatomy of a QR Code</h2>
+      <p>Every standard QR code consists of several key functional components:</p>
+      <ul class="list-disc pl-5 space-y-1.5">
+        <li><strong>Finder Patterns (Corner Eyes):</strong> The three distinctive square targets at the corners that allow camera sensors to recognize code orientation and tilt.</li>
+        <li><strong>Timing Patterns:</strong> Alternating black and white modules between finder patterns that help determine grid coordinates.</li>
+        <li><strong>Quiet Zone:</strong> The essential blank margin surrounding the outer perimeter of the code that separates modules from surrounding visual noise.</li>
+        <li><strong>Data Modules:</strong> The central grid containing the binary encoded payload and Reed-Solomon error correction blocks.</li>
+      </ul>
+
+      <h2 class="text-lg font-bold text-slate-900 dark:text-white pt-4">Understanding Error Correction (Reed-Solomon)</h2>
+      <p>
+        QR codes incorporate mathematical error correction algorithms. This enables scanners to read the code even if portions are covered, scratched, or obscured by a central logo.
+      </p>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 text-center text-xs">
+        <div class="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+          <div class="font-bold text-indigo-600">Level L</div>
+          <div class="text-[11px] text-slate-400">~7% recovery</div>
+        </div>
+        <div class="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+          <div class="font-bold text-indigo-600">Level M (Default)</div>
+          <div class="text-[11px] text-slate-400">~15% recovery</div>
+        </div>
+        <div class="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+          <div class="font-bold text-indigo-600">Level Q</div>
+          <div class="text-[11px] text-slate-400">~25% recovery</div>
+        </div>
+        <div class="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+          <div class="font-bold text-indigo-600">Level H (Logos)</div>
+          <div class="text-[11px] text-slate-400">~30% recovery</div>
+        </div>
+      </div>
+
+      <h2 class="text-lg font-bold text-slate-900 dark:text-white pt-4">Start Creating Free QR Codes</h2>
+      <p>
+        Generate your own branded static or dynamic QR code instantly without installing software or creating an account.
+      </p>
+      <div class="pt-2">
+        <a
+          href="/"
+          class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-xs bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/20 transition-all"
+        >
+          Open Free QR Generator &rarr;
+        </a>
+      </div>
+    </div>
+  </article>
+</BaseLayout>

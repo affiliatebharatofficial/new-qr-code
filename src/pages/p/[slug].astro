@@ -1,0 +1,490 @@
+---
+import { getDb } from '../../lib/db/client';
+import { buildVCardPayload, buildEventPayload } from '../../lib/qr/payloads';
+
+const { slug } = Astro.params;
+const db = getDb(Astro.locals);
+
+const res = await db.prepare('SELECT * FROM landing_pages WHERE slug = ?').bind(slug).all();
+const page = res.results?.[0] as any;
+
+const isPublished = page && page.status === 'published';
+
+let content: any = {};
+let design: any = {};
+
+if (page) {
+  try {
+    content = typeof page.content_json === 'string' ? JSON.parse(page.content_json) : (page.content_json || {});
+    design = typeof page.design_json === 'string' ? JSON.parse(page.design_json) : (page.design_json || {});
+  } catch {
+    content = {};
+    design = {};
+  }
+}
+
+const themeBg = design.theme === 'dark' ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900';
+const cardBg = design.theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200';
+const primaryColor = design.primaryColor || '#0f172a';
+
+// Pre-generate downloadable vCard data for Business Card / Contact
+let vCardData = '';
+if (page && (page.type === 'business_card' || page.type === 'contact')) {
+  vCardData = buildVCardPayload({
+    firstName: content.name || 'Contact',
+    company: content.company || '',
+    jobTitle: content.title || '',
+    phone: content.phone || '',
+    email: content.email || '',
+    website: content.website || '',
+    address: content.address || '',
+  });
+}
+---
+
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>{isPublished ? page.title : 'Page Unavailable'}</title>
+  {isPublished && (
+    <>
+      <meta property="og:title" content={page.title} />
+      <meta property="og:description" content={content.bio || content.description || 'View details and connect.'} />
+      {content.image && <meta property="og:image" content={content.image} />}
+    </>
+  )}
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+  </style>
+</head>
+<body class={`min-h-full flex flex-col justify-between ${themeBg} antialiased selection:bg-slate-900 selection:text-white`}>
+  {!isPublished ? (
+    <!-- Page Unavailable / Moderated State -->
+    <div class="max-w-sm mx-auto my-auto p-6 text-center space-y-3">
+      <div class="w-12 h-12 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-500 flex items-center justify-center mx-auto text-xl font-bold">
+        🔒
+      </div>
+      <h1 class="text-lg font-bold text-slate-900 dark:text-white">Page Unavailable</h1>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        This QR landing page is currently unavailable or has been unpublished by the author.
+      </p>
+    </div>
+  ) : (
+    <main class="w-full max-w-sm mx-auto p-4 sm:p-6 space-y-4">
+      
+      <!-- 1. Digital Business Card -->
+      {page.type === 'business_card' && (
+        <div class={`rounded-xl border ${cardBg} shadow-card overflow-hidden p-6 text-center space-y-5`}>
+          <!-- Avatar / Profile Photo -->
+          <div class="relative w-20 h-20 mx-auto">
+            {content.avatar ? (
+              <img src={content.avatar} alt={content.name} class="w-full h-full rounded-full object-cover border border-slate-200 dark:border-slate-700" />
+            ) : (
+              <div class="w-full h-full rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center text-2xl font-black">
+                {(content.name || 'U')[0]}
+              </div>
+            )}
+          </div>
+
+          <div class="space-y-0.5">
+            <h1 class="text-lg font-extrabold text-slate-900 dark:text-white">{content.name}</h1>
+            {content.title && <p class="text-xs font-semibold text-slate-600 dark:text-slate-400">{content.title}</p>}
+            {content.company && <p class="text-xs text-slate-500">{content.company}</p>}
+          </div>
+
+          {content.bio && (
+            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              {content.bio}
+            </p>
+          )}
+
+          <!-- Quick Action Buttons -->
+          <div class="grid grid-cols-3 gap-1.5">
+            {content.phone && (
+              <a href={`tel:${content.phone}`} class="p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-center flex flex-col items-center gap-0.5 hover:bg-slate-200 transition-colors">
+                <span class="text-xs font-bold">Call</span>
+                <span class="text-[9px] text-slate-500">Phone</span>
+              </a>
+            )}
+            {content.email && (
+              <a href={`mailto:${content.email}`} class="p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-center flex flex-col items-center gap-0.5 hover:bg-slate-200 transition-colors">
+                <span class="text-xs font-bold">Email</span>
+                <span class="text-[9px] text-slate-500">Message</span>
+              </a>
+            )}
+            {content.website && (
+              <a href={content.website} target="_blank" rel="noopener noreferrer" class="p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-center flex flex-col items-center gap-0.5 hover:bg-slate-200 transition-colors">
+                <span class="text-xs font-bold">Web</span>
+                <span class="text-[9px] text-slate-500">Visit ↗</span>
+              </a>
+            )}
+          </div>
+
+          <!-- Save Contact CTA -->
+          {vCardData && (
+            <button
+              type="button"
+              id="save-contact-btn"
+              data-vcard={vCardData}
+              data-filename={`${(content.name || 'contact').replace(/\s+/g, '_')}.vcf`}
+              class="w-full py-2.5 px-4 rounded-lg font-bold text-xs bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-subtle cursor-pointer flex items-center justify-center gap-2"
+            >
+              <span>👤 Save Contact to Phone</span>
+            </button>
+          )}
+
+          <!-- Social Links -->
+          {content.socials && Object.keys(content.socials).length > 0 && (
+            <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-center gap-2 flex-wrap text-xs">
+              {Object.entries(content.socials).map(([net, link]: any) => (
+                <a href={link} target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-semibold capitalize transition-colors">
+                  {net} ↗
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      <!-- 2. Restaurant Menu -->
+      {page.type === 'menu' && (
+        <div class="space-y-4">
+          <div class={`rounded-xl border ${cardBg} shadow-card p-5 text-center space-y-2`}>
+            {content.logo && <img src={content.logo} alt={content.restaurantName} class="w-14 h-14 rounded-lg object-cover mx-auto mb-1.5 border border-slate-200" />}
+            <h1 class="text-lg font-extrabold text-slate-900 dark:text-white">{content.restaurantName || page.title}</h1>
+            {content.description && <p class="text-xs text-slate-500">{content.description}</p>}
+          </div>
+
+          <!-- Menu Sections -->
+          {(content.sections || []).map((sec: any) => (
+            <div class={`rounded-xl border ${cardBg} shadow-card p-4 space-y-3`}>
+              <h2 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1.5">
+                {sec.title}
+              </h2>
+              <div class="space-y-2.5 divide-y divide-slate-100 dark:divide-slate-800">
+                {(sec.items || []).map((item: any) => (
+                  <div class="pt-2.5 first:pt-0 flex items-start justify-between gap-3">
+                    <div class="space-y-0.5 flex-1">
+                      <div class="flex items-center gap-1.5">
+                        <span class="text-xs font-bold text-slate-900 dark:text-white">{item.name}</span>
+                        {item.isVegetarian && <span class="text-[9px] px-1 py-0.2 rounded bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 font-mono font-bold">VEG</span>}
+                      </div>
+                      {item.description && <p class="text-[11px] text-slate-500 leading-snug">{item.description}</p>}
+                    </div>
+                    <span class="text-xs font-bold text-slate-900 dark:text-white whitespace-nowrap font-mono">
+                      {content.currency || '$'}{item.price}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <!-- 3. Social Profile Links -->
+      {page.type === 'social_profile' && (
+        <div class={`rounded-xl border ${cardBg} shadow-card p-6 text-center space-y-5`}>
+          <div class="w-16 h-16 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center text-xl font-black mx-auto">
+            {(content.name || 'S')[0]}
+          </div>
+          <div class="space-y-0.5">
+            <h1 class="text-lg font-extrabold text-slate-900 dark:text-white">{content.name || page.title}</h1>
+            {content.bio && <p class="text-xs text-slate-500 leading-relaxed">{content.bio}</p>}
+          </div>
+
+          <div class="space-y-2">
+            {(content.links || []).map((lnk: any) => (
+              <a
+                href={lnk.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="block w-full py-2.5 px-4 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-slate-900 dark:hover:border-white bg-slate-50/50 dark:bg-slate-800/40 font-bold text-xs text-slate-900 dark:text-white transition-colors"
+              >
+                {lnk.title || lnk.platform} &rarr;
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <!-- 4. App Download Page -->
+      {page.type === 'app_download' && (
+        <div class={`rounded-xl border ${cardBg} shadow-card p-6 text-center space-y-5`}>
+          <div class="w-14 h-14 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center text-2xl mx-auto font-black">
+            📱
+          </div>
+          <div class="space-y-0.5">
+            <h1 class="text-lg font-extrabold text-slate-900 dark:text-white">{content.appName || page.title}</h1>
+            {content.description && <p class="text-xs text-slate-500 leading-relaxed">{content.description}</p>}
+          </div>
+
+          <div class="space-y-2 pt-1">
+            {content.iosUrl && (
+              <a
+                href={content.iosUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                id="ios-download-btn"
+                class="block w-full py-2.5 px-4 rounded-lg bg-black text-white font-bold text-xs hover:bg-slate-900 transition-colors"
+              >
+                Download on Apple App Store 🍏
+              </a>
+            )}
+            {content.androidUrl && (
+              <a
+                href={content.androidUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                id="android-download-btn"
+                class="block w-full py-2.5 px-4 rounded-lg bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 transition-colors"
+              >
+                Get it on Google Play 🤖
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+
+      <!-- 5. Business Review Page -->
+      {page.type === 'review' && (
+        <div class={`rounded-xl border ${cardBg} shadow-card p-6 text-center space-y-4`}>
+          <div class="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-500 flex items-center justify-center text-2xl mx-auto border border-amber-200 dark:border-amber-800">
+            ★
+          </div>
+          <div class="space-y-0.5">
+            <h1 class="text-lg font-extrabold text-slate-900 dark:text-white">{content.businessName || page.title}</h1>
+            <p class="text-xs text-slate-500">Rate your experience</p>
+          </div>
+
+          <div class="py-1 text-xl tracking-widest text-amber-400">
+            ★★★★★
+          </div>
+
+          <a
+            href={content.reviewUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="block w-full py-2.5 px-4 rounded-lg font-bold text-xs bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors"
+          >
+            Leave a Google Review &rarr;
+          </a>
+        </div>
+      )}
+
+      <!-- 6. Event Page -->
+      {page.type === 'event' && (
+        <div class={`rounded-xl border ${cardBg} shadow-card p-6 text-center space-y-4`}>
+          <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center text-2xl mx-auto">
+            📅
+          </div>
+          <div class="space-y-0.5">
+            <h1 class="text-lg font-extrabold text-slate-900 dark:text-white">{content.title || page.title}</h1>
+            {content.location && <p class="text-xs font-semibold text-slate-600 dark:text-slate-400">{content.location}</p>}
+          </div>
+
+          <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-800 text-[11px] font-mono space-y-0.5 text-slate-700 dark:text-slate-300">
+            <div>Start: {content.startDate} {content.startTime || ''}</div>
+            {content.endDate && <div>End: {content.endDate} {content.endTime || ''}</div>}
+          </div>
+
+          {content.description && <p class="text-xs text-slate-500 leading-relaxed">{content.description}</p>}
+
+          <button
+            type="button"
+            id="add-to-calendar-btn"
+            data-event={JSON.stringify(content)}
+            class="w-full py-2.5 px-4 rounded-lg font-bold text-xs bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors cursor-pointer"
+          >
+            + Add to Calendar (.ics)
+          </button>
+        </div>
+      )}
+
+      <!-- 7. Product Page -->
+      {page.type === 'product' && (
+        <div class={`rounded-xl border ${cardBg} shadow-card overflow-hidden p-5 space-y-3`}>
+          {content.image && <img src={content.image} alt={content.title} class="w-full h-44 rounded-lg object-cover mb-2 border border-slate-200" />}
+          <div class="flex items-start justify-between gap-2">
+            <h1 class="text-base font-extrabold text-slate-900 dark:text-white">{content.title || page.title}</h1>
+            {content.price && <span class="text-sm font-black text-slate-900 dark:text-white font-mono whitespace-nowrap">{content.price}</span>}
+          </div>
+          {content.description && <p class="text-xs text-slate-500 leading-relaxed">{content.description}</p>}
+          {content.ctaUrl && (
+            <a
+              href={content.ctaUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="block w-full py-2.5 px-4 rounded-lg text-center font-bold text-xs bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 transition-colors"
+            >
+              {content.ctaText || 'Learn More'} &rarr;
+            </a>
+          )}
+        </div>
+      )}
+
+      <!-- 8. Simple Contact Page -->
+      {page.type === 'contact' && (
+        <div class={`rounded-xl border ${cardBg} shadow-card p-6 text-center space-y-4`}>
+          <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center text-2xl mx-auto">
+            👤
+          </div>
+          <div class="space-y-0.5">
+            <h1 class="text-lg font-extrabold text-slate-900 dark:text-white">{content.name || page.title}</h1>
+            {content.company && <p class="text-xs text-slate-500">{content.company}</p>}
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            {content.phone && (
+              <a href={`tel:${content.phone}`} class="p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 font-bold text-xs text-slate-800 dark:text-slate-200 text-center">
+                Call Phone
+              </a>
+            )}
+            {content.email && (
+              <a href={`mailto:${content.email}`} class="p-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 font-bold text-xs text-slate-800 dark:text-slate-200 text-center">
+                Send Email
+              </a>
+            )}
+          </div>
+
+          {vCardData && (
+            <button
+              type="button"
+              id="save-contact-btn"
+              data-vcard={vCardData}
+              data-filename={`${(content.name || 'contact').replace(/\s+/g, '_')}.vcf`}
+              class="w-full py-2.5 px-4 rounded-lg font-bold text-xs bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 transition-colors cursor-pointer"
+            >
+              Save Contact
+            </button>
+          )}
+        </div>
+      )}
+
+    </main>
+  )}
+
+  <!-- Footer & Moderation Trigger -->
+  <footer class="w-full text-center py-4 border-t border-slate-200/80 dark:border-slate-800/80 text-[11px] text-slate-400 space-y-0.5">
+    <div>Hosted via QR Generator Platform</div>
+    {isPublished && (
+      <div>
+        <button type="button" id="open-report-btn" class="text-slate-400 hover:text-red-500 cursor-pointer underline text-[10px]">
+          Report abuse
+        </button>
+      </div>
+    )}
+  </footer>
+
+  <!-- Report Abuse Modal -->
+  <div id="report-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/60">
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 max-w-xs w-full space-y-3 shadow-card">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+        <h3 class="text-xs font-bold text-slate-900 dark:text-white uppercase">Report Issue</h3>
+        <button type="button" id="close-report-btn" class="text-slate-400 hover:text-slate-600 p-1">✕</button>
+      </div>
+      <form id="report-form" class="space-y-2.5" onsubmit="return false;">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Reason</label>
+          <select id="report-reason" class="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-800 text-xs bg-slate-50 dark:bg-slate-800">
+            <option value="spam">Spam / Phishing</option>
+            <option value="inappropriate">Inappropriate Content</option>
+            <option value="copyright">Copyright Infringement</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Details (Optional)</label>
+          <textarea id="report-desc" rows="2" class="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-800 text-xs bg-slate-50 dark:bg-slate-800" placeholder="Describe the issue..."></textarea>
+        </div>
+        <button type="submit" class="w-full py-2 rounded-lg font-bold text-xs bg-red-600 text-white hover:bg-red-700 cursor-pointer">
+          Submit Report
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('#save-contact-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const vcard = btn.getAttribute('data-vcard');
+        const filename = btn.getAttribute('data-filename') || 'contact.vcf';
+        if (!vcard) return;
+        const blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    });
+
+    document.getElementById('add-to-calendar-btn')?.addEventListener('click', () => {
+      const btn = document.getElementById('add-to-calendar-btn');
+      const eventJson = btn?.getAttribute('data-event');
+      if (!eventJson) return;
+      try {
+        const data = JSON.parse(eventJson);
+        const dtStart = (data.startDate || '').replace(/[^0-9]/g, '') + (data.startTime ? 'T' + data.startTime.replace(/[^0-9]/g, '').padEnd(6, '0') : '');
+        const dtEnd = (data.endDate || data.startDate || '').replace(/[^0-9]/g, '') + (data.endTime || data.startTime ? 'T' + (data.endTime || data.startTime).replace(/[^0-9]/g, '').padEnd(6, '0') : '');
+        const icsContent = [
+          'BEGIN:VCALENDAR',
+          'VERSION:2.0',
+          'BEGIN:VEVENT',
+          `SUMMARY:${data.title || 'Event'}`,
+          `DTSTART:${dtStart}`,
+          `DTEND:${dtEnd}`,
+          data.location ? `LOCATION:${data.location}` : '',
+          data.description ? `DESCRIPTION:${data.description}` : '',
+          'END:VEVENT',
+          'END:VCALENDAR',
+        ].filter(Boolean).join('\r\n');
+
+        const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${(data.title || 'event').replace(/\s+/g, '_')}.ics`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        alert('Could not generate calendar file.');
+      }
+    });
+
+    const reportModal = document.getElementById('report-modal');
+    document.getElementById('open-report-btn')?.addEventListener('click', () => {
+      reportModal?.classList.remove('hidden');
+      reportModal?.classList.add('flex');
+    });
+    document.getElementById('close-report-btn')?.addEventListener('click', () => {
+      reportModal?.classList.add('hidden');
+      reportModal?.classList.remove('flex');
+    });
+    document.getElementById('report-form')?.addEventListener('submit', async () => {
+      const reason = (document.getElementById('report-reason') as HTMLSelectElement)?.value;
+      const description = (document.getElementById('report-desc') as HTMLTextAreaElement)?.value;
+      const slug = window.location.pathname.split('/').filter(Boolean).pop();
+      try {
+        const res = await fetch(`/api/landing-pages/${slug}/report`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason, description }),
+        });
+        if (res.ok) {
+          alert('Report submitted. Thank you.');
+          reportModal?.classList.add('hidden');
+          reportModal?.classList.remove('flex');
+        }
+      } catch {
+        alert('Failed to submit report.');
+      }
+    });
+  </script>
+</body>
+</html>

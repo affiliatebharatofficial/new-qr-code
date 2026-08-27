@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is a Phone Call QR Code Generator?';
+const overviewParagraphs = [
+  'A Phone Call QR code generator creates a 2D optical barcode that automatically dials a specified telephone number when scanned by a smartphone camera. The user simply points their camera at the printed code and taps the prompt on screen, immediately launching the native phone dialer with your business or hotline number pre-entered.',
+  'Printed phone numbers on billboards, highway signage, service vans, emergency posters, and brochures are prone to lost conversions because people frequently misdial digits, forget area codes, or find manual dialing inconvenient while on the move. A Phone QR code encodes the standard "tel:+15551234567" URI scheme, removing dialing friction entirely.',
+  'Deploying Phone QR codes enables immediate voice contact for emergency dispatch lines, local locksmiths, roadside towing services, customer hotlines, and concierge desks. Our generator is 100% free, private, client-side, and offers high-resolution PNG and Vector SVG downloads.'
+];
+
+const sectors = [
+  {
+    name: 'Emergency Services & Roadside Assistance',
+    description: 'Print on towing vehicles, parking garage tickets, and roadside callboxes for immediate breakdown assistance.',
+    benefit: 'Enables distressed drivers to connect with dispatchers in one second.'
+  },
+  {
+    name: 'Home Trades & Locksmiths',
+    description: 'Place on refrigerator magnets, utility meters, and local service flyers for urgent plumbing, electrical, or lockout help.',
+    benefit: 'Captures urgent, high-value local inbound service calls.'
+  },
+  {
+    name: 'Hospitality & Concierge Desks',
+    description: 'Display in hotel guest rooms and elevator lobbies for room service, housekeeping, and valet requests.',
+    benefit: 'Connects guests to hotel amenities without looking up internal extension codes.'
+  },
+  {
+    name: 'Crisis Hotlines & Community Support',
+    description: 'Print on public transit posters, community boards, and healthcare pamphlets for immediate counselor access.',
+    benefit: 'Provides discreet, barrier-free access to critical public health resources.'
+  },
+  {
+    name: 'Real Estate Yard Signs',
+    description: 'Add to "For Sale" lawn placards allowing drive-by prospects to speak directly with the listing agent.',
+    benefit: 'Connects agents with high-intent buyers while they are physically parked in front of the home.'
+  },
+  {
+    name: 'Direct Mail & Print Advertising',
+    description: 'Incorporate on magazine ads, direct mail postcards, and local coupon booklets for telephone order placement.',
+    benefit: 'Transforms passive print advertising into direct inbound phone leads.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Enter Telephone Number',
+    description: 'Input your full phone number including country code and area code (e.g. +1 555 123 4567).'
+  },
+  {
+    title: '2. Style Brand Colors',
+    description: 'Pick modern high-contrast colors, select rounded dot modules, and upload your company icon or telephone badge.'
+  },
+  {
+    title: '3. Export Vector SVG or PNG',
+    description: 'Download print-ready Vector SVG files for large format signage or high-definition PNGs for print collateral.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Emergency Utility Placards',
+    description: 'Mounted on water heaters, circuit breaker panels, and HVAC units for emergency repair calls.',
+    example: 'Plumbing contractor placing branded service stickers on residential water tanks.'
+  },
+  {
+    title: 'Highway Billboards & Signage',
+    description: 'High-contrast oversized QR codes on roadside advertising designed for passenger scanning.',
+    example: 'Personal injury law firm displaying an urgent phone consultation QR on highway displays.'
+  },
+  {
+    title: 'Hotel Room Bedside Cards',
+    description: 'Placed beside guest room telephones for instant connection to the front desk or concierge.',
+    example: 'Boutique hotel allowing guests to call concierge directly from their personal mobile phones.'
+  },
+  {
+    title: 'Fleet Vehicle Wraps',
+    description: 'Printed on the rear doors of service vans for pedestrians and stopped traffic.',
+    example: 'Mobile pet grooming service generating local neighborhood phone inquiries.'
+  }
+];
+
+const tips = [
+  'International Country Code Formatting: Always format numbers with the international plus sign and country code (e.g., +1 for USA, +44 for UK) to ensure universal compatibility.',
+  'High Visual Contrast for Driving Distance: Use dark modules on clean white backgrounds to ensure fast camera autofocus from several feet away.',
+  'Clear Action Callout: Always pair the QR code with clear instructional copy such as "Scan to Call Our 24/7 Hotline".',
+  'Vector SVG for Outdoor Signage: Use Vector SVG format when printing oversized signs, vehicle wraps, or vinyl decals to ensure crisp edges.',
+  'Test Across Carriers: Test scan the QR code with multiple smartphones on different telecom networks to ensure direct dialer launching.'
+];
+
+const technicalNotes = 'Standards Compliance: Generates standard RFC 3966 "tel:" URI schemes recognized globally across iOS, Android, and Windows mobile devices.';
+
+const faqs = [
+  {
+    question: 'How does a Phone QR code work when scanned?',
+    answer: 'When a user points their smartphone camera at the QR code, the device immediately detects the phone number and displays a "Call [Phone Number]" prompt. Tapping the prompt launches the phone dialer with the number pre-filled.'
+  },
+  {
+    question: 'Does scanning the QR code make the call automatically without confirmation?',
+    answer: 'No. Modern mobile operating systems (iOS and Android) require an explicit user tap on the screen prompt before placing the call, ensuring user safety against accidental dialing.'
+  },
+  {
+    question: 'How should I format the phone number for maximum compatibility?',
+    answer: 'We recommend international E.164 format: include the plus sign, country code, area code, and phone number without spaces or special characters (for example: +15551234567).'
+  },
+  {
+    question: 'Can I use this for toll-free 1-800 numbers or hotline extensions?',
+    answer: 'Yes! You can encode standard toll-free numbers, local landlines, and direct mobile lines. For extension dialing, most modern phone dialers support standard comma pauses.'
+  },
+  {
+    question: 'Do Phone QR codes expire?',
+    answer: 'No. Static Phone QR codes contain the hardcoded telephone number and have no expiration date. They function permanently as long as the phone number is active.'
+  },
+  {
+    question: 'Are call logs or scans tracked on your servers?',
+    answer: 'No. The Phone QR code is generated 100% client-side in your browser. All phone dialing happens directly between the user\'s phone app and the telecom carrier without our servers ever seeing the call.'
+  }
+];
+
+const relatedTools = [
+  { name: 'SMS QR Generator', slug: 'sms-qr-code-generator', description: 'Send pre-written text messages directly to mobile phones.' },
+  { name: 'WhatsApp QR Generator', slug: 'whatsapp-qr-code-generator', description: 'Start instant direct WhatsApp business conversations.' },
+  { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Share full contact credentials directly to address books.' },
+  { name: 'Email QR Generator', slug: 'email-qr-code-generator', description: 'Launch pre-formatted email inquiries with custom subject lines.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="Phone QR Code Generator — One-Tap Phone Call QR Code"
+  description="Generate free Phone QR codes that dial your number instantly when scanned. Compatible with iPhone and Android. Free vector SVG & PNG download."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="phone"
+      headline="Phone Call QR Code Generator"
+      subheadline="Let customers and clients call your business hotline or emergency line with a single scan—no manual dialing required."
+    />
+  </div>
+
+  <LandingContent
+    heading="Phone Call QR Code"
+    subheading="Eliminate dialing friction and connect customers directly to your voice support."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

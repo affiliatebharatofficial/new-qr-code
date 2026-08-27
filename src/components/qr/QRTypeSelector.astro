@@ -1,0 +1,118 @@
+---
+import { QR_TYPE_METADATA, type QRType } from '../../lib/qr/types';
+
+interface Props {
+  initialType?: QRType;
+}
+
+const { initialType = 'url' } = Astro.props;
+const qrTypes = Object.values(QR_TYPE_METADATA);
+
+const categories = [
+  { id: 'all', name: 'All Types' },
+  { id: 'popular', name: 'Popular' },
+  { id: 'payment', name: 'Payment' },
+  { id: 'business', name: 'Business' },
+  { id: 'personal', name: 'Personal' },
+];
+
+const categoryMap: Record<string, string[]> = {
+  popular: ['url', 'wifi', 'vcard', 'whatsapp', 'venmo', 'paypal', 'cash_app', 'upi'],
+  payment: ['venmo', 'paypal', 'zelle', 'cash_app', 'upi'],
+  business: ['vcard', 'email', 'event', 'app', 'review', 'location', 'phone', 'paypal'],
+  personal: ['social', 'whatsapp', 'phone', 'sms', 'text', 'venmo', 'cash_app'],
+};
+---
+
+<div class="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 shadow-card space-y-3" aria-label="QR Code Type Selection">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-100 dark:border-slate-800">
+    <div class="flex items-center gap-2">
+      <span class="w-1.5 h-1.5 rounded-full bg-slate-900 dark:bg-white"></span>
+      <h2 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">1. Select QR Code Type</h2>
+    </div>
+
+    <!-- Category Filter Segment -->
+    <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-0.5 rounded-lg text-[11px] font-medium" role="tablist" aria-label="QR Type Categories">
+      {categories.map((cat) => (
+        <button
+          type="button"
+          class={`category-filter-btn px-2.5 py-1 rounded-md transition-colors cursor-pointer ${
+            cat.id === 'all'
+              ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-bold shadow-subtle'
+              : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+          }`}
+          data-category={cat.id}
+          role="tab"
+          aria-selected={cat.id === 'all'}
+        >
+          {cat.name}
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <!-- QR Type Grid -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-1.5" role="tablist" aria-label="QR Types" id="qr-types-grid">
+    {qrTypes.map((type) => {
+      const isPopular = categoryMap.popular.includes(type.id);
+      const isPayment = categoryMap.payment.includes(type.id);
+      const isBusiness = categoryMap.business.includes(type.id);
+      const isPersonal = categoryMap.personal.includes(type.id);
+      const isSelected = type.id === initialType;
+
+      return (
+        <button
+          type="button"
+          data-type-btn={type.id}
+          data-is-popular={isPopular ? 'true' : 'false'}
+          data-is-payment={isPayment ? 'true' : 'false'}
+          data-is-business={isBusiness ? 'true' : 'false'}
+          data-is-personal={isPersonal ? 'true' : 'false'}
+          role="tab"
+          id={`tab-btn-${type.id}`}
+          aria-controls={`form-${type.id}`}
+          aria-selected={isSelected}
+          class={`qr-type-item flex flex-col items-center justify-center p-2.5 rounded-lg text-xs transition-colors border cursor-pointer ${
+            isSelected
+              ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white font-bold shadow-subtle'
+              : 'bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 border-slate-200/80 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium'
+          }`}
+        >
+          <span class="truncate w-full text-center leading-tight">{type.name}</span>
+          <span class={`text-[9px] font-mono uppercase mt-0.5 ${isSelected ? 'text-slate-300 dark:text-slate-600' : 'text-slate-400'}`}>
+            {type.id}
+          </span>
+        </button>
+      );
+    })}
+  </div>
+</div>
+
+<script>
+  // Category Filtering Logic
+  document.querySelectorAll('.category-filter-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const cat = btn.getAttribute('data-category');
+      
+      document.querySelectorAll('.category-filter-btn').forEach((b) => {
+        b.className = 'category-filter-btn px-2.5 py-1 rounded-md transition-colors text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 cursor-pointer';
+        b.setAttribute('aria-selected', 'false');
+      });
+      btn.className = 'category-filter-btn px-2.5 py-1 rounded-md transition-colors bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-bold shadow-subtle cursor-pointer';
+      btn.setAttribute('aria-selected', 'true');
+
+      document.querySelectorAll('.qr-type-item').forEach((item: any) => {
+        if (cat === 'all') {
+          item.classList.remove('hidden');
+        } else {
+          const matches = item.getAttribute(`data-is-${cat}`) === 'true';
+          if (matches) {
+            item.classList.remove('hidden');
+          } else {
+            item.classList.add('hidden');
+          }
+        }
+      });
+    });
+  });
+</script>

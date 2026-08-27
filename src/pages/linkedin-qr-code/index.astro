@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is a LinkedIn QR Code Generator?';
+const overviewParagraphs = [
+  'A LinkedIn QR code generator creates an optical 2D barcode that opens your personal LinkedIn profile or corporate LinkedIn company page directly inside the LinkedIn mobile app. When scanned by prospective employers, business partners, conference peers, or clients, the recipient can immediately tap "Connect", "Follow", or send an InMail message in seconds.',
+  'At high-tempo professional conferences, networking mixers, and corporate expos, exchanging business cards often leads to forgotten conversations or manual typing errors when searching for common names on LinkedIn. A LinkedIn QR code provides an instantaneous, direct digital handshake that links physical encounters straight to your verified career history, endorsements, and mutual connections.',
+  'Our free generator enables professional styling, corporate navy palettes, custom dot modules, and high-resolution Vector SVG or PNG downloads for business cards, resumes, conference lanyards, and presentation slide decks.'
+];
+
+const sectors = [
+  {
+    name: 'Conference Speakers & Keynote Panellists',
+    description: 'Display on closing presentation slides allowing hundreds of audience members to connect instantly.',
+    benefit: 'Turns speaking engagements into hundreds of verified high-level industry connections.'
+  },
+  {
+    name: 'Sales Executives & B2B Account Managers',
+    description: 'Add to proposal leave-behinds, meeting agendas, and pitch decks to establish immediate rapport.',
+    benefit: 'Builds executive credibility by providing instant access to past client recommendations.'
+  },
+  {
+    name: 'Job Seekers, Students & Recent Grads',
+    description: 'Print on printed resumes, CV portfolios, and job fair business cards.',
+    benefit: 'Enables hiring managers and recruiters to view full portfolios and endorsements in 1 tap.'
+  },
+  {
+    name: 'Tech Founders, VCs & Angel Investors',
+    description: 'Display on phone lock screens and startup pitch decks during demo days and investor summits.',
+    benefit: 'Facilitates fast investor and founder connections without paper card clutter.'
+  },
+  {
+    name: 'Consultants, Lawyers & Advisory Partners',
+    description: 'Incorporate on business cards and executive correspondence for prospective corporate clients.',
+    benefit: 'Projects an authoritative, accessible professional presence.'
+  },
+  {
+    name: 'Corporate Recruiting & Employer Branding',
+    description: 'Feature on university career fair banners linking directly to the corporate careers page on LinkedIn.',
+    benefit: 'Attracts top-tier student candidates to follow company hiring updates.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Enter Profile or Company URL',
+    description: 'Input your personal profile slug (e.g., https://linkedin.com/in/yourname) or company page link.'
+  },
+  {
+    title: '2. Customize Corporate Branding',
+    description: 'Select professional navy or monochrome colors, pick rounded modules, and add the LinkedIn icon.'
+  },
+  {
+    title: '3. Add to Resumes & Slides',
+    description: 'Download in scalable Vector SVG for print collateral or high-DPI PNG for presentation slide decks.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Keynote Presentation Closing Slides',
+    description: 'Displayed prominently on concluding presentation slides allowing auditorium attendees to connect from their seats.',
+    example: 'Tech keynote speaker adding 300+ enterprise connections during a 45-minute talk.'
+  },
+  {
+    title: 'Printed Resumes & CV Documents',
+    description: 'Placed neatly in the resume header allowing recruiters to review full recommendations and articles.',
+    example: 'Senior software engineer showcasing open-source contributions and peer recommendations.'
+  },
+  {
+    title: 'Conference Lanyard Name Tags',
+    description: 'Printed directly on attendee summit badges for effortless peer networking between sessions.',
+    example: 'Industry expo attendee capturing 75+ qualified B2B leads during a 2-day conference.'
+  },
+  {
+    title: 'Executive Business Cards',
+    description: 'Printed on the back of luxury paper cards providing a direct gateway to your professional network.',
+    example: 'Management consultant providing clients with verified credentials and endorsements.'
+  }
+];
+
+const tips = [
+  'Use Clean Profile Slugs: Use your customized public URL (e.g. linkedin.com/in/firstname-lastname) rather than auto-generated alphanumeric strings for a simpler QR matrix.',
+  'High Resolution for Auditorium Screens: Use high-definition PNG (1024px or 2048px) on presentation slides so audience members in the back row can scan comfortably.',
+  'High Foreground Contrast: Keep modules dark against a pure white background for rapid scanning in dimly lit conference halls.',
+  'Vector SVG for Resume Printing: Export in vector SVG to ensure the QR code prints razor-sharp on high-resolution office laser printers.',
+  'Verify Mobile Deep Linking: Always test scan with both iOS and Android camera apps to confirm direct launching into the LinkedIn mobile app.'
+];
+
+const technicalNotes = 'Standards Compliance: Standard ISO/IEC 18004 QR symbols compatible with all iOS and Android smartphone camera apps and LinkedIn mobile deep links.';
+
+const faqs = [
+  {
+    question: 'How do colleagues connect on LinkedIn using this QR code?',
+    answer: 'When scanned with any smartphone camera, the device automatically opens the LinkedIn mobile app directly to your profile page, where the user can tap "Connect", "Follow", or send a message.'
+  },
+  {
+    question: 'Can I create a LinkedIn QR code for a company page?',
+    answer: 'Yes! Simply enter your company page slug (e.g., https://linkedin.com/company/brandname) in the profile URL input field to direct scanners to your corporate page.'
+  },
+  {
+    question: 'Does the scanner need a special app to read the LinkedIn QR code?',
+    answer: 'No special app is required. Standard built-in camera apps on all modern iPhones and Android smartphones read the QR code natively and launch LinkedIn automatically.'
+  },
+  {
+    question: 'Can I add a LinkedIn logo to the center of the QR code?',
+    answer: 'Yes. Switch to the Logo tab in the customization panel and select the LinkedIn logo or upload your personal portrait. Our tool automatically applies Level H error correction (30%) for reliable scanning.'
+  },
+  {
+    question: 'Do LinkedIn QR codes expire?',
+    answer: 'No. Static LinkedIn QR codes encode your profile URL permanently and have no expiration date. They will work indefinitely as long as your LinkedIn profile remains active.'
+  },
+  {
+    question: 'Are there any scan limits or fees?',
+    answer: 'No. Generating and downloading your LinkedIn QR code is 100% free with unlimited scans forever.'
+  }
+];
+
+const relatedTools = [
+  { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Share full contact credentials directly to smartphone address books.' },
+  { name: 'Digital Business Card', slug: 'digital-business-card', description: 'Create complete contact profile cards for networking.' },
+  { name: 'URL QR Generator', slug: 'url-to-qr-code', description: 'Direct traffic to your personal website or portfolio.' },
+  { name: 'Email QR Generator', slug: 'email-qr-code-generator', description: 'Generate pre-filled emails for business inquiries.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="LinkedIn QR Code Generator — Connect Instantly with Networking QR"
+  description="Generate custom LinkedIn profile and company page QR codes for conferences, resumes, business cards, and presentations. Free vector SVG & PNG download."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="social"
+      headline="LinkedIn Networking QR Code Generator"
+      subheadline="Expand your professional network at summits, conferences, and job interviews with a one-scan LinkedIn QR code."
+    />
+  </div>
+
+  <LandingContent
+    heading="LinkedIn Networking QR Code"
+    subheading="Streamline professional networking at events and conferences with direct LinkedIn profile QR codes."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

@@ -1,0 +1,77 @@
+---
+---
+
+<div class="space-y-2.5 pt-1" aria-label="QR Code Download and Export Options">
+  <!-- Status Message -->
+  <div id="download-success-status" class="hidden p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 items-center justify-center gap-1.5">
+    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+    </svg>
+    <span id="download-status-text">Downloaded successfully</span>
+  </div>
+
+  <!-- Primary Download Buttons (PNG & SVG) -->
+  <div class="grid grid-cols-2 gap-2">
+    <button
+      type="button"
+      id="download-png-btn"
+      class="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg font-bold text-xs bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-subtle cursor-pointer"
+      aria-label="Download QR code as PNG image"
+    >
+      <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+      </svg>
+      <span>Download PNG</span>
+    </button>
+
+    <button
+      type="button"
+      id="download-svg-btn"
+      class="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg font-bold text-xs bg-white dark:bg-slate-800 text-slate-800 dark:text-white border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/80 transition-colors shadow-subtle cursor-pointer"
+      aria-label="Download QR code as Vector SVG"
+    >
+      <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+      </svg>
+      <span>Vector SVG</span>
+    </button>
+  </div>
+
+  <!-- Secondary Actions -->
+  <div class="grid grid-cols-3 gap-1.5">
+    <button
+      type="button"
+      id="save-qr-btn"
+      class="flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer transition-colors"
+      aria-label="Save QR Code"
+    >
+      <span>💾</span> Save
+    </button>
+
+    <button
+      type="button"
+      id="copy-qr-btn"
+      class="relative flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer transition-colors"
+      aria-label="Copy to Clipboard"
+    >
+      <span id="copy-btn-text">📋 Copy</span>
+      <span id="copy-success-tooltip" class="absolute -top-7 left-1/2 -translate-x-1/2 hidden px-2 py-0.5 bg-slate-900 text-white text-[10px] font-bold rounded shadow whitespace-nowrap">
+        Copied!
+      </span>
+    </button>
+
+    <button
+      type="button"
+      id="download-jpg-btn"
+      class="flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer transition-colors"
+      aria-label="Download JPG"
+    >
+      JPG
+    </button>
+  </div>
+
+  <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] text-slate-400 font-mono">
+    <span>Vector Print Ready</span>
+    <span>100% Client-Side</span>
+  </div>
+</div>

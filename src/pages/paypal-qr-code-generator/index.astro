@@ -1,0 +1,49 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+import { getPayPalContent } from '../../lib/i18n/content/paypal';
+
+const content = getPayPalContent('en');
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: content.faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title={content.title}
+  description={content.description}
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="paypal"
+      headline={content.h1}
+      subheadline={content.subheadline}
+    />
+  </div>
+
+  <LandingContent
+    heading={content.heading}
+    subheading={content.subheading}
+    overviewTitle={content.overviewTitle}
+    overviewParagraphs={content.overviewParagraphs}
+    sectors={content.sectors}
+    howItWorks={content.howItWorks}
+    useCases={content.useCases}
+    tips={content.tips}
+    technicalNotes={content.technicalNotes}
+    faqs={content.faqs}
+    relatedTools={content.relatedTools}
+  />
+</BaseLayout>

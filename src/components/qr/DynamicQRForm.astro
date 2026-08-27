@@ -1,0 +1,745 @@
+---
+import Badge from '../ui/Badge.astro';
+
+interface Props {
+  initialType?: string;
+}
+
+const { initialType = 'url' } = Astro.props;
+---
+
+<div class="bg-white dark:bg-slate-900 rounded-xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-card space-y-3.5" aria-label="QR Code Information Form">
+  <div class="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
+    <div class="flex items-center gap-2">
+      <span class="w-1.5 h-1.5 rounded-full bg-slate-900 dark:bg-white"></span>
+      <h2 id="current-type-title" class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
+        2. Enter QR Details
+      </h2>
+    </div>
+    <div class="flex items-center gap-2">
+      <Badge variant="primary" id="active-type-badge">{initialType.toUpperCase()}</Badge>
+      <button
+        type="button"
+        id="generator-reset-btn"
+        class="text-[11px] font-semibold text-slate-400 hover:text-red-500 transition-colors px-2 py-0.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+        title="Reset all form fields to default"
+      >
+        ↺ Reset
+      </button>
+    </div>
+  </div>
+
+  <!-- Inline Validation Error Banner -->
+  <div id="form-inline-error" class="hidden p-2.5 rounded-lg text-xs bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-300 flex items-center gap-2" role="alert" aria-live="assertive">
+    <svg class="w-4 h-4 shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <span id="form-inline-error-text"></span>
+  </div>
+
+  <!-- FORM ENGINE -->
+  <form id="qr-input-form" onsubmit="return false;" class="space-y-3" novalidate>
+    
+    <!-- 1. URL Form -->
+    <div id="form-url" class="type-form space-y-1.5" role="tabpanel" aria-labelledby="tab-btn-url">
+      <label for="input-url" class="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+        Website URL <span class="text-red-500" title="Required">*</span>
+      </label>
+      <input
+        type="url"
+        id="input-url"
+        autocomplete="url"
+        inputmode="url"
+        placeholder="https://example.com"
+        class="w-full px-3.5 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 dark:focus:ring-white text-xs sm:text-sm font-medium transition-colors"
+        value="https://example.com"
+        aria-describedby="url-helper"
+        aria-required="true"
+      />
+      <p id="url-helper" class="text-[11px] text-slate-500">Destination link (must begin with https:// or http://)</p>
+    </div>
+
+    <!-- 2. Text Form -->
+    <div id="form-text" class="type-form hidden space-y-1.5" role="tabpanel" aria-labelledby="tab-btn-text">
+      <div class="flex items-center justify-between">
+        <label for="input-text" class="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+          Plain Text Content <span class="text-red-500" title="Required">*</span>
+        </label>
+        <span id="text-char-count" class="text-[10px] font-mono text-slate-500">29 chars</span>
+      </div>
+      <textarea
+        id="input-text"
+        rows="3"
+        placeholder="Enter plain text, notes, or promo code..."
+        class="w-full px-3.5 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 dark:focus:ring-white text-xs sm:text-sm font-medium transition-colors"
+        aria-describedby="text-helper"
+        aria-required="true"
+      >Hello World from QR Generator!</textarea>
+      <p id="text-helper" class="text-[11px] text-slate-500">Encodes raw text without network requests.</p>
+    </div>
+
+    <!-- 3. Wi-Fi Form -->
+    <div id="form-wifi" class="type-form hidden space-y-3" role="tabpanel" aria-labelledby="tab-btn-wifi">
+      <div>
+        <label for="input-wifi-ssid" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          Network Name (SSID) <span class="text-red-500" title="Required">*</span>
+        </label>
+        <input
+          type="text"
+          id="input-wifi-ssid"
+          placeholder="e.g. Guest-WiFi"
+          class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 text-xs font-medium"
+          value="MyHomeWiFi"
+          aria-required="true"
+        />
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label for="input-wifi-auth" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Encryption Type
+          </label>
+          <select
+            id="input-wifi-auth"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          >
+            <option value="WPA" selected>WPA/WPA2/WPA3 (Standard)</option>
+            <option value="WEP">WEP (Legacy)</option>
+            <option value="nopass">None (Open Network)</option>
+          </select>
+        </div>
+
+        <div id="wifi-pass-container">
+          <label for="input-wifi-pass" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Password
+          </label>
+          <div class="relative">
+            <input
+              type="password"
+              id="input-wifi-pass"
+              placeholder="••••••••"
+              class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 text-xs font-medium pr-10"
+              value="SecretPass123"
+            />
+            <button
+              type="button"
+              id="toggle-wifi-pass"
+              class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs cursor-pointer"
+            >
+              👁️
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. vCard Form -->
+    <div id="form-vcard" class="type-form hidden space-y-3" role="tabpanel" aria-labelledby="tab-btn-vcard">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label for="input-vcard-fn" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            First Name <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="input-vcard-fn"
+            placeholder="John"
+            value="John"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          />
+        </div>
+        <div>
+          <label for="input-vcard-ln" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Last Name
+          </label>
+          <input
+            type="text"
+            id="input-vcard-ln"
+            placeholder="Doe"
+            value="Doe"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label for="input-vcard-org" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Organization / Company
+          </label>
+          <input
+            type="text"
+            id="input-vcard-org"
+            placeholder="Acme Corp"
+            value="Acme Corp"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          />
+        </div>
+        <div>
+          <label for="input-vcard-title" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Job Title
+          </label>
+          <input
+            type="text"
+            id="input-vcard-title"
+            placeholder="Product Director"
+            value="Product Director"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label for="input-vcard-tel" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Phone Number
+          </label>
+          <input
+            type="tel"
+            id="input-vcard-tel"
+            placeholder="+1 555 123 4567"
+            value="+15551234567"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          />
+        </div>
+        <div>
+          <label for="input-vcard-email" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Email Address
+          </label>
+          <input
+            type="email"
+            id="input-vcard-email"
+            placeholder="john@example.com"
+            value="john@example.com"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Email Form -->
+    <div id="form-email" class="type-form hidden space-y-3" role="tabpanel" aria-labelledby="tab-btn-email">
+      <div>
+        <label for="input-email-to" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          Recipient Email <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="email"
+          id="input-email-to"
+          placeholder="hello@example.com"
+          value="hello@example.com"
+          class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+        />
+      </div>
+      <div>
+        <label for="input-email-subject" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          Subject Line
+        </label>
+        <input
+          type="text"
+          id="input-email-subject"
+          placeholder="Inquiry from Website"
+          class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+        />
+      </div>
+    </div>
+
+    <!-- 6. Phone Form -->
+    <div id="form-phone" class="type-form hidden space-y-2" role="tabpanel" aria-labelledby="tab-btn-phone">
+      <label for="input-phone-number" class="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+        Phone Number <span class="text-red-500">*</span>
+      </label>
+      <input
+        type="tel"
+        id="input-phone-number"
+        placeholder="+1 (555) 123-4567"
+        value="+15551234567"
+        class="w-full px-3.5 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs sm:text-sm font-medium"
+      />
+    </div>
+
+    <!-- 7. SMS Form -->
+    <div id="form-sms" class="type-form hidden space-y-3" role="tabpanel" aria-labelledby="tab-btn-sms">
+      <div>
+        <label for="input-sms-phone" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          Phone Number <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="tel"
+          id="input-sms-phone"
+          placeholder="+15551234567"
+          value="+15551234567"
+          class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+        />
+      </div>
+      <div>
+        <label for="input-sms-message" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          Pre-filled Message
+        </label>
+        <textarea
+          id="input-sms-message"
+          rows="2"
+          placeholder="I'd like to book an appointment..."
+          class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- 8. WhatsApp Form -->
+    <div id="form-whatsapp" class="type-form hidden space-y-3" role="tabpanel" aria-labelledby="tab-btn-whatsapp">
+      <div>
+        <label for="input-whatsapp-phone" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          WhatsApp Number (with Country Code) <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="tel"
+          id="input-whatsapp-phone"
+          placeholder="919876543210"
+          value="919876543210"
+          class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+        />
+      </div>
+      <div>
+        <label for="input-whatsapp-message" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          Initial Message
+        </label>
+        <textarea
+          id="input-whatsapp-message"
+          rows="2"
+          placeholder="Hi! I have a question about..."
+          class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- 9. Location Form -->
+    <div id="form-location" class="type-form hidden space-y-3" role="tabpanel" aria-labelledby="tab-btn-location">
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label for="input-location-lat" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Latitude <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="number"
+            step="any"
+            id="input-location-lat"
+            placeholder="37.7749"
+            value="37.7749"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          />
+        </div>
+        <div>
+          <label for="input-location-lng" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Longitude <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="number"
+            step="any"
+            id="input-location-lng"
+            placeholder="-122.4194"
+            value="-122.4194"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. UPI Form -->
+    <div id="form-upi" class="type-form hidden space-y-3" role="tabpanel" aria-labelledby="tab-btn-upi">
+      <div class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-600 dark:text-slate-400">
+        This tool generates QR codes for the destination you provide. Payments are processed by the respective payment service.
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label for="input-upi-vpa" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Virtual Payment Address (VPA / UPI ID) <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="input-upi-vpa"
+            placeholder="merchant@okhdfcbank"
+            value="merchant@upi"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          />
+        </div>
+        <div>
+          <label for="input-upi-name" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Payee Name <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="input-upi-name"
+            placeholder="Store Name"
+            value="Store Merchant"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          />
+        </div>
+      </div>
+      <div>
+        <label for="input-upi-amount" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          Amount in INR (Optional)
+        </label>
+        <input
+          type="number"
+          step="0.01"
+          id="input-upi-amount"
+          placeholder="500.00"
+          class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+        />
+      </div>
+    </div>
+
+    <!-- 10b. Venmo Form -->
+    <div id="form-venmo" class="type-form hidden space-y-3" role="tabpanel" aria-labelledby="tab-btn-venmo">
+      <div class="p-2.5 rounded-lg bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50 text-[11px] text-blue-700 dark:text-blue-300">
+        This tool generates QR codes for the destination you provide. Payments are processed by the respective payment service.
+      </div>
+      <div>
+        <label for="input-venmo-username" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          Venmo Username or Profile URL <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          id="input-venmo-username"
+          placeholder="yourusername or @yourusername"
+          value="yourusername"
+          class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+        />
+        <p class="text-[11px] text-slate-500 mt-1">Encodes destination: https://venmo.com/u/yourusername</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label for="input-venmo-amount" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Amount in USD (Optional)
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            id="input-venmo-amount"
+            placeholder="25.00"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          />
+        </div>
+        <div>
+          <label for="input-venmo-note" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Payment Note / Memo (Optional)
+          </label>
+          <input
+            type="text"
+            id="input-venmo-note"
+            placeholder="Dinner / Services"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- 10c. PayPal Form -->
+    <div id="form-paypal" class="type-form hidden space-y-3" role="tabpanel" aria-labelledby="tab-btn-paypal">
+      <div class="p-2.5 rounded-lg bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50 text-[11px] text-blue-700 dark:text-blue-300">
+        This tool generates QR codes for the destination you provide. Payments are processed by the respective payment service.
+      </div>
+      <div>
+        <label for="input-paypal-input" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          PayPal.Me Username, Email, or Payment URL <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          id="input-paypal-input"
+          placeholder="yourusername or https://paypal.me/yourusername"
+          value="yourusername"
+          class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+        />
+        <p class="text-[11px] text-slate-500 mt-1">Encodes destination: https://paypal.me/yourusername</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label for="input-paypal-amount" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Amount (Optional)
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            id="input-paypal-amount"
+            placeholder="50.00"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          />
+        </div>
+        <div>
+          <label for="input-paypal-currency" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Currency
+          </label>
+          <select
+            id="input-paypal-currency"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          >
+            <option value="USD" selected>USD ($)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="GBP">GBP (£)</option>
+            <option value="CAD">CAD ($)</option>
+            <option value="AUD">AUD ($)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10d. Zelle Form -->
+    <div id="form-zelle" class="type-form hidden space-y-3" role="tabpanel" aria-labelledby="tab-btn-zelle">
+      <div class="p-2.5 rounded-lg bg-purple-50/70 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900/50 text-[11px] text-purple-700 dark:text-purple-300">
+        This tool generates QR codes for the destination you provide. Payments are processed by the respective payment service.
+      </div>
+      <div>
+        <label for="input-zelle-recipient" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          Zelle-Enrolled Email, Mobile Number, or Bank Recipient Link <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          id="input-zelle-recipient"
+          placeholder="e.g. yourname@example.com or +1 555-123-4567"
+          value="recipient@example.com"
+          class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+        />
+        <p class="text-[11px] text-slate-500 mt-1">Encodes recipient info for direct scanning inside supported banking apps.</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label for="input-zelle-name" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Payee / Business Name (Optional)
+          </label>
+          <input
+            type="text"
+            id="input-zelle-name"
+            placeholder="e.g. John Doe / Business"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          />
+        </div>
+        <div>
+          <label for="input-zelle-note" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Note / Memo (Optional)
+          </label>
+          <input
+            type="text"
+            id="input-zelle-note"
+            placeholder="e.g. Invoice / Rent"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- 10e. Cash App Form -->
+    <div id="form-cash_app" class="type-form hidden space-y-3" role="tabpanel" aria-labelledby="tab-btn-cash_app">
+      <div class="p-2.5 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 text-[11px] text-emerald-700 dark:text-emerald-300">
+        This tool generates QR codes for the destination you provide. Payments are processed by the respective payment service.
+      </div>
+      <div>
+        <label for="input-cashapp-cashtag" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          $Cashtag or Cash App URL <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          id="input-cashapp-cashtag"
+          placeholder="$yourcashtag or yourcashtag"
+          value="$yourcashtag"
+          class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+        />
+        <p class="text-[11px] text-slate-500 mt-1">Encodes destination: https://cash.app/$yourcashtag</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label for="input-cashapp-amount" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Amount in USD (Optional)
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            id="input-cashapp-amount"
+            placeholder="15.00"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          />
+        </div>
+        <div>
+          <label for="input-cashapp-note" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Payment Note (Optional)
+          </label>
+          <input
+            type="text"
+            id="input-cashapp-note"
+            placeholder="Coffee / Tip"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- 11. Social Media Form -->
+    <div id="form-social" class="type-form hidden space-y-3" role="tabpanel" aria-labelledby="tab-btn-social">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label for="input-social-platform" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Platform
+          </label>
+          <select
+            id="input-social-platform"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          >
+            <option value="instagram" selected>Instagram</option>
+            <option value="youtube">YouTube</option>
+            <option value="tiktok">TikTok</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="facebook">Facebook</option>
+            <option value="twitter">X (Twitter)</option>
+          </select>
+        </div>
+        <div>
+          <label for="input-social-handle" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Username / Handle / Channel URL <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="input-social-handle"
+            placeholder="username"
+            value="brandhandle"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- 12. App Store Form -->
+    <div id="form-app" class="type-form hidden space-y-3" role="tabpanel" aria-labelledby="tab-btn-app">
+      <div>
+        <label for="input-app-name" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          App Name <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          id="input-app-name"
+          placeholder="Super App"
+          value="SuperApp"
+          class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+        />
+      </div>
+      <div>
+        <label for="input-app-ios" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          Apple App Store URL
+        </label>
+        <input
+          type="url"
+          id="input-app-ios"
+          placeholder="https://apps.apple.com/app/id123456"
+          class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+        />
+      </div>
+      <div>
+        <label for="input-app-android" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          Google Play Store URL
+        </label>
+        <input
+          type="url"
+          id="input-app-android"
+          placeholder="https://play.google.com/store/apps/details?id=com.app"
+          class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+        />
+      </div>
+    </div>
+
+    <!-- 13. Event Form -->
+    <div id="form-event" class="type-form hidden space-y-3" role="tabpanel" aria-labelledby="tab-btn-event">
+      <div>
+        <label for="input-event-title" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          Event Title <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          id="input-event-title"
+          placeholder="Product Launch 2026"
+          value="Tech Conference 2026"
+          class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+        />
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label for="input-event-start-date" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Start Date <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="date"
+            id="input-event-start-date"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          />
+        </div>
+        <div>
+          <label for="input-event-location" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Venue / Location
+          </label>
+          <input
+            type="text"
+            id="input-event-location"
+            placeholder="Convention Hall B"
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- 14. Review Form -->
+    <div id="form-review" class="type-form hidden space-y-3" role="tabpanel" aria-labelledby="tab-btn-review">
+      <div>
+        <label for="input-review-business" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          Business Name <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          id="input-review-business"
+          placeholder="Cafe Bistro"
+          value="Downtown Bistro"
+          class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+        />
+      </div>
+      <div>
+        <label for="input-review-url" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          Google Maps / Review Destination URL <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="url"
+          id="input-review-url"
+          placeholder="https://g.page/r/example/review"
+          value="https://google.com/maps"
+          class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium"
+        />
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<script>
+  // Password Visibility Toggle for Wi-Fi Form
+  const togglePassBtn = document.getElementById('toggle-wifi-pass');
+  const wifiPassInput = document.getElementById('input-wifi-pass') as HTMLInputElement;
+
+  togglePassBtn?.addEventListener('click', () => {
+    if (wifiPassInput) {
+      if (wifiPassInput.type === 'password') {
+        wifiPassInput.type = 'text';
+      } else {
+        wifiPassInput.type = 'password';
+      }
+    }
+  });
+
+  // Hide/Show password based on Open network mode
+  const wifiAuthSelect = document.getElementById('input-wifi-auth') as HTMLSelectElement;
+  const wifiPassContainer = document.getElementById('wifi-pass-container');
+
+  wifiAuthSelect?.addEventListener('change', () => {
+    if (wifiPassContainer) {
+      if (wifiAuthSelect.value === 'nopass') {
+        wifiPassContainer.classList.add('hidden');
+      } else {
+        wifiPassContainer.classList.remove('hidden');
+      }
+    }
+  });
+</script>

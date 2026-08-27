@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Privacy Policy" description="Our privacy commitment: Static QR generation runs 100% client-side. We do not store or track your static QR content.">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 sm:p-12 shadow-sm space-y-8">
+      <div>
+        <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white">Privacy Policy</h1>
+        <p class="text-xs text-slate-400 mt-1">Last Updated: August 2026</p>
+      </div>
+
+      <section class="space-y-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">1. Client-Side Static QR Generation</h2>
+        <p>
+          We believe in privacy-by-design. When you generate static QR codes (such as URLs, plain text, Wi-Fi credentials, vCards, SMS, WhatsApp, or UPI payment strings) on our website without registering an account, the entire generation process executes locally in your web browser using client-side JavaScript.
+        </p>
+        <p>
+          <strong>Your Wi-Fi passwords, contact addresses, or encoded messages are NEVER uploaded to our servers or stored in our database.</strong>
+        </p>
+      </section>
+
+      <section class="space-y-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">2. Dynamic QR Codes & Scan Analytics</h2>
+        <p>
+          For users who create Dynamic QR codes, scanning the code redirects through our edge routing service (<code>/r/:shortCode</code>). We collect privacy-preserving, aggregated statistics including:
+        </p>
+        <ul class="list-disc list-inside space-y-1 pl-2">
+          <li>Timestamp of the scan</li>
+          <li>Country, region, and city (derived from Cloudflare edge headers)</li>
+          <li>Device type (Mobile, Desktop, Tablet) and browser family</li>
+          <li>Referring domain</li>
+        </ul>
+        <p>
+          We do NOT store raw visitor IP addresses or personally identifiable information of individuals who scan your dynamic codes.
+        </p>
+      </section>
+
+      <section class="space-y-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">3. Cookies and Local Storage</h2>
+        <p>
+          We only use essential local storage tokens for remembering your theme preference (Dark/Light mode) and secure HTTP-only session cookies if you log into an account. We do not sell user data to third-party data brokers.
+        </p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>

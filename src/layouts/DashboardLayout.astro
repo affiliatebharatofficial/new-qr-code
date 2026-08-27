@@ -1,0 +1,177 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { getCurrentUser } from '../lib/auth/jwt';
+
+interface Props {
+  title: string;
+  activeNav?: 'overview' | 'qr' | 'templates' | 'bulk' | 'landing_pages' | 'billing' | 'account';
+}
+
+const { title, activeNav = 'overview' } = Astro.props;
+const user = await getCurrentUser(Astro.request, Astro.locals);
+
+if (!user) {
+  return Astro.redirect('/login');
+}
+---
+
+<BaseLayout title={title} noIndex={true}>
+  <div class="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col lg:flex-row">
+    <!-- Desktop Sidebar -->
+    <aside class="hidden lg:flex flex-col w-60 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-5 space-y-6 shrink-0">
+      <div class="flex items-center gap-2.5">
+        <a href="/" class="flex items-center gap-2 group">
+          <div class="w-7 h-7 rounded-md bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center font-black text-xs">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm13-2h3v3h-3v-3zm-5 5h3v3h-3v-3zm5 0h3v3h-3v-3zm-5-5h3v3h-3v-3z"/>
+            </svg>
+          </div>
+          <span class="font-extrabold text-sm text-slate-900 dark:text-white tracking-tight">Workspace</span>
+        </a>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="space-y-1 flex-1 text-xs" aria-label="Dashboard Navigation">
+        <a
+          href="/dashboard"
+          class={`flex items-center gap-2.5 px-3 py-2 rounded-lg font-semibold transition-colors ${
+            activeNav === 'overview'
+              ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+          }`}
+        >
+          <span>📊</span>
+          <span>Overview</span>
+        </a>
+
+        <a
+          href="/dashboard/qr"
+          class={`flex items-center gap-2.5 px-3 py-2 rounded-lg font-semibold transition-colors ${
+            activeNav === 'qr'
+              ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+          }`}
+        >
+          <span>🏁</span>
+          <span>My QR Codes</span>
+        </a>
+
+        <a
+          href="/dashboard/landing-pages"
+          class={`flex items-center gap-2.5 px-3 py-2 rounded-lg font-semibold transition-colors ${
+            activeNav === 'landing_pages'
+              ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+          }`}
+        >
+          <span>📱</span>
+          <span>Landing Pages</span>
+        </a>
+
+        <a
+          href="/dashboard/templates"
+          class={`flex items-center gap-2.5 px-3 py-2 rounded-lg font-semibold transition-colors ${
+            activeNav === 'templates'
+              ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+          }`}
+        >
+          <span>🎨</span>
+          <span>Design Templates</span>
+        </a>
+
+        <a
+          href="/dashboard/bulk"
+          class={`flex items-center gap-2.5 px-3 py-2 rounded-lg font-semibold transition-colors ${
+            activeNav === 'bulk'
+              ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+          }`}
+        >
+          <span>📦</span>
+          <span>Bulk CSV</span>
+        </a>
+
+        <a
+          href="/dashboard/billing"
+          class={`flex items-center gap-2.5 px-3 py-2 rounded-lg font-semibold transition-colors ${
+            activeNav === 'billing'
+              ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+          }`}
+        >
+          <span>💳</span>
+          <span>Billing &amp; Plan</span>
+        </a>
+
+        <a
+          href="/dashboard/account"
+          class={`flex items-center gap-2.5 px-3 py-2 rounded-lg font-semibold transition-colors ${
+            activeNav === 'account'
+              ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+          }`}
+        >
+          <span>👤</span>
+          <span>Account</span>
+        </a>
+
+        <div class="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800">
+          <a
+            href="/"
+            class="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-subtle"
+          >
+            <span>+ Create New QR</span>
+          </a>
+        </div>
+      </nav>
+
+      <!-- User Profile & Logout Footer -->
+      <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <div class="truncate mr-2">
+          <div class="text-xs font-bold text-slate-900 dark:text-white truncate">{user.name}</div>
+          <div class="text-[10px] text-slate-400 truncate font-mono">{user.email}</div>
+        </div>
+        <button
+          type="button"
+          id="sidebar-logout-btn"
+          class="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
+          title="Sign Out"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Mobile Navigation Topbar -->
+    <div class="lg:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-2.5 flex items-center justify-between">
+      <a href="/dashboard" class="flex items-center gap-2 font-bold text-xs text-slate-900 dark:text-white">
+        <span>Workspace</span>
+      </a>
+      <div class="flex items-center gap-1 text-xs">
+        <a href="/dashboard" class="px-2 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100">Overview</a>
+        <a href="/dashboard/qr" class="px-2 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100">QRs</a>
+        <a href="/dashboard/landing-pages" class="px-2 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100">Pages</a>
+        <a href="/dashboard/billing" class="px-2 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100">Billing</a>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 p-6 sm:p-8 lg:p-8 max-w-6xl w-full mx-auto space-y-6">
+      <slot />
+    </main>
+  </div>
+</BaseLayout>
+
+<script>
+  document.getElementById('sidebar-logout-btn')?.addEventListener('click', async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/';
+    } catch {
+      window.location.href = '/';
+    }
+  });
+</script>

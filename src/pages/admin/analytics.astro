@@ -1,0 +1,61 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { parseSessionCookie, verifySessionToken } from '../../lib/auth/jwt';
+import { getDb } from '../../lib/db/client';
+
+const cookieHeader = Astro.request.headers.get('cookie');
+const sessionToken = parseSessionCookie(cookieHeader);
+const user = sessionToken ? await verifySessionToken(sessionToken) : null;
+
+if (!user || user.role !== 'admin') {
+  return Astro.redirect('/login');
+}
+
+const db = getDb(Astro.locals);
+const scansRes = await db.prepare('SELECT * FROM qr_scans ORDER BY scanned_at DESC LIMIT 50').all();
+const scans = scansRes.results || [];
+---
+
+<AdminLayout title="Global Analytics" activeSection="analytics">
+  <div class="space-y-6">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Global Scan Stream</h1>
+      <p class="text-xs text-slate-500 mt-1">Real-time scan event logs across all active dynamic QR codes.</p>
+    </div>
+
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+        <h2 class="text-sm font-bold text-slate-900 dark:text-white">Recent Scans (Last 50)</h2>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="border-b border-slate-100 dark:border-slate-800 text-slate-400 font-semibold uppercase tracking-wider bg-slate-50/50 dark:bg-slate-800/30">
+              <th class="py-3 px-6">Timestamp</th>
+              <th class="py-3 px-6">QR ID</th>
+              <th class="py-3 px-6">Country / City</th>
+              <th class="py-3 px-6">Device</th>
+              <th class="py-3 px-6">Browser & OS</th>
+              <th class="py-3 px-6">Referrer</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+            {scans.map((s: any) => (
+              <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
+                <td class="py-3 px-6 font-mono text-slate-400">
+                  {new Date(s.scanned_at).toLocaleString()}
+                </td>
+                <td class="py-3 px-6 font-mono text-indigo-600 dark:text-indigo-400">{s.qr_id}</td>
+                <td class="py-3 px-6 font-medium">{s.country || 'Unknown'}, {s.city || 'Unknown'}</td>
+                <td class="py-3 px-6 capitalize">{s.device_type}</td>
+                <td class="py-3 px-6">{s.browser} on {s.os}</td>
+                <td class="py-3 px-6 text-slate-400">{s.referrer || 'Direct'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</AdminLayout>

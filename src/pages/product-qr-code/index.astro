@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is a Product QR Code Generator?';
+const overviewParagraphs = [
+  'A Product QR code generator transforms consumer goods packaging, hangtags, retail boxes, and warranty cards into interactive digital gateways. When customers scan the code using a smartphone camera, their phone opens product setup guides, interactive video tutorials, digital warranty registration forms, authenticity verification certificates, or recipe inspirations in seconds.',
+  'Physical product packaging has limited surface real estate and cannot accommodate multi-language user manuals, regulatory disclosures, instructional video demonstrations, or real-time firmware downloads. A Product QR code bridges physical goods directly to dynamic cloud content, eliminating paper user manual printing costs while providing consumers with rich post-purchase support.',
+  'Our platform allows brands to create custom branded QR codes with embedded product logos, custom colors, and rounded dot patterns. Download resolution-independent Vector SVG files for high-speed industrial packaging press lines or high-definition PNGs for small retail hangtags.'
+];
+
+const sectors = [
+  {
+    name: 'Consumer Electronics & Hardware',
+    description: 'Print on product unboxing guides and device chassis linking to setup videos, user manuals, and warranty forms.',
+    benefit: 'Reduces customer support call volume during initial out-of-box setup.'
+  },
+  {
+    name: 'Food, Beverage & Craft Goods',
+    description: 'Place on bottles, jars, and carton packaging detailing farm-to-table ingredient sourcing, recipes, and allergen data.',
+    benefit: 'Builds consumer trust through transparent supply chain storytelling.'
+  },
+  {
+    name: 'Apparel, Footwear & Luxury Goods',
+    description: 'Attach to garment hangtags and sewn-in labels with fabric care instructions and blockchain authenticity certificates.',
+    benefit: 'Combats counterfeit knockoffs and verifies authentic original products.'
+  },
+  {
+    name: 'Cosmetics & Personal Care',
+    description: 'Embed on skincare bottles linking to ingredient safety lists, usage frequency tips, and tutorial videos.',
+    benefit: 'Empowers beauty shoppers with transparent clinical ingredient information.'
+  },
+  {
+    name: 'Pharmaceutical & Health Supplements',
+    description: 'Print on medicine packaging linking to dosage calculators, expiry trackers, and multi-language patient leaflets.',
+    benefit: 'Ensures patients have immediate access to complete medication guidelines.'
+  },
+  {
+    name: 'Home Appliances & Furniture',
+    description: 'Attach to furniture flat-pack boxes directing buyers to 3D interactive assembly instructions.',
+    benefit: 'Eliminates assembly frustration and reduces return rates.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Enter Product Landing URL',
+    description: 'Enter your online user manual link, warranty registration form, video tutorial, or product transparency portal.'
+  },
+  {
+    title: '2. Style Brand & Packaging Theme',
+    description: 'Match your packaging color palette, pick rounded or square dot modules, and upload your brand logo.'
+  },
+  {
+    title: '3. Export Vector SVG for Press',
+    description: 'Download in scalable Vector SVG for packaging dielines and plate printing or high-DPI PNG for retail labels.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Retail Box Packaging Dielines',
+    description: 'Printed directly on retail carton exterior packaging alongside standard UPC barcodes for consumer engagement.',
+    example: 'Audio headphone brand linking to an interactive Bluetooth pairing guide.'
+  },
+  {
+    title: 'Garment Fabric Care Hangtags',
+    description: 'High-quality card hangtags attached to designer clothing detailing sustainable washing techniques.',
+    example: 'Eco-fashion label showcasing organic cotton supply chain tracing.'
+  },
+  {
+    title: 'Artisan Food Jar Labels',
+    description: 'Stickers on jam and sauce jars directing home cooks to chef-curated recipe ideas.',
+    example: 'Gourmet olive oil producer sharing Mediterranean recipe pairing videos.'
+  },
+  {
+    title: 'Warranty & Registration Cards',
+    description: 'Enclosed in product boxes enabling buyers to activate extended warranties in one tap.',
+    example: 'Power tool manufacturer doubling warranty registration rates.'
+  }
+];
+
+const tips = [
+  'Vector SVG for Packaging Dielines: Always provide vector SVG files to packaging printers to guarantee razor-sharp module edges on offset presses.',
+  'Minimum Physical Label Size: For small retail tags and bottles, ensure the printed QR code is at least 15 x 15 mm (0.6 x 0.6 inches).',
+  'High Contrast Against Packaging: Avoid printing low-contrast foil or metallic QR codes; maintain dark modules on a clean solid white backing.',
+  'Clear Consumer Callout: Print explicit instructional copy such as "Scan with phone camera for setup video & warranty registration".',
+  'Dynamic QR Codes for Future Updates: Use Dynamic QR codes so you can update manuals or firmware links without recalling printed retail boxes.'
+];
+
+const technicalNotes = 'Standards Compliance: Standard ISO/IEC 18004 compliant QR symbols compatible with all iOS, Android, and industrial 2D optical scanners.';
+
+const faqs = [
+  {
+    question: 'How do customers scan a Product QR code on packaging?',
+    answer: 'Customers open their smartphone camera app, point it at the product label, and tap the on-screen banner to view the setup guide, user manual, or warranty form in their mobile browser.'
+  },
+  {
+    question: 'Can I change the user manual or video link after printing packaging boxes?',
+    answer: 'If you use a Dynamic QR code, you can update the destination website link anytime from your dashboard without having to redesign or reprint your physical product packaging.'
+  },
+  {
+    question: 'Can I replace printed paper user manuals with a Product QR code?',
+    answer: 'Yes! Many global consumer brands now replace bulky multi-language printed manuals with a single compact QR code on the packaging, saving printing costs and reducing paper waste.'
+  },
+  {
+    question: 'What is the minimum physical print size for a product QR code?',
+    answer: 'For handheld consumer goods, we recommend a minimum size of 15 x 15 mm (0.6 x 0.6 inches) with a 2 mm quiet zone margin around the edges for reliable scanning.'
+  },
+  {
+    question: 'Can I embed our company logo in the center of the QR code?',
+    answer: 'Yes! You can upload your brand logo in PNG, JPG, or SVG format. Our tool automatically applies Level H error correction (30%) so the code scans reliably with your logo centered.'
+  },
+  {
+    question: 'Do Product QR codes expire?',
+    answer: 'Static Product QR codes encode your web link permanently and have no expiration date. They remain active indefinitely as long as your destination website remains online.'
+  }
+];
+
+const relatedTools = [
+  { name: 'URL QR Generator', slug: 'url-to-qr-code', description: 'Convert website links, blogs, and stores into scannable codes.' },
+  { name: 'Google Reviews QR', slug: 'google-reviews-qr-code', description: 'Direct happy customers to write 5-star Google reviews.' },
+  { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Share customer support and corporate contact credentials.' },
+  { name: 'Wi-Fi QR Generator', slug: 'wifi-qr-code-generator', description: 'Let customers connect to in-store Wi-Fi networks easily.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="Product QR Code Generator — Packaging, Manuals & Warranty QR"
+  description="Generate custom Product QR codes for packaging, user manuals, warranty registration, and authenticity verification. Free vector SVG & PNG download."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="url"
+      headline="Product QR Code Generator"
+      subheadline="Connect physical retail products to digital user manuals, warranty forms, video guides, and recipe hubs."
+    />
+  </div>
+
+  <LandingContent
+    heading="Product Packaging QR Code"
+    subheading="Elevate retail packaging with instant access to setup guides, warranties, and transparency data."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

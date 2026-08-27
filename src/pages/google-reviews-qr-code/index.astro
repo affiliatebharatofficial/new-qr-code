@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is a Google Reviews QR Code?';
+const overviewParagraphs = [
+  'A Google Reviews QR code directs satisfied customers straight to your Google Business Profile\'s official review form with a single smartphone camera scan. Instead of asking customers to manually open Google Maps, search for your business name, navigate through profile tabs, and locate the "Write a review" button, a dedicated review QR code launches the 5-star rating window immediately.',
+  'Online customer reviews are among the most influential local SEO ranking factors for Google Local Pack and Google Maps search results. Increasing your review volume, average star rating, and review frequency builds immediate trust with nearby consumers searching for local services. Physical point-of-sale review QR codes eliminate review friction when customer satisfaction is highest—immediately following a meal, service, checkout, or appointment.',
+  'Our free generator creates crisp, high-resolution Google Reviews QR codes with custom styling, brand colors, and central logo placement. Export print-ready Vector SVG files for counter standees, table tents, mirror decals, and packaging slips.'
+];
+
+const sectors = [
+  {
+    name: 'Restaurants, Cafes & Bakeries',
+    description: 'Display on table tents, dining receipt footers, and takeout bags right as diners finish their meals.',
+    benefit: 'Captures immediate 5-star ratings before customers leave the restaurant.'
+  },
+  {
+    name: 'Dental, Medical & Optical Clinics',
+    description: 'Place on checkout reception desks and appointment reminder cards for post-treatment feedback.',
+    benefit: 'Builds vital healthcare trust and social proof in your local metropolitan area.'
+  },
+  {
+    name: 'Auto Repair, Detailing & Dealerships',
+    description: 'Attach to steering wheel key tags and final repair invoices when handing back vehicle keys.',
+    benefit: 'Drives high-value local commercial leads through organic Google Maps visibility.'
+  },
+  {
+    name: 'Hair Salons, Barbershops & Spas',
+    description: 'Place discrete mirror stickers and reception standees where clients admire their new styling.',
+    benefit: 'Converts emotional customer delight into lasting digital reputation.'
+  },
+  {
+    name: 'Home Services & Trades (Plumbing, HVAC)',
+    description: 'Print on technician leave-behind business cards, fridge magnets, and completion receipts.',
+    benefit: 'Helps local trade businesses outrank competitors in neighborhood search results.'
+  },
+  {
+    name: 'Hotels & Boutique B&Bs',
+    description: 'Include on keycard holders, in-room television screens, and express checkout kiosks.',
+    benefit: 'Significantly boosts TripAdvisor and Google travel search ranking.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Paste Your Google Review URL',
+    description: 'Paste your official Google Business Profile review link (e.g., https://g.page/r/[PlaceID]/review or your Google Maps share link).'
+  },
+  {
+    title: '2. Customize Standee Design',
+    description: 'Pick modern high-contrast colors, select rounded dot patterns, and add your business logo or the Google "G" icon.'
+  },
+  {
+    title: '3. Print at Checkout Counter',
+    description: 'Download in scalable Vector SVG or high-DPI PNG. Print on acrylic stands, tabletop cards, or receipt footers.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Checkout Counter Standees',
+    description: 'Sturdy acrylic stands placed next to the credit card terminal with a clear "Review Us on Google" prompt.',
+    example: 'Specialty coffee shop collecting 50+ new monthly Google reviews.'
+  },
+  {
+    title: 'Thermal Dining Receipts',
+    description: 'Printed at the bottom of customer bills with a "Scan to rate your dining experience" call to action.',
+    example: 'Italian restaurant boosting Google rating from 4.2 to 4.8 stars.'
+  },
+  {
+    title: 'Service Leave-Behind Cards',
+    description: 'High-quality thank-you cards handed by technicians directly to homeowners upon successful repair completion.',
+    example: 'Local electrical contractor gathering 200+ verified local homeowner reviews.'
+  },
+  {
+    title: 'Mirror & Window Decals',
+    description: 'Subtle, elegant transparent vinyl decals placed on styling mirrors in salons and barbershops.',
+    example: 'Downtown hair salon converting styling clients into passionate Google reviewers.'
+  }
+];
+
+const tips = [
+  'Use Direct Short Review Links: Obtain your direct Google Review short link from your Google Business Profile dashboard (click "Ask for reviews") so the review window opens directly.',
+  'Clear Call to Action: Accompany the QR code with clear text such as "Scan to rate your visit on Google" so customers know exactly what to expect.',
+  'High Contrast for Dim Lighting: Ensure the QR modules are dark against a clean white background for fast scanning in ambient cafe or salon lighting.',
+  'Train Staff on Asking: Encourage staff to say "If you enjoyed your visit today, scanning the standee on the counter takes just 10 seconds!"',
+  'Respond to All Reviews: Promptly respond to every new Google review to signal active customer service to Google search algorithms.'
+];
+
+const technicalNotes = 'Compatibility: Compatible with all iOS and Android smartphone camera apps. Works with both standard Google Maps place URLs and direct https://g.page/ review deep links.';
+
+const faqs = [
+  {
+    question: 'How do I find my direct Google Review link?',
+    answer: 'Log into your Google Business Profile on Google Search or Maps, click the "Ask for reviews" button in your dashboard, and copy the provided short URL (e.g. https://g.page/r/[YourID]/review).'
+  },
+  {
+    question: 'Does the customer need a Google account to leave a review?',
+    answer: 'Yes. Google requires users to be logged into a Google/Gmail account to submit ratings and reviews, which prevents spam and keeps reviews verified.'
+  },
+  {
+    question: 'Does the QR code take customers directly to the review pop-up?',
+    answer: 'Yes! When you use your official Google Business review link, scanning the QR code opens the review box immediately with the 5-star selection ready for the customer.'
+  },
+  {
+    question: 'Can I print this QR code on customer receipts?',
+    answer: 'Absolutely. Download the high-contrast PNG or SVG format and embed it into your thermal POS receipt printer software template.'
+  },
+  {
+    question: 'Do Google Reviews QR codes expire?',
+    answer: 'No. Static review QR codes never expire. They will work permanently as long as your Google Business Profile remains active.'
+  },
+  {
+    question: 'How many reviews can I collect with this QR code?',
+    answer: 'There are zero limits. You can generate unlimited scans and collect unlimited reviews from your customers completely free.'
+  }
+];
+
+const relatedTools = [
+  { name: 'URL QR Generator', slug: 'url-to-qr-code', description: 'Direct traffic to your website, blog, or booking form.' },
+  { name: 'Wi-Fi QR Generator', slug: 'wifi-qr-code-generator', description: 'Offer frictionless guest Wi-Fi in your cafe or waiting room.' },
+  { name: 'Digital Menu QR', slug: 'restaurant-menu-qr-code', description: 'Create contactless mobile dining menus for restaurant tables.' },
+  { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Share merchant and concierge contact cards with visitors.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="Google Reviews QR Code Generator — Get More 5-Star Customer Reviews"
+  description="Generate custom Google Reviews QR codes. Direct customers straight to your Google Business review box with one camera scan. Free vector SVG & PNG."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="review"
+      headline="Google Reviews QR Code Generator"
+      subheadline="Get more 5-star customer reviews on Google Maps. Send happy customers directly to your review rating box in a single scan."
+    />
+  </div>
+
+  <LandingContent
+    heading="Google Reviews QR Code"
+    subheading="Streamline customer feedback and boost your Google Maps local SEO ranking."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

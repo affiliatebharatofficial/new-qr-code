@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is a URL to QR Code Generator?';
+const overviewParagraphs = [
+  'A URL to QR code generator converts any web address, landing page, blog post, or e-commerce store link into a high-density 2D optical barcode. When prospective customers, readers, or event attendees scan the code using a smartphone camera, their browser opens the destination URL immediately without requiring them to type long website addresses or complex query parameters.',
+  'By replacing manual typing with a single scan, URL QR codes bridge offline physical collateral—such as printed product packaging, direct mail postcards, billboards, vehicle wraps, and trade show banners—directly into digital engagement. Static URL QR codes encode the destination web address directly into the pixel matrix, allowing them to function permanently without ongoing server subscription costs.',
+  'Our browser-based generator enables full visual customization including brand color matching, custom corner eye geometries, round or square module dots, and central logo embedding with automated Reed-Solomon error correction (Level H). Outputs are available as high-resolution PNG raster graphics for screen media or precision Vector SVG paths ready for professional commercial printing.'
+];
+
+const sectors = [
+  {
+    name: 'Retail & E-Commerce',
+    description: 'Print URL QR codes on product packaging, unboxing cards, and store receipts to guide buyers to reorder portals or customer review forms.',
+    benefit: 'Turns one-time in-store customers into recurring digital buyers.'
+  },
+  {
+    name: 'Restaurants & Hospitality',
+    description: 'Direct diners to mobile food menus, wine pairings, reservation forms, and online feedback pages directly from table tents.',
+    benefit: 'Eliminates paper printing costs and allows real-time seasonal menu updates.'
+  },
+  {
+    name: 'Real Estate Agencies',
+    description: 'Place URL QR codes on "For Sale" yard signs, window displays, and property brochures linking directly to 3D virtual tours.',
+    benefit: 'Captures drive-by prospect interest with immediate high-definition media.'
+  },
+  {
+    name: 'Event Organizers & Expos',
+    description: 'Add scannable links on badges, attendee lanyards, stage backdrops, and printed agendas for instant schedule and slide deck access.',
+    benefit: 'Drives high attendee engagement without distributing bulky printed binders.'
+  },
+  {
+    name: 'Professional Services & Consultants',
+    description: 'Incorporate portfolio QR links on presentation handouts, case study one-pagers, and business correspondence.',
+    benefit: 'Provides instant proof of work and client testimonials.'
+  },
+  {
+    name: 'Authors & Publishers',
+    description: 'Embed URL QR codes at the end of book chapters, journal articles, and academic papers to reference live digital citations and video tutorials.',
+    benefit: 'Connects offline printed literature with rich interactive media.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Paste Destination Link',
+    description: 'Enter your full web address including https:// or http:// (e.g., https://yourbrand.com/special-offer).'
+  },
+  {
+    title: '2. Customize Colors & Logo',
+    description: 'Match your corporate color scheme, pick modern rounded or dot modules, and upload your high-resolution brand logo.'
+  },
+  {
+    title: '3. Export Vector SVG or PNG',
+    description: 'Download print-ready vector SVG files for physical signage or high-DPI PNGs for digital assets.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Product Packaging & Hang Tags',
+    description: 'Printed on retail boxes and garment tags to showcase instructions, user manuals, and brand story videos.',
+    example: 'Cosmetics brand adding a tutorial video QR code to product cartons.'
+  },
+  {
+    title: 'Direct Mail & Postcards',
+    description: 'Mailed to local households offering a targeted discount code applied automatically at checkout.',
+    example: 'HVAC repair company sending seasonal inspection mailers with a booking QR.'
+  },
+  {
+    title: 'Trade Show Exhibition Booths',
+    description: 'Displayed on large roll-up pull banners to collect booth visitor contact details and demo requests.',
+    example: 'Software vendor driving booth visitors to an interactive product simulator.'
+  },
+  {
+    title: 'Vehicle Wraps & Delivery Fleets',
+    description: 'Oversized high-contrast QR codes on transit vans and delivery trucks for pedestrians at stoplights.',
+    example: 'Local catering van displaying a quick-order link on rear doors.'
+  }
+];
+
+const tips = [
+  'Protocol Prefix Required: Always ensure your URL begins with https:// or http:// so mobile operating systems recognize it as a web link.',
+  'URL Shortening for Cleaner Patterns: Shorter URLs produce simpler QR matrices with larger pixel blocks that scan significantly faster from greater distances.',
+  'High Foreground-to-Background Contrast: Maintain a dark module color against a clean white or light background for rapid camera autofocus.',
+  'Minimum Physical Print Size: For handheld print materials like business cards, print at a minimum of 20 x 20 mm (0.8 x 0.8 inches).',
+  'Multi-Device Field Testing: Always test the printed proof across both iOS and Android camera apps before beginning large-scale print runs.'
+];
+
+const technicalNotes = 'Standards Compliance: Generates ISO/IEC 18004 compliant standard QR symbols with configurable Reed-Solomon error correction from Level L (7%) up to Level H (30%).';
+
+const faqs = [
+  {
+    question: 'How do I convert a website link into a QR code?',
+    answer: 'Enter or paste your destination website URL into the input field above. The generator immediately creates the QR code in real-time inside your browser. You can then customize colors, add a logo, and download the PNG or SVG file.'
+  },
+  {
+    question: 'Do static website URL QR codes ever expire?',
+    answer: 'No. Static URL QR codes encode the destination address directly into the pixel matrix. They never expire and will work permanently as long as your destination web page remains online.'
+  },
+  {
+    question: 'Can I change the destination URL after printing the QR code?',
+    answer: 'For static QR codes, the URL is permanently encoded and cannot be changed once printed. To update destination links in the future without reprinting physical materials, choose the Dynamic QR option in your dashboard.'
+  },
+  {
+    question: 'What is the best file format for printing URL QR codes?',
+    answer: 'Vector SVG is the industry standard for professional printing because it scales to any physical size (from business cards to giant billboards) with zero loss of sharpness. PNG is best for digital screens and email templates.'
+  },
+  {
+    question: 'Can I put my company logo in the center of the URL QR code?',
+    answer: 'Yes. Upload your logo file (PNG, JPG, or SVG) in the Customization panel. Our system automatically configures Level H error correction so the camera can scan the code even with the center area covered.'
+  },
+  {
+    question: 'Why does my QR code look dense with tiny dots?',
+    answer: 'QR code density depends on the character count of your URL. Long URLs with tracking parameters produce denser codes. Using a shorter URL creates a cleaner, more readable matrix with larger dots.'
+  }
+];
+
+const relatedTools = [
+  { name: 'Wi-Fi QR Generator', slug: 'wifi-qr-code-generator', description: 'Let visitors join your wireless network without typing passwords.' },
+  { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Share full contact details directly to address books.' },
+  { name: 'Google Reviews QR', slug: 'google-reviews-qr-code', description: 'Send satisfied customers directly to your Google review form.' },
+  { name: 'WhatsApp QR Generator', slug: 'whatsapp-qr-code-generator', description: 'Launch instant WhatsApp chats with pre-filled inquiries.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="URL to QR Code Generator — Convert Website Link to QR Code"
+  description="Convert website links, landing pages, and online stores into high-resolution QR codes. Instant client-side generation with vector SVG & PNG export."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="url"
+      headline="URL to QR Code Generator"
+      subheadline="Create crisp, high-resolution QR codes that direct customers straight to your website, store, or landing page."
+    />
+  </div>
+
+  <LandingContent
+    heading="Website URL QR Code"
+    subheading="Convert digital web links into instant scannable touchpoints for print media and packaging."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

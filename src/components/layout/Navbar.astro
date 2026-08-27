@@ -1,0 +1,408 @@
+---
+import { parseSessionCookie, verifySessionToken } from '../../lib/auth/jwt';
+import { getUITranslations } from '../../lib/i18n/ui';
+import { getLanguageSwitcherLinks, getLocalizedPath } from '../../lib/i18n/routes';
+import { LOCALE_METADATA, type Locale } from '../../lib/i18n/config';
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'en' } = Astro.props;
+const ui = getUITranslations(locale);
+const languageLinks = getLanguageSwitcherLinks(Astro.url.pathname);
+const currentLangMeta = LOCALE_METADATA[locale] || LOCALE_METADATA.en;
+
+const cookieHeader = Astro.request.headers.get('cookie');
+const sessionToken = parseSessionCookie(cookieHeader);
+const user = sessionToken ? await verifySessionToken(sessionToken) : null;
+---
+
+<header class="sticky top-0 z-50 w-full bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 transition-colors">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    
+    <!-- Brand Logo Mark -->
+    <a href={getLocalizedPath('/', locale)} class="flex items-center gap-3 group" aria-label={`${ui.brand.title} Homepage`}>
+      <!-- QR Geometric Mark -->
+      <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-black shadow-sm group-hover:scale-105 transition-transform">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm13-2h3v3h-3v-3zm-5 5h3v3h-3v-3zm5 0h3v3h-3v-3zm-5-5h3v3h-3v-3z"/>
+        </svg>
+      </div>
+      <div class="flex flex-col">
+        <div class="flex items-center gap-1.5">
+          <span class="text-base font-extrabold tracking-tight text-slate-900 dark:text-white">{ui.brand.title}</span>
+          <span class="px-1.5 py-0.2 text-[10px] uppercase font-mono font-bold tracking-wider rounded bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60">
+            {ui.brand.badge}
+          </span>
+        </div>
+        <span class="text-[10px] text-slate-500 font-medium -mt-0.5">{ui.brand.subtitle}</span>
+      </div>
+    </a>
+
+    <!-- Primary Desktop Navigation -->
+    <nav class="hidden lg:flex items-center gap-6 text-xs font-semibold text-slate-600 dark:text-slate-300">
+      
+      <!-- Generators Dropdown -->
+      <div class="relative group">
+        <button
+          type="button"
+          class="flex items-center gap-1 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white py-2 transition-colors cursor-pointer"
+          aria-expanded="false"
+        >
+          <span>{ui.nav.generators}</span>
+          <svg class="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition-transform duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        <div class="absolute top-full left-0 w-80 pt-2 hidden group-hover:block transition-all z-50">
+          <div class="bg-white dark:bg-slate-900 rounded-xl p-3 shadow-elevated border border-slate-200 dark:border-slate-800 grid grid-cols-2 gap-2 text-xs font-medium">
+            <div class="space-y-1">
+              <div class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Popular</div>
+              <a href={getLocalizedPath('/url-to-qr-code', locale)} class="px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white flex items-center justify-between">
+                <span>URL Link</span>
+                <span class="text-[10px] text-slate-400 font-mono">Web</span>
+              </a>
+              <a href={getLocalizedPath('/wifi-qr-code-generator', locale)} class="px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white flex items-center justify-between">
+                <span>Wi-Fi</span>
+                <span class="text-[10px] text-slate-400 font-mono">WPA</span>
+              </a>
+              <a href={getLocalizedPath('/vcard-qr-code-generator', locale)} class="px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white flex items-center justify-between">
+                <span>vCard</span>
+                <span class="text-[10px] text-slate-400 font-mono">VCF</span>
+              </a>
+              <a href={getLocalizedPath('/whatsapp-qr-code-generator', locale)} class="px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white flex items-center justify-between">
+                <span>WhatsApp</span>
+                <span class="text-[10px] text-slate-400 font-mono">Chat</span>
+              </a>
+              <a href={getLocalizedPath('/google-reviews-qr-code', locale)} class="px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white flex items-center justify-between">
+                <span>Google Review</span>
+                <span class="text-[10px] text-slate-400 font-mono">★</span>
+              </a>
+            </div>
+
+            <div class="space-y-1">
+              <div class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Payment QR</div>
+              <a href={getLocalizedPath('/venmo-qr-code-generator', locale)} class="px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white flex items-center justify-between">
+                <span>Venmo</span>
+                <span class="text-[10px] text-blue-500 font-mono font-bold">$</span>
+              </a>
+              <a href={getLocalizedPath('/paypal-qr-code-generator', locale)} class="px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white flex items-center justify-between">
+                <span>PayPal</span>
+                <span class="text-[10px] text-blue-600 font-mono font-bold">PP</span>
+              </a>
+              <a href={getLocalizedPath('/cash-app-qr-code-generator', locale)} class="px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white flex items-center justify-between">
+                <span>Cash App</span>
+                <span class="text-[10px] text-emerald-500 font-mono font-bold">$</span>
+              </a>
+              <a href={getLocalizedPath('/zelle-qr-code-generator', locale)} class="px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white flex items-center justify-between">
+                <span>Zelle</span>
+                <span class="text-[10px] text-purple-500 font-mono font-bold">Z</span>
+              </a>
+              <a href={getLocalizedPath('/upi-qr-code-generator', locale)} class="px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white flex items-center justify-between">
+                <span>UPI Pay</span>
+                <span class="text-[10px] text-orange-500 font-mono font-bold">₹</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <a href={getLocalizedPath('/digital-business-card', locale)} class="text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white transition-colors">
+        {ui.nav.businessCards}
+      </a>
+      <a href={getLocalizedPath('/restaurant-menu-qr-code', locale)} class="text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white transition-colors">
+        {ui.nav.menus}
+      </a>
+      <a href="/guides" class="text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white transition-colors">
+        {ui.nav.guides}
+      </a>
+      <a href="/pricing" class="text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white transition-colors">
+        {ui.nav.pricing}
+      </a>
+    </nav>
+
+    <!-- Right Controls: Language Selector, Theme Toggle, Auth, Hamburger -->
+    <div class="flex items-center gap-1.5 sm:gap-3">
+      
+      <!-- Multilingual Dropdown Switcher (Desktop & Tablet) -->
+      <div class="relative group hidden sm:block">
+        <button
+          type="button"
+          class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors text-xs font-semibold cursor-pointer"
+          aria-label="Select Language"
+          title="Select Language"
+        >
+          <span>{currentLangMeta.flag}</span>
+          <span class="hidden md:inline-block">{currentLangMeta.nativeName}</span>
+          <svg class="w-3 h-3 text-slate-400 group-hover:rotate-180 transition-transform duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        <div class="absolute right-0 top-full w-48 pt-2 hidden group-hover:block transition-all z-50">
+          <div class="bg-white dark:bg-slate-900 rounded-xl p-1.5 shadow-elevated border border-slate-200 dark:border-slate-800 space-y-0.5 text-xs">
+            {languageLinks.map((lang) => (
+              <a
+                href={lang.href}
+                class={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+                  lang.active
+                    ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-bold'
+                    : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+              >
+                <div class="flex items-center gap-2">
+                  <span>{lang.flag}</span>
+                  <span>{lang.nativeName}</span>
+                </div>
+                <span class="text-[10px] uppercase font-mono text-slate-400">{lang.locale}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <!-- Theme Toggle Button -->
+      <button
+        id="theme-toggle"
+        type="button"
+        class="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+        aria-label="Toggle Dark / Light Theme"
+        title="Toggle Theme"
+      >
+        <svg id="theme-icon-sun" class="w-4 h-4 hidden dark:block text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+        <svg id="theme-icon-moon" class="w-4 h-4 block dark:hidden text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+      </button>
+
+      {user ? (
+        <div class="hidden sm:flex items-center gap-2">
+          {user.role === 'admin' && (
+            <a
+              href="/admin"
+              class="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20"
+            >
+              {ui.nav.admin}
+            </a>
+          )}
+          <a
+            href="/dashboard"
+            class="px-3.5 py-2 text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-colors"
+          >
+            {ui.nav.dashboard}
+          </a>
+        </div>
+      ) : (
+        <div class="hidden sm:flex items-center gap-2">
+          <a
+            href="/login"
+            class="px-2.5 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white transition-colors"
+          >
+            {ui.nav.login}
+          </a>
+          <a
+            href="/signup"
+            class="px-3.5 py-2 text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all"
+          >
+            {ui.nav.signup}
+          </a>
+        </div>
+      )}
+
+      <!-- Mobile Hamburger Button -->
+      <button
+        id="mobile-menu-btn"
+        type="button"
+        class="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+        aria-label="Toggle Navigation Menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <!-- Hamburger 3-line icon -->
+        <svg id="hamburger-open-icon" class="w-5 h-5 block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <!-- Close X icon -->
+        <svg id="hamburger-close-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Mobile Dropdown Navigation Drawer -->
+  <div id="mobile-menu" class="hidden lg:hidden bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-4 pt-3 pb-6 space-y-4 text-xs font-medium max-h-[85vh] overflow-y-auto shadow-2xl">
+    
+    <!-- Mobile Auth Row if on phone -->
+    <div class="sm:hidden pb-3 border-b border-slate-200 dark:border-slate-800">
+      {user ? (
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-xs text-slate-500 font-semibold truncate">Logged in as {user.name || user.email}</span>
+          <a
+            href="/dashboard"
+            class="px-4 py-2 text-xs font-bold rounded-lg bg-indigo-600 text-white shadow-sm"
+          >
+            {ui.nav.dashboard}
+          </a>
+        </div>
+      ) : (
+        <div class="grid grid-cols-2 gap-2">
+          <a
+            href="/login"
+            class="py-2.5 text-center text-xs font-bold rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900"
+          >
+            {ui.nav.login}
+          </a>
+          <a
+            href="/signup"
+            class="py-2.5 text-center text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+          >
+            {ui.nav.signup}
+          </a>
+        </div>
+      )}
+    </div>
+
+    <!-- Quick Tools Grid -->
+    <div>
+      <div class="font-bold text-[10px] uppercase tracking-wider text-slate-400 pb-1.5">Standard QR Generators</div>
+      <div class="grid grid-cols-2 gap-1.5">
+        <a href={getLocalizedPath('/url-to-qr-code', locale)} class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/60 text-slate-800 dark:text-slate-200 font-semibold flex items-center justify-between">
+          <span>Website URL</span>
+          <span class="text-[10px] text-slate-400 font-mono">Web</span>
+        </a>
+        <a href={getLocalizedPath('/wifi-qr-code-generator', locale)} class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/60 text-slate-800 dark:text-slate-200 font-semibold flex items-center justify-between">
+          <span>Wi-Fi Network</span>
+          <span class="text-[10px] text-slate-400 font-mono">WPA</span>
+        </a>
+        <a href={getLocalizedPath('/vcard-qr-code-generator', locale)} class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/60 text-slate-800 dark:text-slate-200 font-semibold flex items-center justify-between">
+          <span>vCard Contact</span>
+          <span class="text-[10px] text-slate-400 font-mono">VCF</span>
+        </a>
+        <a href={getLocalizedPath('/whatsapp-qr-code-generator', locale)} class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/60 text-slate-800 dark:text-slate-200 font-semibold flex items-center justify-between">
+          <span>WhatsApp Chat</span>
+          <span class="text-[10px] text-slate-400 font-mono">Chat</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Payment QR Tools Grid -->
+    <div>
+      <div class="font-bold text-[10px] uppercase tracking-wider text-slate-400 pb-1.5">Payment QR Tools</div>
+      <div class="grid grid-cols-2 gap-1.5">
+        <a href={getLocalizedPath('/venmo-qr-code-generator', locale)} class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/60 text-slate-800 dark:text-slate-200 font-semibold flex items-center justify-between">
+          <span>Venmo</span>
+          <span class="text-[10px] text-blue-500 font-bold">$</span>
+        </a>
+        <a href={getLocalizedPath('/paypal-qr-code-generator', locale)} class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/60 text-slate-800 dark:text-slate-200 font-semibold flex items-center justify-between">
+          <span>PayPal</span>
+          <span class="text-[10px] text-blue-600 font-bold">PP</span>
+        </a>
+        <a href={getLocalizedPath('/cash-app-qr-code-generator', locale)} class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/60 text-slate-800 dark:text-slate-200 font-semibold flex items-center justify-between">
+          <span>Cash App</span>
+          <span class="text-[10px] text-emerald-500 font-bold">$</span>
+        </a>
+        <a href={getLocalizedPath('/zelle-qr-code-generator', locale)} class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/60 text-slate-800 dark:text-slate-200 font-semibold flex items-center justify-between">
+          <span>Zelle</span>
+          <span class="text-[10px] text-purple-500 font-bold">Z</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Navigation Links -->
+    <div class="space-y-1 pt-1 border-t border-slate-100 dark:border-slate-800">
+      <a href={getLocalizedPath('/digital-business-card', locale)} class="block py-2 px-2.5 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900 font-semibold">{ui.nav.businessCards}</a>
+      <a href={getLocalizedPath('/restaurant-menu-qr-code', locale)} class="block py-2 px-2.5 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900 font-semibold">{ui.nav.menus}</a>
+      <a href="/guides" class="block py-2 px-2.5 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900 font-semibold">{ui.nav.guides}</a>
+      <a href="/pricing" class="block py-2 px-2.5 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900 font-semibold">{ui.nav.pricing}</a>
+    </div>
+
+    <!-- Mobile Language Selector Row -->
+    <div class="pt-3 border-t border-slate-100 dark:border-slate-800">
+      <div class="font-bold text-[10px] uppercase tracking-wider text-slate-400 pb-1.5">Language / Idioma</div>
+      <div class="flex flex-wrap gap-1.5">
+        {languageLinks.map((lang) => (
+          <a
+            href={lang.href}
+            class={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border ${
+              lang.active
+                ? 'bg-indigo-600 text-white border-indigo-600 font-bold shadow-sm'
+                : 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
+            }`}
+          >
+            <span>{lang.flag}</span>
+            <span>{lang.nativeName}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  // Theme Toggle Logic
+  const toggleBtn = document.getElementById('theme-toggle');
+  toggleBtn?.addEventListener('click', () => {
+    const isDark = document.documentElement.classList.contains('dark');
+    if (isDark) {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    } else {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    }
+  });
+
+  // Mobile Menu Toggle with Animated Icons & Accessibility
+  const mobileBtn = document.getElementById('mobile-menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const openIcon = document.getElementById('hamburger-open-icon');
+  const closeIcon = document.getElementById('hamburger-close-icon');
+
+  function toggleMobileNav() {
+    if (!mobileMenu) return;
+    const isHidden = mobileMenu.classList.contains('hidden');
+    if (isHidden) {
+      mobileMenu.classList.remove('hidden');
+      mobileBtn?.setAttribute('aria-expanded', 'true');
+      openIcon?.classList.add('hidden');
+      openIcon?.classList.remove('block');
+      closeIcon?.classList.remove('hidden');
+      closeIcon?.classList.add('block');
+    } else {
+      mobileMenu.classList.add('hidden');
+      mobileBtn?.setAttribute('aria-expanded', 'false');
+      openIcon?.classList.remove('hidden');
+      openIcon?.classList.add('block');
+      closeIcon?.classList.add('hidden');
+      closeIcon?.classList.remove('block');
+    }
+  }
+
+  mobileBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleMobileNav();
+  });
+
+  // Close when clicking outside
+  document.addEventListener('click', (e) => {
+    if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+      const target = e.target as HTMLElement;
+      if (!mobileMenu.contains(target) && !mobileBtn?.contains(target)) {
+        toggleMobileNav();
+      }
+    }
+  });
+
+  // Close on ESC key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && mobileMenu && !mobileMenu.classList.contains('hidden')) {
+      toggleMobileNav();
+    }
+  });
+</script>

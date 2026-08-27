@@ -1,0 +1,154 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getDb } from '../../../lib/db/client';
+
+const url = new URL(Astro.request.url);
+const search = url.searchParams.get('q') || '';
+const typeFilter = url.searchParams.get('type') || '';
+const statusFilter = url.searchParams.get('status') || '';
+
+const db = getDb(Astro.locals);
+
+let query = `
+  SELECT q.*, u.email as owner_email
+  FROM qr_codes q
+  LEFT JOIN users u ON q.user_id = u.id
+  ORDER BY q.created_at DESC
+  LIMIT 50
+`;
+
+const res = await db.prepare(query).all();
+let qrs = res.results || [];
+
+if (search) {
+  qrs = qrs.filter((q: any) => q.name.toLowerCase().includes(search.toLowerCase()) || (q.owner_email && q.owner_email.toLowerCase().includes(search.toLowerCase())));
+}
+if (typeFilter) {
+  qrs = qrs.filter((q: any) => q.type === typeFilter);
+}
+if (statusFilter) {
+  qrs = qrs.filter((q: any) => q.status === statusFilter);
+}
+---
+
+<AdminLayout title="QR Code Management" activeNav="qr_codes">
+  <div class="space-y-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white">QR Code Moderation</h1>
+        <p class="text-xs text-slate-400 mt-1">Audit QR code destinations, scan volume, and disable abusive QR links.</p>
+      </div>
+
+      <form method="GET" class="flex items-center gap-2 flex-wrap text-xs">
+        <input
+          type="text"
+          name="q"
+          value={search}
+          placeholder="Search by name or email..."
+          class="px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-500 focus:ring-1 focus:ring-indigo-500"
+        />
+        <select name="type" class="px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-300">
+          <option value="">All Types</option>
+          <option value="url" selected={typeFilter === 'url'}>URL</option>
+          <option value="wifi" selected={typeFilter === 'wifi'}>Wi-Fi</option>
+          <option value="vcard" selected={typeFilter === 'vcard'}>vCard</option>
+        </select>
+        <button type="submit" class="px-4 py-2 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm">
+          Filter
+        </button>
+      </form>
+    </div>
+
+    <div class="bg-slate-950 rounded-3xl border border-slate-800 overflow-hidden shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-900/60 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+            <tr>
+              <th class="py-3.5 px-6">QR Name</th>
+              <th class="py-3.5 px-6">Owner</th>
+              <th class="py-3.5 px-6">Type</th>
+              <th class="py-3.5 px-6">Destination</th>
+              <th class="py-3.5 px-6">Scans</th>
+              <th class="py-3.5 px-6">Status</th>
+              <th class="py-3.5 px-6 text-right">Moderation</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/80">
+            {qrs.length === 0 ? (
+              <tr>
+                <td colspan="7" class="py-8 text-center text-slate-500">No QR codes found.</td>
+              </tr>
+            ) : (
+              qrs.map((q: any) => {
+                const isDynamic = Boolean(q.is_dynamic);
+                return (
+                  <tr class="hover:bg-slate-900/40 transition-colors">
+                    <td class="py-4 px-6 font-bold text-white">
+                      {q.name}
+                      <div class="text-[10px] text-slate-500 font-mono">{q.id}</div>
+                    </td>
+                    <td class="py-4 px-6 text-slate-300">
+                      {q.owner_email || q.user_id}
+                    </td>
+                    <td class="py-4 px-6">
+                      <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-800 text-slate-300">
+                        {q.type} {isDynamic ? '• Dyn' : ''}
+                      </span>
+                    </td>
+                    <td class="py-4 px-6 text-slate-400 font-mono truncate max-w-xs">
+                      {q.destination || q.payload || '—'}
+                    </td>
+                    <td class="py-4 px-6 text-slate-200 font-bold">
+                      {q.scans_count || 0}
+                    </td>
+                    <td class="py-4 px-6">
+                      <span class={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                        q.status === 'active' ? 'bg-emerald-900/50 text-emerald-300' : 'bg-red-900/50 text-red-300'
+                      }`}>
+                        {q.status}
+                      </span>
+                    </td>
+                    <td class="py-4 px-6 text-right">
+                      <button
+                        type="button"
+                        class="toggle-qr-status-btn px-3 py-1 rounded-lg text-xs font-semibold cursor-pointer border transition-colors"
+                        data-id={q.id}
+                        data-status={q.status}
+                      >
+                        {q.status === 'active' ? 'Disable 🛑' : 'Re-Enable 🟢'}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  document.querySelectorAll('.toggle-qr-status-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id');
+      const curStatus = btn.getAttribute('data-status');
+      const newStatus = curStatus === 'active' ? 'disabled' : 'active';
+
+      if (!confirm(`Are you sure you want to change this QR code status to ${newStatus}?`)) return;
+
+      try {
+        const res = await fetch(`/api/admin/qr-codes/${id}/status`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus }),
+        });
+        if (res.ok) window.location.reload();
+        else alert('Failed to update QR code status.');
+      } catch {
+        alert('Error updating QR status.');
+      }
+    });
+  });
+</script>

@@ -1,0 +1,221 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Generator from '../components/qr/Generator.astro';
+import { QR_TYPE_METADATA } from '../lib/qr/types';
+
+const qrTypes = Object.values(QR_TYPE_METADATA);
+
+const faqs = [
+  {
+    q: 'Is this QR Code Generator free to use?',
+    a: 'Yes. You can generate, customize, and download unlimited high-resolution static QR codes in PNG and SVG formats without creating an account or paying fees.',
+  },
+  {
+    q: 'Do generated static QR codes expire?',
+    a: 'Static QR codes (URLs, Wi-Fi, vCard, SMS, Email, UPI) encode data directly into the pixel pattern. They never expire and function offline indefinitely without external dependencies.',
+  },
+  {
+    q: 'How does client-side QR generation protect privacy?',
+    a: 'Rendering is performed directly in your web browser using HTML5 Canvas and Vector SVG generation. Your sensitive inputs (like Wi-Fi passwords, contact cards, or private notes) are never sent to external servers.',
+  },
+  {
+    q: 'What is the difference between Static and Dynamic QR codes?',
+    a: 'Static QR codes contain hardcoded data and cannot be altered once printed. Dynamic QR codes route through a short redirection URL, enabling you to update destination links at any time and inspect scan telemetry.',
+  },
+  {
+    q: 'Can I add a custom brand logo to my QR code?',
+    a: 'Yes. Upload your PNG, JPG, WebP, or SVG logo. The generator centers the logo, clears interfering background dots, and optimizes Reed-Solomon error correction to preserve scan reliability.',
+  },
+  {
+    q: 'What is the recommended minimum print size for a QR code?',
+    a: 'For close-range handheld materials (like business cards and dining menus), print at a minimum of 20 × 20 mm (0.8 × 0.8 inches). For posters, billboards, or table tents scanned from a distance, maintain a 10:1 distance-to-size ratio (e.g. 10 cm wide for a 1 meter scan distance).',
+  },
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.a,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="Free QR Code Generator — Create Custom QR Codes with Logo (Vector SVG & PNG)"
+  description="Free QR code generator with logo, custom colors, and frames. Create high-resolution static and dynamic QR codes for URLs, Wi-Fi, vCard, WhatsApp, and UPI with instant SVG & PNG downloads."
+  jsonLd={faqJsonLd}
+>
+  <!-- Hero & Generator Workspace (Above the fold) -->
+  <div class="relative bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <Generator
+      initialType="url"
+      headline="Free QR Code Generator"
+      subheadline="Create custom, high-resolution QR codes with your logo in seconds. 100% free with instant vector SVG & PNG downloads."
+    />
+  </div>
+
+  <!-- QR Types Section -->
+  <section class="py-12 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl mx-auto mb-8 text-center">
+        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          Supported QR Payload Formats
+        </h2>
+        <p class="mt-1 text-xs sm:text-sm text-slate-500">
+          Standards-compliant encoding for consumer smartphones, industrial scanners, and point-of-sale systems.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        {qrTypes.map((type) => (
+          <a
+            href={`/${type.slug}`}
+            class="group p-4 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 hover:border-slate-900 dark:hover:border-white transition-colors"
+          >
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                {type.name}
+              </span>
+              <span class="text-[10px] font-mono text-slate-400 uppercase">{type.id}</span>
+            </div>
+            <p class="text-[11px] text-slate-500 leading-snug">
+              {type.description}
+            </p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Technical Features Section -->
+  <section id="features" class="py-12 bg-slate-50 dark:bg-slate-950 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl mx-auto mb-8 text-center">
+        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          Engineered for Print &amp; Digital Production
+        </h2>
+        <p class="mt-1 text-xs sm:text-sm text-slate-500">
+          Built on open web standards for maximum optical contrast and scan resilience.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-2">
+          <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-800 dark:text-slate-200 text-xs font-mono font-bold">
+            01
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white">Zero Server Data Leakage</h3>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            All static QR calculations and rasterizations occur in browser memory. Sensitive passwords and contact vCards remain local.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-2">
+          <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-800 dark:text-slate-200 text-xs font-mono font-bold">
+            02
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white">Precision Vector SVG</h3>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            Clean SVG paths without raster artifacts, ready for Adobe Illustrator, Figma, vinyl cutters, packaging, and commercial printing.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-2">
+          <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-800 dark:text-slate-200 text-xs font-mono font-bold">
+            03
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white">Automated Error Correction</h3>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            Intelligent Reed-Solomon tuning up to Level H (30% recovery) when embedding brand logos, preventing scan degradation.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Static vs Dynamic Comparison -->
+  <section class="py-12 bg-white dark:bg-slate-900 border-y border-slate-200 dark:border-slate-800 transition-colors">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-2xl mx-auto mb-8 text-center">
+        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          Static vs Dynamic QR Architecture
+        </h2>
+        <p class="mt-1 text-xs sm:text-sm text-slate-500">
+          Comparing payload mechanics between standalone static codes and cloud-routed dynamic links.
+        </p>
+      </div>
+
+      <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-slate-500 font-bold uppercase tracking-wider">
+            <tr>
+              <th class="py-3 px-4">Capability</th>
+              <th class="py-3 px-4 text-slate-900 dark:text-white">Static QR</th>
+              <th class="py-3 px-4 text-indigo-600 dark:text-indigo-400">Dynamic QR</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+            <tr>
+              <td class="py-3 px-4 font-semibold">Destination Editability</td>
+              <td class="py-3 px-4 text-slate-400">Fixed at generation</td>
+              <td class="py-3 px-4 text-emerald-600 dark:text-emerald-400 font-semibold">Editable anytime</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-semibold">Scan Telemetry &amp; Geo Metrics</td>
+              <td class="py-3 px-4 text-slate-400">None (Privacy-safe)</td>
+              <td class="py-3 px-4 text-emerald-600 dark:text-emerald-400 font-semibold">Country, device, count</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-semibold">Server Dependency</td>
+              <td class="py-3 px-4 text-emerald-600 dark:text-emerald-400 font-semibold">Zero (Functions offline)</td>
+              <td class="py-3 px-4 text-slate-500">Edge Redirect Worker</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-semibold">Logo &amp; Style Customization</td>
+              <td class="py-3 px-4 text-emerald-600 dark:text-emerald-400 font-semibold">Supported</td>
+              <td class="py-3 px-4 text-emerald-600 dark:text-emerald-400 font-semibold">Supported</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="py-12 bg-slate-50 dark:bg-slate-950 transition-colors">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-2xl mx-auto mb-8 text-center">
+        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          Frequently Asked Questions
+        </h2>
+        <p class="mt-1 text-xs sm:text-sm text-slate-500">
+          Core technical and usage details regarding QR code standards.
+        </p>
+      </div>
+
+      <div class="space-y-2.5">
+        {faqs.map((faq) => (
+          <details class="group bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex items-center justify-between cursor-pointer font-bold text-slate-900 dark:text-white text-xs sm:text-sm">
+              <span>{faq.q}</span>
+              <span class="ml-3 text-slate-400 group-open:rotate-180 transition-transform duration-150">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </span>
+            </summary>
+            <p class="mt-2.5 text-xs text-slate-500 leading-relaxed">
+              {faq.a}
+            </p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

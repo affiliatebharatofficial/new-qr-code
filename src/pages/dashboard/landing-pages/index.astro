@@ -1,0 +1,229 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import { getCurrentUser } from '../../../lib/auth/jwt';
+import { getUserEntitlements } from '../../../lib/billing/entitlements';
+import { getDb } from '../../../lib/db/client';
+
+const user = await getCurrentUser(Astro.request, Astro.locals);
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+const entitlements = await getUserEntitlements(user.id, Astro.locals);
+const limit = entitlements.landingPageLimit;
+
+const db = getDb(Astro.locals);
+const res = await db.prepare(`
+  SELECT lp.*, qr.short_code as qr_short_code, qr.scans_count as qr_scans
+  FROM landing_pages lp
+  LEFT JOIN qr_codes qr ON lp.qr_id = qr.id
+  WHERE lp.user_id = ?
+  ORDER BY lp.created_at DESC
+`).bind(user.id).all();
+
+const pages = (res.results || []).map((p: any) => {
+  let content = {};
+  try {
+    content = typeof p.content_json === 'string' ? JSON.parse(p.content_json) : (p.content_json || {});
+  } catch {
+    content = {};
+  }
+  return { ...p, content_json: content };
+});
+---
+
+<DashboardLayout title="QR Landing Pages" activeNav="qr">
+  <div class="space-y-8 max-w-5xl mx-auto">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold text-slate-400">
+            {pages.length} / {limit === null ? '∞' : limit} Hosted Pages Used
+          </span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-1">
+          QR Landing Pages
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">
+          Create mobile-first Digital Business Cards, Restaurant Menus, App Download pages, and Event portals.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <a
+          href="/dashboard/landing-pages/new"
+          class="px-5 py-2.5 rounded-2xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/20 transition-all"
+        >
+          + Create Landing Page
+        </a>
+      </div>
+    </div>
+
+    <!-- Pages List -->
+    {pages.length === 0 ? (
+      <div class="p-12 text-center rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+        <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h3 class="text-base font-bold text-slate-900 dark:text-white">No landing pages yet</h3>
+        <p class="text-xs text-slate-500 max-w-sm mx-auto">
+          Create a mobile-optimized business card, digital menu, or app download portal connected directly to an editable dynamic QR code.
+        </p>
+        <a
+          href="/dashboard/landing-pages/new"
+          class="inline-block px-5 py-2.5 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+        >
+          Create First Page &rarr;
+        </a>
+      </div>
+    ) : (
+      <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 dark:bg-slate-950/60 border-b border-slate-200 dark:border-slate-800 text-slate-400 uppercase tracking-wider font-bold">
+              <tr>
+                <th class="py-3.5 px-6">Page Name</th>
+                <th class="py-3.5 px-6">Type</th>
+                <th class="py-3.5 px-6">Status</th>
+                <th class="py-3.5 px-6">Scans</th>
+                <th class="py-3.5 px-6">Public URL</th>
+                <th class="py-3.5 px-6 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+              {pages.map((p: any) => {
+                return (
+                  <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                    <td class="py-4 px-6 font-bold text-slate-900 dark:text-white">
+                      <a href={`/p/${p.slug}`} target="_blank" class="hover:text-indigo-600 transition-colors">
+                        {p.title}
+                      </a>
+                    </td>
+                    <td class="py-4 px-6">
+                      <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60">
+                        {p.type.replace('_', ' ')}
+                      </span>
+                    </td>
+                    <td class="py-4 px-6">
+                      <span class={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
+                        p.status === 'published'
+                          ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                      }`}>
+                        <span class={`w-1.5 h-1.5 rounded-full ${p.status === 'published' ? 'bg-emerald-500' : 'bg-slate-400'}`}></span>
+                        {p.status}
+                      </span>
+                    </td>
+                    <td class="py-4 px-6 font-bold text-slate-700 dark:text-slate-300">
+                      {p.qr_id ? (
+                        <a href={`/dashboard/qr/${p.qr_id}/analytics`} class="underline decoration-dotted hover:text-indigo-600">
+                          {p.qr_scans || 0} scans
+                        </a>
+                      ) : (
+                        <span class="text-slate-400">—</span>
+                      )}
+                    </td>
+                    <td class="py-4 px-6 font-mono text-[11px] text-slate-500">
+                      <a href={`/p/${p.slug}`} target="_blank" rel="noopener noreferrer" class="hover:underline text-indigo-600">
+                        /p/{p.slug} ↗
+                      </a>
+                    </td>
+                    <td class="py-4 px-6 text-right space-x-1 whitespace-nowrap">
+                      <a
+                        href={`/p/${p.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-block p-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold"
+                        title="Live Preview"
+                      >
+                        Preview
+                      </a>
+                      <button
+                        type="button"
+                        class="toggle-status-btn inline-block p-1.5 rounded-lg text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/60 font-semibold cursor-pointer"
+                        data-id={p.id}
+                        data-status={p.status}
+                      >
+                        {p.status === 'published' ? 'Unpublish' : 'Publish'}
+                      </button>
+                      <button
+                        type="button"
+                        class="duplicate-page-btn inline-block p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 font-semibold cursor-pointer"
+                        data-id={p.id}
+                      >
+                        Duplicate
+                      </button>
+                      <button
+                        type="button"
+                        class="delete-page-btn inline-block p-1.5 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-950/60 font-semibold cursor-pointer"
+                        data-id={p.id}
+                        data-title={p.title}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )}
+  </div>
+</DashboardLayout>
+
+<script>
+  // Toggle Status (Publish / Unpublish)
+  document.querySelectorAll('.toggle-status-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id');
+      const curStatus = btn.getAttribute('data-status');
+      const newStatus = curStatus === 'published' ? 'unpublished' : 'published';
+      try {
+        const res = await fetch(`/api/landing-pages/${id}/status`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus }),
+        });
+        if (res.ok) window.location.reload();
+      } catch {
+        alert('Failed to update page status.');
+      }
+    });
+  });
+
+  // Duplicate Page
+  document.querySelectorAll('.duplicate-page-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id');
+      if (!id) return;
+      try {
+        const res = await fetch(`/api/landing-pages/${id}/duplicate`, { method: 'POST' });
+        if (res.ok) window.location.reload();
+        else alert('Failed to duplicate landing page.');
+      } catch {
+        alert('Error duplicating page.');
+      }
+    });
+  });
+
+  // Delete Page
+  document.querySelectorAll('.delete-page-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id');
+      const title = btn.getAttribute('data-title');
+      if (!id || !confirm(`Delete landing page "${title}"? Any linked QR codes will no longer open this page.`)) return;
+      try {
+        const res = await fetch(`/api/landing-pages/${id}`, { method: 'DELETE' });
+        if (res.ok) window.location.reload();
+        else alert('Failed to delete landing page.');
+      } catch {
+        alert('Error deleting page.');
+      }
+    });
+  });
+</script>

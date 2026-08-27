@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is an Event Calendar QR Code Generator?';
+const overviewParagraphs = [
+  'An Event Calendar QR code generator encodes calendar invite details (iCalendar / vCalendar / .ICS standard format) into a scannable 2D barcode. When scanned with any smartphone camera, the device automatically prompts the user to add the event—including title, start and end date/time, physical venue location, and event description—straight into their native calendar app (Apple Calendar, Google Calendar, or Microsoft Outlook).',
+  'Event organizers face high drop-off rates when attendees must manually type event dates, times, and venue addresses from physical posters, flyers, or conference agendas into their personal calendars. An Event QR code automates calendar entry with a single tap, drastically improving attendee show-up rates and enabling automated calendar reminder alerts on attendee smartphones.',
+  'Deploying Event QR codes on concert posters, wedding invitations, conference schedules, trade show agendas, and seminar handouts ensures high turnout. Our generator runs 100% client-side, enabling brand styling, custom colors, and vector SVG or PNG downloads.'
+];
+
+const sectors = [
+  {
+    name: 'Conferences & Corporate Summits',
+    description: 'Print on printed conference agendas and name badges for individual keynote breakout sessions.',
+    benefit: 'Enables attendees to bookmark key sessions with automatic push reminders.'
+  },
+  {
+    name: 'Wedding & Social Event Planners',
+    description: 'Include on formal printed RSVP save-the-date cards and invitations for ceremony and reception times.',
+    benefit: 'Ensures guests save the exact date and venue location without manual calendar entry.'
+  },
+  {
+    name: 'Live Concerts, Theaters & Festivals',
+    description: 'Display on festival posters, ticket confirmations, and promotional flyers.',
+    benefit: 'Boosts ticket holder attendance by placing automatic reminder alerts on smartphones.'
+  },
+  {
+    name: 'Universities & Academic Institutions',
+    description: 'Add to orientation guides, lecture schedules, and campus event bulletin boards.',
+    benefit: 'Keeps students organized across complex campus timetables.'
+  },
+  {
+    name: 'Sports Leagues & Tournaments',
+    description: 'Print on team schedule flyers and community board notices for upcoming match times.',
+    benefit: 'Helps fans and parents save season game dates instantly.'
+  },
+  {
+    name: 'Webinars, Workshops & Seminars',
+    description: 'Feature on promotional slide decks and marketing collateral for upcoming live workshops.',
+    benefit: 'Maximizes live broadcast attendance rates.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Enter Event Details',
+    description: 'Input your event title, start and end dates/times, venue location or video link, and a brief description.'
+  },
+  {
+    title: '2. Customize Theme & Styling',
+    description: 'Select brand colors, pick rounded or dot modules, and upload your event logo or calendar badge.'
+  },
+  {
+    title: '3. Export Vector SVG or PNG',
+    description: 'Download in scalable Vector SVG for print flyers and banners or high-DPI PNG for digital assets.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Wedding Save-the-Date Cards',
+    description: 'Printed on luxury paper cards allowing invited guests to lock the date in their phone calendar instantly.',
+    example: 'Couples sharing ceremony times and venue address on wedding stationery.'
+  },
+  {
+    title: 'Conference Breakout Session Signs',
+    description: 'Printed at the entrance of individual conference rooms for immediate session scheduling.',
+    example: 'Tech expo attendees saving afternoon workshop times.'
+  },
+  {
+    title: 'Community Festival Flyers',
+    description: 'Distributed in local neighborhoods for weekend street fairs, farmers markets, and parades.',
+    example: 'Town council boosting civic festival attendance.'
+  },
+  {
+    title: 'Sports Season Schedule Cards',
+    description: 'Handed out to parents and athletes with all home and away game fixtures.',
+    example: 'Youth soccer club distributing season fixture calendars.'
+  }
+];
+
+const tips = [
+  'Time Zone Accuracy: Ensure start and end times correspond to your local venue time zone to avoid calendar offset issues.',
+  'Include Venue Location: Enter a complete street address in the location field so smartphone calendar apps can offer driving alerts.',
+  'Keep Descriptions Focused: Keep event summary notes concise to maintain a clean, easily scannable QR code matrix.',
+  'High Contrast for Event Lighting: Use dark modules against clean white backgrounds for easy scanning in dimly lit auditoriums.',
+  'Verify Across Apple & Google Calendar: Always test scan with both iOS Camera (Apple Calendar) and Android Camera (Google Calendar).'
+];
+
+const technicalNotes = 'Standards Compliance: Generates standard vCalendar / iCalendar 2.0 ("BEGIN:VEVENT\\nSUMMARY:...\\nDTSTART:...") payloads natively parsed by Apple Calendar, Google Calendar, and Microsoft Outlook.';
+
+const faqs = [
+  {
+    question: 'What happens when someone scans an Event QR code?',
+    answer: 'When scanned with a smartphone camera, the device automatically recognizes the calendar payload and opens the native calendar app with the event title, start/end times, venue location, and notes pre-filled, ready to save with 1 tap.'
+  },
+  {
+    question: 'Does this work on both Apple Calendar and Google Calendar?',
+    answer: 'Yes! The standard iCalendar (vEvent) format is universally supported across iOS (Apple Calendar), Android (Google Calendar), Samsung Calendar, and desktop Outlook.'
+  },
+  {
+    question: 'Can I include a full venue address in the event?',
+    answer: 'Yes. You can specify a full street address in the Location field. When saved to the user\'s calendar, their phone can even provide automatic traffic and departure notifications based on their location.'
+  },
+  {
+    question: 'Can I use an Event QR code for online virtual events and webinars?',
+    answer: 'Absolutely. You can paste your Zoom, Google Meet, or Microsoft Teams meeting link into the location or description field so attendees can join with a single click from their calendar.'
+  },
+  {
+    question: 'Do Event QR codes expire?',
+    answer: 'No. Static Event QR codes encode the date and time permanently and will work indefinitely. Users can scan the code even after the event has passed to record historical dates.'
+  },
+  {
+    question: 'Are event details saved to your server?',
+    answer: 'No. Our Event QR code generator runs 100% locally in your browser. All calendar formatting happens in client-side memory without saving event details to external servers.'
+  }
+];
+
+const relatedTools = [
+  { name: 'Location QR Generator', slug: 'location-qr-code-generator', description: 'Guide attendees to the exact physical venue with GPS coordinates.' },
+  { name: 'URL QR Generator', slug: 'url-to-qr-code', description: 'Direct traffic to your event ticketing or registration landing page.' },
+  { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Share speaker and organizer contact cards with attendees.' },
+  { name: 'Google Reviews QR', slug: 'google-reviews-qr-code', description: 'Collect attendee reviews and feedback after the event.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="Event QR Code Generator — Calendar Invite & vEvent QR Code"
+  description="Generate free Event QR codes that add dates, times, and venue locations directly to Apple and Google Calendar with 1 scan. Free vector SVG & PNG."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="event"
+      headline="Event Calendar QR Code Generator"
+      subheadline="Let attendees, guests, and fans save your event dates, times, and venue locations directly into their phone calendar in a single tap."
+    />
+  </div>
+
+  <LandingContent
+    heading="Event Calendar QR Code"
+    subheading="Boost event attendance and eliminate manual calendar entry for weddings, conferences, and festivals."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

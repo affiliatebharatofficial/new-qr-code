@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://qrcode.page/' },
+    { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://qrcode.page/guides' },
+    { '@type': 'ListItem', position: 3, name: 'Restaurant QR Menus', item: 'https://qrcode.page/guides/how-to-use-qr-codes-for-restaurants' },
+  ],
+};
+---
+
+<BaseLayout
+  title="How to Use QR Codes for Contactless Restaurant Menus"
+  description="A complete hospitality guide on creating contactless QR menus, tabletop display recommendations, dynamic price updates, and Google review collection."
+  canonical="https://qrcode.page/guides/how-to-use-qr-codes-for-restaurants"
+  jsonLd={breadcrumbJsonLd}
+>
+  <article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-8">
+    <nav class="flex items-center gap-2 text-xs font-semibold text-slate-400" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-indigo-600">Home</a>
+      <span>/</span>
+      <a href="/guides" class="hover:text-indigo-600">Guides</a>
+      <span>/</span>
+      <span class="text-slate-600 dark:text-slate-300 truncate">Restaurant QR Menus</span>
+    </nav>
+
+    <header class="space-y-3">
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+        How to Use QR Codes for Contactless Restaurant Menus
+      </h1>
+      <p class="text-xs text-slate-400 font-mono">Updated August 2026 • 6 min read</p>
+    </header>
+
+    <div class="prose prose-slate dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed space-y-6 text-slate-700 dark:text-slate-300">
+      <p>
+        Digital QR menus have revolutionized the restaurant industry by eliminating expensive reprinting cycles, enabling instant seasonal price updates, and providing hygienic touchless dining.
+      </p>
+
+      <h2 class="text-lg font-bold text-slate-900 dark:text-white pt-2">1. Always Use Dynamic QR Codes</h2>
+      <p>
+        Never print a static PDF URL on tabletop acrylic stands. If your menu prices change or you introduce new chef specials, a <strong>Dynamic QR code</strong> allows you to update your digital menu instantly in your dashboard without reprinting a single physical tabletop sticker.
+      </p>
+
+      <h2 class="text-lg font-bold text-slate-900 dark:text-white pt-2">2. Optimize for Fast Mobile Loading</h2>
+      <p>
+        Guests in restaurants often browse on cellular data. Avoid massive 50MB PDF downloads. Our hosted <strong>QR Restaurant Menu</strong> generates ultra-lightweight, mobile-first web menus with categorized starters, mains, drinks, and dietary labels that load in under a second.
+      </p>
+
+      <h2 class="text-lg font-bold text-slate-900 dark:text-white pt-2">3. Combine Menus with Guest Wi-Fi &amp; Google Reviews</h2>
+      <p>
+        Maximize table engagement by placing a dual-action card: a <strong>Menu QR</strong> on the front and a <strong>Google Review QR</strong> or <strong>Wi-Fi QR</strong> on the back.
+      </p>
+
+      <div class="pt-4">
+        <a href="/restaurant-menu-qr-code" class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-xs bg-indigo-600 hover:bg-indigo-700 text-white shadow-md">
+          Create Restaurant Menu QR &rarr;
+        </a>
+      </div>
+    </div>
+  </article>
+</BaseLayout>

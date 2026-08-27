@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is a Contact QR Code Generator?';
+const overviewParagraphs = [
+  'A Contact QR code generator creates a scannable 2D barcode that transfers your complete professional or personal contact credentials—including full name, mobile telephone numbers, direct email address, business title, company name, website URL, and physical address—directly into any smartphone\'s contact list in a single tap.',
+  'Transcribing contact details manually from printed paper business cards, flyers, or conference name tags is slow and causes frequent typographical errors. A Contact QR code encodes standard vCard 3.0 protocols recognized natively by Apple iOS Contacts, Google Android Contacts, Samsung Address Book, and desktop Outlook without requiring any third-party app installations.',
+  'Because all contact information is stored in the self-contained static QR barcode matrix, contact sharing works 100% offline without needing internet access or saving personal data on external servers. You can download crisp vector SVG files for physical printing or high-definition PNGs for digital email signatures, resumes, and lock-screen backgrounds.'
+];
+
+const sectors = [
+  {
+    name: 'Real Estate Agents & Brokers',
+    description: 'Print on property brochures, yard signs, and open house cards so interested home buyers can save agent contacts in seconds.',
+    benefit: 'Enables immediate phone calls and text inquiries from serious buyers.'
+  },
+  {
+    name: 'Sales Executives & Consultants',
+    description: 'Add to client proposal leave-behinds, presentation slides, and business correspondence.',
+    benefit: 'Accelerates business follow-ups by putting direct mobile lines directly into decision-makers’ phones.'
+  },
+  {
+    name: 'Medical Doctors & Dental Clinics',
+    description: 'Include on new patient cards and appointment folders for emergency contact and reception access.',
+    benefit: 'Provides patients with a clear, permanent emergency office contact card.'
+  },
+  {
+    name: 'Tradespeople & Home Contractors',
+    description: 'Affix to equipment service tags, magnet cards, and estimate folders for plumbers and electricians.',
+    benefit: 'Guarantees homeowners can find your number during urgent emergency repairs.'
+  },
+  {
+    name: 'Corporate Executives & Founders',
+    description: 'Display on phone lock-screen backgrounds and conference badges for fast peer-to-peer networking.',
+    benefit: 'Projects an eco-friendly, modern tech brand image with zero paper waste.'
+  },
+  {
+    name: 'Customer Support & Helpdesks',
+    description: 'Embed on product packaging and warranty cards for instant technical support contact details.',
+    benefit: 'Connects customers directly to dedicated support phone lines.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Fill in Contact Information',
+    description: 'Input your name, job title, company, direct phone number, email address, website, and office location.'
+  },
+  {
+    title: '2. Style Your Visual Identity',
+    description: 'Apply corporate colors, pick rounded or dot module styles, and upload your central portrait photo or logo.'
+  },
+  {
+    title: '3. Export for Print & Digital',
+    description: 'Download Vector SVG for letterpress cards or high-definition PNG for digital email signatures and lock screens.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Paper Business Card Reverse',
+    description: 'Printed on the back of luxury paper cards providing a digital backup with 1-tap contact saving.',
+    example: 'Executive business card with an elegant monochrome contact QR on the back.'
+  },
+  {
+    title: 'Conference Lanyard Name Badges',
+    description: 'Printed directly onto attendee lanyard passes to facilitate rapid contact exchange in expo halls.',
+    example: 'Tech expo badge enabling quick networking scans between sessions.'
+  },
+  {
+    title: 'Phone Lock-Screen Wallpaper',
+    description: 'Saved as phone background image during networking events so peers can scan directly from your screen.',
+    example: 'Sales rep presenting lock-screen QR at an industry mixer.'
+  },
+  {
+    title: 'Email Signature Banners',
+    description: 'Embedded as a compact graphic at the bottom of outgoing business emails for mobile recipients.',
+    example: 'Consultant email signature with a "Scan to save my mobile" tag.'
+  }
+];
+
+const tips = [
+  'International Phone Formatting: Always use international notation (e.g., +1 555 123 4567) with country codes so global contacts can dial seamlessly.',
+  'Omit Non-Essential Fields: Keep contact entries focused to produce a cleaner QR matrix that scans faster from a distance.',
+  'High Error Correction for Logos: If adding a central logo or profile icon, ensure Level H (30%) error correction is enabled.',
+  'Minimum Physical Card Size: When printing on physical business cards, keep the QR code at least 25 x 25 mm (1 x 1 inch) for fast camera autofocus.',
+  'Test Across iOS and Android: Verify that scanning opens the phone address book cleanly on both iPhone and Android devices.'
+];
+
+const technicalNotes = 'Standards Compliance: Generates standard vCard 3.0 payloads natively parsed by iOS Contacts, Google Contacts, Android OS, and desktop email clients.';
+
+const faqs = [
+  {
+    question: 'How does a Contact QR code work when scanned?',
+    answer: 'When scanned with a smartphone camera, the device automatically detects the contact payload and displays an "Add to Contacts" prompt. Tapping it opens the phone\'s address book with all details pre-filled for 1-tap saving.'
+  },
+  {
+    question: 'Does scanning a Contact QR code require internet access?',
+    answer: 'No! Static Contact QR codes store all contact fields directly inside the barcode matrix, allowing scanning and contact saving to work 100% offline without any internet connection.'
+  },
+  {
+    question: 'Is my personal contact data saved to your server?',
+    answer: 'No. Our Contact QR code generator operates 100% locally in your browser memory. Your personal details are never uploaded or stored in external databases.'
+  },
+  {
+    question: 'Does the scanner need a special app to save my contact info?',
+    answer: 'No special app is required. Built-in camera apps on all modern iPhones and Android smartphones read Contact QR codes natively.'
+  },
+  {
+    question: 'Can I include my physical office address in the contact card?',
+    answer: 'Yes! You can fill in your complete physical address (street, city, state, postal code, and country). When saved, smartphone address books can even offer 1-tap map directions.'
+  },
+  {
+    question: 'Do Contact QR codes expire?',
+    answer: 'No. Static Contact QR codes encode the data permanently and have no expiration date. They will work indefinitely as long as your phone and email remain active.'
+  }
+];
+
+const relatedTools = [
+  { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Create offline vCard 3.0 contact cards.' },
+  { name: 'Digital Business Card', slug: 'digital-business-card', description: 'Create hosted mobile business cards with links and bio.' },
+  { name: 'WhatsApp QR Generator', slug: 'whatsapp-qr-code-generator', description: 'Start instant WhatsApp conversations with prospective clients.' },
+  { name: 'Email QR Generator', slug: 'email-qr-code-generator', description: 'Create pre-addressed email drafts for business inquiries.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="Contact QR Code Generator — Save Phone Numbers & Emails"
+  description="Generate free Contact QR codes. Allow clients and prospects to save your phone number, email, and address directly to their contacts with 1 scan."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="vcard"
+      headline="Contact QR Code Generator"
+      subheadline="Make sharing contact details effortless. Let clients and networking peers save phone numbers, emails, and address cards directly."
+    />
+  </div>
+
+  <LandingContent
+    heading="Contact Details QR Code"
+    subheading="Instant address book sync for sales executives, realtors, consultants, and businesses."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

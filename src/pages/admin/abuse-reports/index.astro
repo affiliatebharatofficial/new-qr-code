@@ -1,0 +1,145 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getDb } from '../../../lib/db/client';
+
+const url = new URL(Astro.request.url);
+const statusFilter = url.searchParams.get('status') || 'pending';
+
+const db = getDb(Astro.locals);
+
+const res = await db.prepare(`
+  SELECT ar.*, lp.title as page_title, lp.slug as page_slug
+  FROM abuse_reports ar
+  LEFT JOIN landing_pages lp ON ar.landing_page_id = lp.id
+  ORDER BY ar.created_at DESC
+  LIMIT 50
+`).all();
+
+let reports = res.results || [];
+if (statusFilter) {
+  reports = reports.filter((r: any) => r.status === statusFilter);
+}
+---
+
+<AdminLayout title="Abuse Moderation Queue" activeNav="abuse_reports">
+  <div class="space-y-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Abuse Moderation Queue</h1>
+        <p class="text-xs text-slate-400 mt-1">Review flagged pages and links submitted by users and automated abuse heuristics.</p>
+      </div>
+
+      <!-- Filter tabs -->
+      <div class="flex items-center gap-1.5 p-1 rounded-xl bg-slate-950 border border-slate-800 text-xs font-semibold">
+        <a href="/admin/abuse-reports?status=pending" class={`px-3 py-1.5 rounded-lg ${statusFilter === 'pending' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'}`}>
+          Pending
+        </a>
+        <a href="/admin/abuse-reports?status=resolved" class={`px-3 py-1.5 rounded-lg ${statusFilter === 'resolved' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'}`}>
+          Resolved
+        </a>
+        <a href="/admin/abuse-reports?status=dismissed" class={`px-3 py-1.5 rounded-lg ${statusFilter === 'dismissed' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'}`}>
+          Dismissed
+        </a>
+      </div>
+    </div>
+
+    <!-- Reports Table -->
+    <div class="bg-slate-950 rounded-3xl border border-slate-800 overflow-hidden shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-900/60 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+            <tr>
+              <th class="py-3.5 px-6">Report ID</th>
+              <th class="py-3.5 px-6">Target Resource</th>
+              <th class="py-3.5 px-6">Reason</th>
+              <th class="py-3.5 px-6">Description</th>
+              <th class="py-3.5 px-6">Reported At</th>
+              <th class="py-3.5 px-6 text-right">Moderation Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/80">
+            {reports.length === 0 ? (
+              <tr>
+                <td colspan="6" class="py-8 text-center text-slate-500">No {statusFilter} abuse reports found. Queue is clean! 🎉</td>
+              </tr>
+            ) : (
+              reports.map((r: any) => (
+                <tr class="hover:bg-slate-900/40 transition-colors">
+                  <td class="py-4 px-6 font-mono text-[11px] text-slate-400">
+                    {r.id}
+                  </td>
+                  <td class="py-4 px-6 font-bold text-white">
+                    {r.page_slug ? (
+                      <a href={`/p/${r.page_slug}`} target="_blank" class="hover:text-indigo-400">
+                        {r.page_title || r.landing_page_id} ↗
+                      </a>
+                    ) : (
+                      <span>{r.qr_id || r.landing_page_id}</span>
+                    )}
+                  </td>
+                  <td class="py-4 px-6">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-red-900/50 text-red-300">
+                      {r.reason}
+                    </span>
+                  </td>
+                  <td class="py-4 px-6 text-slate-300 max-w-xs truncate">
+                    {r.description || '—'}
+                  </td>
+                  <td class="py-4 px-6 text-slate-500 font-mono text-[11px]">
+                    {new Date(r.created_at).toLocaleDateString()}
+                  </td>
+                  <td class="py-4 px-6 text-right space-x-1 whitespace-nowrap">
+                    {r.status === 'pending' ? (
+                      <>
+                        <button
+                          type="button"
+                          class="resolve-report-btn px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600 hover:text-white cursor-pointer"
+                          data-id={r.id}
+                          data-action="resolved"
+                        >
+                          Resolve &amp; Disable
+                        </button>
+                        <button
+                          type="button"
+                          class="resolve-report-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 cursor-pointer"
+                          data-id={r.id}
+                          data-action="dismissed"
+                        >
+                          Dismiss
+                        </button>
+                      </>
+                    ) : (
+                      <span class="text-slate-500 capitalize">{r.status}</span>
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  document.querySelectorAll('.resolve-report-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id');
+      const action = btn.getAttribute('data-action');
+      const notes = prompt(`Enter optional moderation note for ${action}:`);
+
+      try {
+        const res = await fetch(`/api/admin/abuse-reports/${id}/resolve`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action, notes }),
+        });
+        if (res.ok) window.location.reload();
+        else alert('Failed to resolve report.');
+      } catch {
+        alert('Error processing report.');
+      }
+    });
+  });
+</script>

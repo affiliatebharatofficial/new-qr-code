@@ -1,0 +1,17 @@
+# Robots.txt for QR Code Generator
+User-agent: *
+Allow: /
+Allow: /guides/
+Allow: /pricing
+
+# Disallow private user portals, auth, dynamic redirects, and API endpoints
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /api/
+Disallow: /login
+Disallow: /signup
+Disallow: /r/
+Disallow: /p/
+
+# Sitemap reference
+Sitemap: https://qrcode.page/sitemap.xml

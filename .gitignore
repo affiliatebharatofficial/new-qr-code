@@ -1,0 +1,23 @@
+# Node dependencies
+node_modules/
+
+# Build outputs
+dist/
+.astro/
+
+# Cloudflare & Wrangler
+.wrangler/
+.mf/
+
+# Environment files & secrets
+.env
+.env.*
+!.env.example
+
+# Scratch and test logs
+scratch/
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db

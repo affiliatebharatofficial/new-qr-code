@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is a vCard QR Code Generator?';
+const overviewParagraphs = [
+  'A vCard QR code generator encodes standard electronic business card data (VCF / vCard 3.0 specification) directly into an optical 2D barcode. When scanned by any modern iOS or Android smartphone camera, the operating system parses the embedded fields—including first and last name, organization, job title, direct mobile number, email address, website, and physical office address—and immediately displays an "Add to Contacts" prompt.',
+  'Physical paper business cards suffer from an estimated 88% discard rate within one week of receipt, primarily because manually transcribing alphanumeric phone numbers and email addresses into phone books is tedious and prone to typos. A vCard QR code eliminates manual entry entirely, transferring complete, error-free contact records directly into Apple Contacts, Google Contacts, Samsung Address Book, and Microsoft Outlook with a single camera tap.',
+  'Because all contact information is serialized directly within the static QR code matrix on your local device, generation is 100% private and offline-capable without storing personal data on external databases. You can download crisp vector SVG files for physical printing or high-DPI PNGs for digital email signatures, resumes, and lock-screen backgrounds.'
+];
+
+const sectors = [
+  {
+    name: 'Real Estate Agents & Brokers',
+    description: 'Print vCard QR codes on open house yard signs, property listing flyers, and luxury presentation folders.',
+    benefit: 'Enables interested home buyers to save agent mobile numbers in one second flat.'
+  },
+  {
+    name: 'Sales Executives & Account Managers',
+    description: 'Include vCard codes on printed meeting leave-behinds, proposals, and client presentation slide decks.',
+    benefit: 'Accelerates deal follow-ups by putting direct lines directly into decision-makers’ phones.'
+  },
+  {
+    name: 'Consultants & Freelancers',
+    description: 'Add digital vCard codes to resumes, invoices, and pitch decks to streamline client communication.',
+    benefit: 'Projects a modern, tech-forward professional image with zero friction.'
+  },
+  {
+    name: 'Healthcare Providers & Clinics',
+    description: 'Display doctor and clinic contact QR codes on appointment reminder cards and prescription packets.',
+    benefit: 'Ensures patients have immediate access to emergency phone numbers and office emails.'
+  },
+  {
+    name: 'Legal & Financial Advisors',
+    description: 'Equip partner business cards and corporate literature with secure, complete contact records.',
+    benefit: 'Provides high-net-worth clients with direct concierge phone access.'
+  },
+  {
+    name: 'Trade Show Exhibitors & Speakers',
+    description: 'Display your vCard code on presentation closing slides and booth staff name badges.',
+    benefit: 'Captures hundreds of attendee leads without handing out stacks of paper cards.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Fill in Contact Fields',
+    description: 'Input your name, job title, company, direct phone number, email address, website, and office location.'
+  },
+  {
+    title: '2. Customize Visual Identity',
+    description: 'Apply your personal or corporate color palette, pick rounded or dot modules, and upload a central portrait photo or logo.'
+  },
+  {
+    title: '3. Print on Cards or Badges',
+    description: 'Download resolution-independent Vector SVG for letterpress/foil printing, or high-definition PNG for digital cards.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Back of Physical Business Cards',
+    description: 'Printed cleanly on the reverse side of paper cards for tactile traditionalists who want instant digital storage.',
+    example: 'Executive business card with an elegant monochrome vCard QR on the back.'
+  },
+  {
+    title: 'Summit & Conference Badges',
+    description: 'Printed directly onto attendee lanyard passes to facilitate rapid peer-to-peer contact exchange in expo halls.',
+    example: 'Tech expo badge enabling quick networking scans between sessions.'
+  },
+  {
+    title: 'Smartphone Lock-Screen Wallpaper',
+    description: 'Saved as phone background image during networking events so peers can scan your screen directly.',
+    example: 'Sales rep presenting lock-screen QR at an industry mixer.'
+  },
+  {
+    title: 'Email Signature Attachments',
+    description: 'Embedded as a compact digital graphic at the bottom of outgoing business emails for mobile recipients.',
+    example: 'Consultant email signature with a "Scan to save my mobile" tag.'
+  }
+];
+
+const tips = [
+  'International Phone Formatting: Always use international E.164 notation (e.g. +1 555 123 4567) with country codes so global contacts can dial seamlessly.',
+  'Omit Unnecessary Fields: QR density increases with every character. Omit empty or non-essential fields to keep the code simpler and easier to scan from a distance.',
+  'High Error Correction for Logos: If adding your company logo or profile icon in the center, ensure Level H (30%) error correction is enabled.',
+  'Minimum Physical Print Size: For physical business cards, ensure the printed QR code is at least 25 x 25 mm (1 x 1 inch) to guarantee fast smartphone autofocus.',
+  'Vector SVG for Offset Printing: Provide vector SVG format to your print shop to avoid raster pixelation or blurry module edges.'
+];
+
+const technicalNotes = 'Standards Compliance: Generates standard vCard 3.0 ("BEGIN:VCARD\\nVERSION:3.0\\n...") payloads natively parsed by iOS Contacts, Google Contacts, Android OS, and desktop email clients.';
+
+const faqs = [
+  {
+    question: 'What happens when someone scans a vCard QR code with their phone?',
+    answer: 'The native smartphone camera detects the vCard payload and presents an "Add to Contacts" banner. Tapping the banner opens the phone address book with all details (name, company, title, mobile, email, website) pre-filled, ready for 1-tap saving.'
+  },
+  {
+    question: 'Is my personal contact information uploaded or saved on your server?',
+    answer: 'No. Our vCard generator operates 100% client-side in your browser. All contact fields are embedded directly into the static QR code pattern in your device memory without remote database logging.'
+  },
+  {
+    question: 'Does the scanner need a special app to read a vCard QR code?',
+    answer: 'No special app is required. All modern iPhones running iOS 11+ and Android smartphones running Android 9+ have built-in vCard decoding inside their native camera apps.'
+  },
+  {
+    question: 'Can I include social media profiles or multiple phone numbers in the vCard?',
+    answer: 'Standard vCard 3.0 supports primary phone, email, website, and address fields. To share rich multi-link profiles, social media handles, and downloadable portfolios on a hosted landing page, use our Digital Business Card page tool.'
+  },
+  {
+    question: 'What is the best way to format phone numbers for international clients?',
+    answer: 'Always include the plus sign and international country code (for example, +1 for US/Canada, +44 for UK, +91 for India). This guarantees seamless one-tap dialing regardless of where your contact travels.'
+  },
+  {
+    question: 'Can I edit my contact details after printing a static vCard QR code?',
+    answer: 'Because static vCard codes store data directly in the black-and-white pixel modules, details cannot be changed once printed. If you anticipate changing your phone number or title, use our Dynamic QR code or Digital Business Card landing page.'
+  }
+];
+
+const relatedTools = [
+  { name: 'Digital Business Card', slug: 'digital-business-card', description: 'Create hosted mobile business cards with links, bio, and vCard download.' },
+  { name: 'Email QR Generator', slug: 'email-qr-code-generator', description: 'Pre-fill recipient email addresses and subject lines for business inquiries.' },
+  { name: 'Phone QR Generator', slug: 'phone-qr-code-generator', description: 'Enable one-tap phone calls directly from printed advertisements.' },
+  { name: 'WhatsApp QR Generator', slug: 'whatsapp-qr-code-generator', description: 'Launch instant WhatsApp business conversations with prospective leads.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="vCard QR Code Generator — Digital Contact Business Card"
+  description="Create digital business card QR codes with full contact details, phone, email, and company info. Compatible with iOS & Android. Free vector SVG & PNG."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="vcard"
+      headline="vCard QR Code Generator"
+      subheadline="Create scannable contact cards that let leads, clients, and colleagues save your complete phone details in a single tap."
+    />
+  </div>
+
+  <LandingContent
+    heading="vCard Contact QR Code"
+    subheading="Seamlessly transfer business credentials directly into smartphone address books."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

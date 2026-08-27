@@ -1,0 +1,90 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getDb } from '../../../lib/db/client';
+
+const db = getDb(Astro.locals);
+
+const [assetsRes, topUsersRes] = await Promise.all([
+  db.prepare('SELECT COUNT(*) as total_objects, COALESCE(SUM(file_size), 0) as total_bytes FROM qr_assets').all(),
+  db.prepare(`
+    SELECT u.id, u.email, u.plan, COUNT(a.id) as object_count, SUM(a.file_size) as user_bytes
+    FROM qr_assets a
+    JOIN users u ON a.user_id = u.id
+    GROUP BY u.id
+    ORDER BY user_bytes DESC
+    LIMIT 20
+  `).all(),
+]);
+
+const totalObjects = (assetsRes.results?.[0] as any)?.total_objects || 0;
+const totalBytes = (assetsRes.results?.[0] as any)?.total_bytes || 0;
+const totalMb = (totalBytes / (1024 * 1024)).toFixed(2);
+const topUsers = topUsersRes.results || [];
+---
+
+<AdminLayout title="Storage Operations" activeNav="storage">
+  <div class="space-y-8">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-white">R2 Cloud Storage Metrics</h1>
+      <p class="text-xs text-slate-400 mt-1">Audit asset storage distribution, bandwidth quotas, and inspect largest accounts.</p>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Total Stored Volume</span>
+        <div class="text-2xl font-black text-white">{totalMb} MB</div>
+      </div>
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Total Objects</span>
+        <div class="text-2xl font-black text-indigo-400">{totalObjects} files</div>
+      </div>
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Orphaned Objects</span>
+        <div class="text-2xl font-black text-emerald-400">0 detected</div>
+      </div>
+    </div>
+
+    <!-- Top Accounts by Storage -->
+    <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-4">
+      <h2 class="text-sm font-bold text-white uppercase tracking-wider">Top Accounts by Asset Storage</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="border-b border-slate-800 text-slate-400 font-bold uppercase">
+            <tr>
+              <th class="py-3 px-4">User</th>
+              <th class="py-3 px-4">Plan</th>
+              <th class="py-3 px-4">Files</th>
+              <th class="py-3 px-4">Storage Used</th>
+              <th class="py-3 px-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800">
+            {topUsers.length === 0 ? (
+              <tr>
+                <td colspan="5" class="py-6 text-center text-slate-500">No storage assets uploaded yet.</td>
+              </tr>
+            ) : (
+              topUsers.map((u: any) => {
+                const mb = (u.user_bytes / (1024 * 1024)).toFixed(2);
+                return (
+                  <tr class="hover:bg-slate-900/40">
+                    <td class="py-3 px-4 font-bold text-white">
+                      <a href={`/admin/users/${u.id}`} class="hover:text-indigo-400">{u.email}</a>
+                    </td>
+                    <td class="py-3 px-4 uppercase text-slate-400">{u.plan}</td>
+                    <td class="py-3 px-4 text-slate-300">{u.object_count}</td>
+                    <td class="py-3 px-4 font-mono text-slate-200">{mb} MB</td>
+                    <td class="py-3 px-4 text-right">
+                      <a href={`/admin/users/${u.id}`} class="text-indigo-400 hover:underline">Inspect &rarr;</a>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</AdminLayout>

@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is a Location QR Code Generator?';
+const overviewParagraphs = [
+  'A Location QR code generator encodes geographical GPS coordinates (latitude and longitude) into an optical 2D barcode. When scanned by any smartphone camera, the device automatically opens the user’s default navigation app (such as Google Maps, Apple Maps, or Waze) with the exact pin location plotted and driving or walking directions ready to start.',
+  'Navigating to rural wedding venues, secret festival entrances, new construction subdivisions, parking lot gates, scenic trailheads, and pop-up food markets is often challenging using standard street addresses alone. A Location QR code uses precise GPS coordinates down to meter-level accuracy, ensuring visitors reach the exact physical entrance rather than an ambiguous municipal postal center.',
+  'Whether printed on event invitations, direct mail flyers, roadside signboards, or tourist guidebooks, Location QR codes eliminate navigation errors. Our generator runs 100% locally in your browser, enabling visual customization, color matching, and vector SVG or PNG exports.'
+];
+
+const sectors = [
+  {
+    name: 'Event Venues & Wedding Barns',
+    description: 'Print on printed wedding invitations and event tickets directing guests to the exact rural entrance or parking meadow.',
+    benefit: 'Prevents guest delays and navigation confusion on remote country roads.'
+  },
+  {
+    name: 'Real Estate & New Home Subdivisions',
+    description: 'Place on roadside directional arrows guiding prospective home buyers to undeveloped model homes.',
+    benefit: 'Guides buyers directly to new lots that are not yet indexed on postal street maps.'
+  },
+  {
+    name: 'Food Trucks & Pop-up Markets',
+    description: 'Share on social media and flyer posters showing exact changing street parking spots.',
+    benefit: 'Enables hungry diners to navigate straight to the food truck hatch.'
+  },
+  {
+    name: 'Tourism Boards & Hiking Trailheads',
+    description: 'Display on park trail marker signs and visitor maps pointing to scenic viewpoints and parking areas.',
+    benefit: 'Provides accurate GPS waypoints for hikers without cell tower search delays.'
+  },
+  {
+    name: 'Parking Facilities & Valet Drop-offs',
+    description: 'Include on parking tickets and validation receipts so drivers can navigate back to their parked car.',
+    benefit: 'Assists visitors in navigating massive multi-story airport or stadium parking garages.'
+  },
+  {
+    name: 'Commercial Logistics & Loading Docks',
+    description: 'Print on supplier shipping manifests pointing freight delivery trucks to specific facility loading gates.',
+    benefit: 'Directs semi-truck drivers away from residential streets to the industrial entrance.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Enter GPS Coordinates',
+    description: 'Type or paste the precise latitude and longitude of your destination (e.g. 37.7749, -122.4194).'
+  },
+  {
+    title: '2. Style Brand Colors',
+    description: 'Choose map-friendly colors, rounded eye frames, and upload an optional map pin icon or venue logo.'
+  },
+  {
+    title: '3. Export Vector SVG or PNG',
+    description: 'Download in print-ready Vector SVG for directional signboards or high-resolution PNG for digital invitations.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Wedding Invitation Direction Cards',
+    description: 'Printed on physical paper RSVP enclosures directing guests to estate ceremonies.',
+    example: 'Vineyard wedding directing guests to the vineyard parking gate.'
+  },
+  {
+    title: 'Construction Site Entry Signs',
+    description: 'Mounted at subdivision perimeters guiding concrete and lumber delivery trucks.',
+    example: 'New residential development guiding heavy trade vehicles to Gate 3.'
+  },
+  {
+    title: 'Festival Campsite Navigation',
+    description: 'Printed on festival programs and wristband tags showing medical tents and stage areas.',
+    example: 'Music festival wayfinding placards across outdoor campground zones.'
+  },
+  {
+    title: 'Tourist Information Kiosks',
+    description: 'Placards in historic downtown areas pointing tourists to local landmarks and museums.',
+    example: 'City walking tour guiding pedestrians to historic monument plazas.'
+  }
+];
+
+const tips = [
+  'Obtaining Exact Coordinates: Right-click any location on Google Maps and click the top numbers to copy exact latitude and longitude to your clipboard.',
+  'Check Decimal Precision: Use coordinates with 4 to 6 decimal places (e.g., 40.7128, -74.0060) for pin-point accuracy within a few meters.',
+  'Universal Map Compatibility: Standard "geo:" URI formatting opens Google Maps on Android and Apple Maps on iPhone automatically.',
+  'High Contrast for Sunlight: Outdoor signs require maximum optical contrast—use dark modules on a solid white background to resist sun glare.',
+  'Verify Directions On-Site: Always scan the printed code with both Apple Maps and Google Maps to ensure driving directions navigate to the intended gate.'
+];
+
+const technicalNotes = 'Standards Compliance: Generates standard RFC 5870 "geo:latitude,longitude" and Google Maps navigation URI schemes recognized natively across iOS and Android.';
+
+const faqs = [
+  {
+    question: 'What happens when someone scans a Location QR code?',
+    answer: 'When scanned with a smartphone camera, the device automatically opens the user\'s default map application (Apple Maps on iOS, Google Maps on Android) with the exact GPS pin plotted and directions ready to start.'
+  },
+  {
+    question: 'How do I find the latitude and longitude coordinates for my location?',
+    answer: 'Open Google Maps on your computer or phone, right-click (or long-press on mobile) the exact entrance or building spot, and click the numbers at the top of the menu to copy the latitude and longitude.'
+  },
+  {
+    question: 'Does a Location QR code work if a venue has no formal street address?',
+    answer: 'Yes! That is the primary superpower of a Location QR code. Because it uses exact GPS latitude and longitude, it works perfectly for remote beaches, park pavilions, construction lots, and open fields with no postal address.'
+  },
+  {
+    question: 'Will this work on both iPhone and Android devices?',
+    answer: 'Yes. iPhones will open the coordinates in Apple Maps (or Google Maps if set as default), while Android devices will open directly in Google Maps.'
+  },
+  {
+    question: 'Do Location QR codes expire?',
+    answer: 'No. Static Location QR codes encode the geographical coordinates permanently and have no expiration date. They will work indefinitely.'
+  },
+  {
+    question: 'Can I include a specific venue name with the coordinates?',
+    answer: 'Yes, our generator supports both direct numeric geo coordinates and Google Maps place links for maximum cross-platform clarity.'
+  }
+];
+
+const relatedTools = [
+  { name: 'Google Maps QR Code', slug: 'google-maps-qr-code', description: 'Create direct Google Maps directions links for local retail shops.' },
+  { name: 'Event QR Generator', slug: 'event-qr-code-generator', description: 'Share calendar invites with embedded location details.' },
+  { name: 'URL QR Generator', slug: 'url-to-qr-code', description: 'Direct visitors to your website, blog, or booking form.' },
+  { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Share full contact credentials and physical office address.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="Location QR Code Generator — GPS Coordinates & Map Directions"
+  description="Generate free Location QR codes with GPS latitude and longitude coordinates. Open direct directions in Apple Maps & Google Maps. Free vector SVG & PNG."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="location"
+      headline="Location QR Code Generator"
+      subheadline="Create scannable GPS location QR codes that launch turn-by-turn navigation in Apple Maps and Google Maps with a single scan."
+    />
+  </div>
+
+  <LandingContent
+    heading="Location GPS QR Code"
+    subheading="Guide visitors directly to precise physical entrances, trailheads, and event venues."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

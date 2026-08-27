@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is a Social Media QR Code Generator?';
+const overviewParagraphs = [
+  'A Social Media QR code generator connects all your social profiles—including Instagram, TikTok, YouTube, LinkedIn, X (Twitter), Facebook, Spotify, and Twitch—into a single scannable 2D barcode. When scanned with a smartphone camera, users open a mobile-optimized landing page containing clickable links to all your channels, allowing them to follow you on their preferred platform in seconds.',
+  'Promoting multiple social media handles across physical print collateral (such as retail packaging, business cards, stickers, trade show booths, and posters) quickly clutters design layouts and confuses audiences. A single consolidated Social Media QR code provides an organized, multi-link gateway that eliminates visual clutter while maximizing cross-platform audience growth.',
+  'Our generator allows you to customize foreground colors, select custom dot patterns, embed your brand logo, and download print-ready vector SVG files for physical signage or high-DPI PNGs for digital graphics.'
+];
+
+const sectors = [
+  {
+    name: 'Content Creators & Influencers',
+    description: 'Print on merch tags, fan meet-and-greet cards, and video backdrop banners linking to all platforms.',
+    benefit: 'Turns single-platform viewers into omnichannel followers across YouTube, TikTok, and Instagram.'
+  },
+  {
+    name: 'Retail Boutiques & Fashion Brands',
+    description: 'Place on in-store shopping bags, garment hangtags, and fitting room mirrors prompting follow-ups.',
+    benefit: 'Grows active social communities directly from in-store physical shoppers.'
+  },
+  {
+    name: 'Restaurants, Bars & Nightclubs',
+    description: 'Display on table tents, cocktail menus, and bathroom mirrors for user-generated content tags.',
+    benefit: 'Drives viral photo and video tags on Instagram Stories and TikTok.'
+  },
+  {
+    name: 'Musicians, Bands & Podcasters',
+    description: 'Include on gig posters, album inserts, and stage banners linking to Spotify, Apple Music, and YouTube.',
+    benefit: 'Converts live show fans into streaming listeners and social subscribers.'
+  },
+  {
+    name: 'Fitness Coaches & Gyms',
+    description: 'Mount beside workout equipment and reception counters linking to workout videos and community groups.',
+    benefit: 'Engages gym members with daily workout tips and motivational content.'
+  },
+  {
+    name: 'Artists & Visual Designers',
+    description: 'Add to art exhibition gallery labels, art prints, and stickers linking to Behance, Dribbble, and Instagram.',
+    benefit: 'Connects gallery art lovers directly with the creator’s digital portfolio.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Add Social Profile Links',
+    description: 'Add links to your Instagram, YouTube, TikTok, LinkedIn, Spotify, and other social media handles.'
+  },
+  {
+    title: '2. Customize Colors & Logo',
+    description: 'Match your visual aesthetic, pick rounded or dot modules, and upload your profile icon or brand logo.'
+  },
+  {
+    title: '3. Download & Print Everywhere',
+    description: 'Export in scalable Vector SVG for print packaging or high-definition PNG for digital marketing assets.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Retail Shopping Bag Graphics',
+    description: 'Printed on retail bags with a "Follow Us for Daily Styling & Drops" call to action.',
+    example: 'Apparel boutique growing its Instagram audience by 500 followers per month.'
+  },
+  {
+    title: 'Merchandise & Clothing Hangtags',
+    description: 'Printed on garment tags linking directly to the brand’s community channels.',
+    example: 'Streetwear brand directing buyers to exclusive TikTok styling drops.'
+  },
+  {
+    title: 'Live Event Stage Banners',
+    description: 'Oversized QR codes displayed on stage screens before and after live musical sets.',
+    example: 'Indie band gaining 2,000+ new Spotify listeners during festival tour.'
+  },
+  {
+    title: 'Restaurant Patio Table Tents',
+    description: 'Tabletop stands encouraging diners to tag the restaurant in food photos for a chance to win dessert.',
+    example: 'Brunch cafe generating hundreds of organic Instagram Stories weekly.'
+  }
+];
+
+const tips = [
+  'Use Complete URLs: Ensure all social profile links start with https:// and include your exact username handle.',
+  'Add Clear Call to Action: Pair the QR code with inviting text such as "Scan to Follow Our Community & Daily Drops".',
+  'High Contrast for Fast Scanning: Use dark modules on a light background for rapid scanning in busy or ambient store lighting.',
+  'Vector SVG for Packaging: Use Vector SVG format when printing on custom retail boxes, poly-mailers, or shopping bags.',
+  'Test Across Mobile Browsers: Verify that scanning opens your multi-link social hub cleanly across iOS Safari and Android Chrome.'
+];
+
+const technicalNotes = 'Standards Compliance: Standard ISO/IEC 18004 QR symbols compatible with all iOS and Android smartphone camera apps.';
+
+const faqs = [
+  {
+    question: 'How does a Social Media QR code work when scanned?',
+    answer: 'When a user scans the QR code with their smartphone camera, it opens a mobile-friendly landing page displaying clickable buttons for all your connected social media channels (Instagram, TikTok, YouTube, LinkedIn, X, Spotify).'
+  },
+  {
+    question: 'Can I add multiple social media accounts to one QR code?',
+    answer: 'Yes! That is the primary advantage of a Social Media QR code. You can connect all your profiles into one centralized page rather than cluttering print materials with multiple separate QR codes.'
+  },
+  {
+    question: 'Which social media platforms are supported?',
+    answer: 'Our tool supports all major platforms including Instagram, TikTok, YouTube, Facebook, LinkedIn, X (Twitter), Spotify, Twitch, Discord, Pinterest, and custom website links.'
+  },
+  {
+    question: 'Can I customize the QR code with my own profile photo or logo?',
+    answer: 'Yes! You can upload your personal avatar or brand logo. Our tool automatically applies Level H error correction (30%) so the QR code scans reliably with your image centered.'
+  },
+  {
+    question: 'Do Social Media QR codes expire?',
+    answer: 'No. Static QR codes encode your destination link permanently and have no expiration date. They will work indefinitely.'
+  },
+  {
+    question: 'Are there any fees to create or use a Social Media QR code?',
+    answer: 'No. Generating and downloading your Social Media QR code is 100% free with no scan limits or hidden charges.'
+  }
+];
+
+const relatedTools = [
+  { name: 'Digital Business Card', slug: 'digital-business-card', description: 'Create complete contact profile cards for networking.' },
+  { name: 'URL QR Generator', slug: 'url-to-qr-code', description: 'Direct traffic to your website, blog, or store.' },
+  { name: 'Google Reviews QR', slug: 'google-reviews-qr-code', description: 'Collect 5-star Google customer reviews at point of sale.' },
+  { name: 'YouTube QR Generator', slug: 'url-to-qr-code', description: 'Direct fans to your latest YouTube video or channel.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="Social Media QR Code Generator — All-in-One Social Profile QR"
+  description="Connect all your social profiles (Instagram, TikTok, YouTube, LinkedIn) in one scannable QR code. Free vector SVG & PNG download with custom logo."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="social"
+      headline="Social Media QR Code Generator"
+      subheadline="Link all your social profiles in one scannable hub. Let fans, customers, and followers connect on their favorite platform in a single scan."
+    />
+  </div>
+
+  <LandingContent
+    heading="Social Media QR Code"
+    subheading="Unify your social channels into one elegant, mobile-friendly landing hub."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

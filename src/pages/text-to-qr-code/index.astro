@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is a Plain Text QR Code Generator?';
+const overviewParagraphs = [
+  'A Plain Text QR code generator encodes alphanumeric characters, words, sentences, serial numbers, cryptographic keys, or notes directly into an optical 2D barcode matrix. When scanned by any smartphone camera or industrial barcode scanner, the device displays the encoded plain text on screen without requiring an active internet connection or opening an external browser.',
+  'Unlike URL QR codes that require active web servers and internet connectivity, plain text QR codes are completely self-contained and decentralized. All information is stored directly in the black and white pixel modules. This makes plain text QR codes ideal for offline environments, industrial inventory tracking, asset tagging, Wi-Fi configuration keys, classroom instructions, and secure multi-factor authentication backups.',
+  'Our client-side tool supports full UTF-8 character encoding including international alphabets, symbols, and emoji. You can customize visual styles, colors, corner shapes, and download resolution-independent Vector SVG files or high-definition PNGs for labeling and industrial printing.'
+];
+
+const sectors = [
+  {
+    name: 'Warehousing & Industrial Inventory',
+    description: 'Print serial numbers, part IDs, warehouse bin locations, and batch codes on equipment tags.',
+    benefit: 'Enables instant offline scanning with industrial handheld laser and optical barcode scanners.'
+  },
+  {
+    name: 'Education & Classroom Learning',
+    description: 'Place on worksheet headers, scavenger hunt stations, and classroom posters with hidden quiz answers or clues.',
+    benefit: 'Engages students in interactive offline learning activities.'
+  },
+  {
+    name: 'Manufacturing & Asset Management',
+    description: 'Affix to machinery, IT hardware, office furniture, and fleet assets for internal equipment audits.',
+    benefit: 'Eliminates transcription errors during annual physical asset inventories.'
+  },
+  {
+    name: 'Museums & Heritage Exhibits',
+    description: 'Display beside artifact cases to provide detailed historical descriptions without requiring internet connection.',
+    benefit: 'Ensures reliable visitor reading even in underground or thick-walled museum vaults.'
+  },
+  {
+    name: 'Software Security & Cryptography',
+    description: 'Encode PGP public key fingerprints, Bitcoin addresses, and offline secret seed phrases for physical paper backup.',
+    benefit: 'Provides cold-storage physical backups completely disconnected from the internet.'
+  },
+  {
+    name: 'Events & Scavenger Hunts',
+    description: 'Mount on park trails, festival checkpoints, and escape room props with encoded puzzle riddles.',
+    benefit: 'Delivers instant offline clues directly to participant smartphones.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Type or Paste Plain Text',
+    description: 'Input your raw text message, serial numbers, voucher codes, or instructions (supports full UTF-8 Unicode).'
+  },
+  {
+    title: '2. Customize Appearance',
+    description: 'Select high-contrast colors, pick rounded or square dot patterns, and embed an optional center icon.'
+  },
+  {
+    title: '3. Export Vector SVG or PNG',
+    description: 'Download print-ready Vector SVG files for thermal label printers or high-resolution PNG for digital documentation.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Industrial Equipment Asset Tags',
+    description: 'Durable metal or vinyl stickers printed with equipment serials, maintenance dates, and asset IDs.',
+    example: 'IT department tagging 500 company laptops with internal inventory codes.'
+  },
+  {
+    title: 'Museum Artifact Placards',
+    description: 'Compact informational placards beside historical displays with offline translated text descriptions.',
+    example: 'Historic castle exhibit sharing translated room stories with tourists.'
+  },
+  {
+    title: 'Classroom Educational Worksheets',
+    description: 'Printed at the bottom of student math assignments containing step-by-step solution keys.',
+    example: 'High school teacher providing self-checking quiz answer keys.'
+  },
+  {
+    title: 'Physical Paper Crypto Backups',
+    description: 'Printed cold-storage recovery keys stored securely in safety deposit boxes.',
+    example: 'Cryptocurrency investor backing up an offline public key.'
+  }
+];
+
+const tips = [
+  'Character Count & Matrix Density: The more text you encode, the denser the QR code becomes. For small physical print labels, keep text concise to ensure fast optical scanning.',
+  'High Contrast for Laser Scanners: Industrial barcode scanners rely on sharp edge contrast. Use solid black modules on pure white backgrounds for maximum scan reliability.',
+  'Vector SVG for Label Printing: Use Vector SVG format when sending files to thermal label printers or laser engraving machines to ensure crisp, razor-sharp edges.',
+  'Avoid Encoding Formatted HTML: Plain text QR codes display raw text. Avoid adding HTML markup or markdown unless your scanning application specifically parses it.',
+  'Test with Native Smartphone Camera: Verify that the text displays legibly across standard iPhone and Android camera viewfinders.'
+];
+
+const technicalNotes = 'Standards Compliance: Encodes raw ISO/IEC 18004 alphanumeric and 8-bit byte data supporting full UTF-8 multi-language characters and emoji.';
+
+const faqs = [
+  {
+    question: 'How does a Plain Text QR code work when scanned?',
+    answer: 'When a smartphone camera or barcode scanner reads the QR code, it immediately displays the encoded text on screen. The scanner can copy the text, read the instructions, or search the text online.'
+  },
+  {
+    question: 'Does scanning a Plain Text QR code require an active internet connection?',
+    answer: 'No! Plain text QR codes are completely self-contained and work 100% offline. Because all data is stored inside the pixel modules, no internet connection or server lookup is required.'
+  },
+  {
+    question: 'How much text can I store inside a Plain Text QR code?',
+    answer: 'A standard QR code can store up to approximately 4,296 alphanumeric characters or 7,089 numeric digits. However, for fast camera scanning on physical labels, keeping text under 300 characters is recommended.'
+  },
+  {
+    question: 'Are special characters, international scripts, and emoji supported?',
+    answer: 'Yes! Our generator uses standard UTF-8 encoding, allowing you to include accents, Cyrillic, Arabic, Chinese, Japanese, Korean characters, and emoji.'
+  },
+  {
+    question: 'Is my encoded text private and secure?',
+    answer: 'Yes. The plain text QR code is generated 100% locally in your web browser memory. Your text is never transmitted over the internet or logged on any remote server.'
+  },
+  {
+    question: 'Do Plain Text QR codes expire?',
+    answer: 'No. Plain text QR codes are static and permanent. They never expire and will remain readable forever as long as the printed medium is physically intact.'
+  }
+];
+
+const relatedTools = [
+  { name: 'URL QR Generator', slug: 'url-to-qr-code', description: 'Convert website links and landing pages into scannable QR codes.' },
+  { name: 'Wi-Fi QR Generator', slug: 'wifi-qr-code-generator', description: 'Let visitors connect to your wireless network without typing passwords.' },
+  { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Share full contact credentials directly to smartphone address books.' },
+  { name: 'SMS QR Generator', slug: 'sms-qr-code-generator', description: 'Send pre-written SMS text messages directly to mobile phones.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="Text to QR Code Generator — Plain Text & Serial QR Code"
+  description="Convert plain text, notes, serial numbers, and keys into offline scannable QR codes. 100% private client-side generation. Free vector SVG & PNG."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="text"
+      headline="Plain Text QR Code Generator"
+      subheadline="Encode notes, serial numbers, instructions, and messages into self-contained, 100% offline scannable QR codes."
+    />
+  </div>
+
+  <LandingContent
+    heading="Plain Text QR Code"
+    subheading="Self-contained, offline-ready QR codes for notes, labeling, and inventory management."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

@@ -1,0 +1,246 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { PLANS, formatPrice } from '../../lib/billing/plans';
+import { getCurrentUser } from '../../lib/auth/jwt';
+
+const user = await getCurrentUser(Astro.request, Astro.locals);
+const userPlan = user?.plan || 'free';
+
+const faqs = [
+  {
+    q: 'Can I use the QR Code Generator for free?',
+    a: 'Yes. Our core client-side static QR generator is 100% free with unlimited generations and downloads. Free registered users also receive up to 25 saved QR codes and 3 dynamic QR campaigns.',
+  },
+  {
+    q: 'What happens to my QR codes if I cancel my subscription?',
+    a: 'Your existing dynamic QR codes will continue to redirect normally without interruption. You will remain on your paid plan until the end of your prepaid billing period, after which your account reverts to Free limits for creating new dynamic codes.',
+  },
+  {
+    q: 'Can I edit the destination URL of a dynamic QR code after printing?',
+    a: 'Yes. You can update the destination link anytime from your dashboard without changing or reprinting the QR code.',
+  },
+  {
+    q: 'What payment methods do you accept?',
+    a: 'We accept all major credit cards (Visa, Mastercard, American Express), Apple Pay, Google Pay, and PayPal securely processed by Lemon Squeezy.',
+  },
+];
+---
+
+<BaseLayout
+  title="Pricing & Plans — Transparent QR Generation Limits"
+  description="Transparent pricing for individuals, creators, and businesses. Unlimited static QR codes forever, with Pro and Business dynamic QR campaigns and analytics."
+>
+  <div class="py-10 sm:py-12 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+    <!-- Header -->
+    <div class="text-center max-w-2xl mx-auto space-y-2">
+      <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+        Simple, Transparent Plans
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-500">
+        Generate unlimited static QR codes for free, or upgrade for dynamic redirects, scan analytics, and bulk jobs.
+      </p>
+    </div>
+
+    <!-- Pricing Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+      <!-- Free Plan -->
+      <div class="flex flex-col justify-between p-6 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-5">
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">{PLANS.free.name}</h3>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+              {PLANS.free.badge}
+            </span>
+          </div>
+          <p class="text-xs text-slate-500">{PLANS.free.description}</p>
+          <div class="flex items-baseline gap-1 pt-1">
+            <span class="text-3xl font-black text-slate-900 dark:text-white">{formatPrice(PLANS.free.monthlyPrice)}</span>
+            <span class="text-xs text-slate-400 font-mono">/ mo</span>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
+            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Included Limits</div>
+            <ul class="space-y-2 text-xs text-slate-600 dark:text-slate-300">
+              {PLANS.free.features.map((feat) => (
+                <li class="flex items-start gap-2">
+                  <span class="text-emerald-500 font-bold">✓</span>
+                  <span>{feat}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          {userPlan === 'free' ? (
+            <a
+              href="/"
+              class="w-full block text-center py-2.5 px-3 rounded-lg font-bold text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition-colors"
+            >
+              Current Plan
+            </a>
+          ) : (
+            <a
+              href="/"
+              class="w-full block text-center py-2.5 px-3 rounded-lg font-bold text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition-colors"
+            >
+              Start Free
+            </a>
+          )}
+        </div>
+      </div>
+
+      <!-- Pro Plan -->
+      <div class="relative flex flex-col justify-between p-6 rounded-xl bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-white shadow-elevated space-y-5">
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">{PLANS.pro.name}</h3>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase font-mono bg-slate-900 dark:bg-white text-white dark:text-slate-900">
+              Popular
+            </span>
+          </div>
+          <p class="text-xs text-slate-500">{PLANS.pro.description}</p>
+          <div class="flex items-baseline gap-1 pt-1">
+            <span class="text-3xl font-black text-slate-900 dark:text-white">{formatPrice(PLANS.pro.monthlyPrice)}</span>
+            <span class="text-xs text-slate-400 font-mono">/ mo</span>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
+            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Everything in Free, plus:</div>
+            <ul class="space-y-2 text-xs text-slate-600 dark:text-slate-300">
+              {PLANS.pro.features.slice(1).map((feat) => (
+                <li class="flex items-start gap-2">
+                  <span class="text-indigo-600 dark:text-indigo-400 font-bold">✓</span>
+                  <span>{feat}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          {userPlan === 'pro' ? (
+            <a
+              href="/dashboard/billing"
+              class="w-full block text-center py-2.5 px-3 rounded-lg font-bold text-xs bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800"
+            >
+              ✓ Active Pro Plan
+            </a>
+          ) : (
+            <button
+              type="button"
+              class="checkout-btn w-full py-2.5 px-3 rounded-lg font-bold text-xs bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-subtle cursor-pointer"
+              data-plan="pro"
+            >
+              Upgrade to Pro
+            </button>
+          )}
+        </div>
+      </div>
+
+      <!-- Business Plan -->
+      <div class="flex flex-col justify-between p-6 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-5">
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">{PLANS.business.name}</h3>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+              {PLANS.business.badge}
+            </span>
+          </div>
+          <p class="text-xs text-slate-500">{PLANS.business.description}</p>
+          <div class="flex items-baseline gap-1 pt-1">
+            <span class="text-3xl font-black text-slate-900 dark:text-white">{formatPrice(PLANS.business.monthlyPrice)}</span>
+            <span class="text-xs text-slate-400 font-mono">/ mo</span>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
+            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Everything in Pro, plus:</div>
+            <ul class="space-y-2 text-xs text-slate-600 dark:text-slate-300">
+              {PLANS.business.features.slice(1).map((feat) => (
+                <li class="flex items-start gap-2">
+                  <span class="text-indigo-600 dark:text-indigo-400 font-bold">✓</span>
+                  <span>{feat}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          {userPlan === 'business' ? (
+            <a
+              href="/dashboard/billing"
+              class="w-full block text-center py-2.5 px-3 rounded-lg font-bold text-xs bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800"
+            >
+              ✓ Active Business Plan
+            </a>
+          ) : (
+            <button
+              type="button"
+              class="checkout-btn w-full py-2.5 px-3 rounded-lg font-bold text-xs bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-subtle cursor-pointer"
+              data-plan="business"
+            >
+              Get Business Plan
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="max-w-3xl mx-auto space-y-4 pt-6">
+      <div class="text-center space-y-1">
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">Billing FAQ</h2>
+        <p class="text-xs text-slate-500">Frequently asked questions regarding subscriptions and plan allowances.</p>
+      </div>
+
+      <div class="space-y-2">
+        {faqs.map((faq) => (
+          <details class="group bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-card">
+            <summary class="flex justify-between items-center font-bold text-xs text-slate-900 dark:text-white cursor-pointer list-none">
+              <span>{faq.q}</span>
+              <span class="text-slate-400 group-open:rotate-180 transition-transform duration-150">▾</span>
+            </summary>
+            <p class="text-xs text-slate-500 leading-relaxed mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+              {faq.a}
+            </p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script define:vars={{ isAuthenticated: !!user }}>
+  document.querySelectorAll('.checkout-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      if (!isAuthenticated) {
+        window.location.href = '/signup?redirect=pricing';
+        return;
+      }
+
+      const planId = btn.getAttribute('data-plan');
+      btn.disabled = true;
+      btn.innerText = 'Redirecting to checkout...';
+
+      try {
+        const res = await fetch('/api/billing/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ planId }),
+        });
+
+        const data = await res.json();
+        if (res.ok && data.checkoutUrl) {
+          window.location.href = data.checkoutUrl;
+        } else {
+          throw new Error(data.error?.message || 'Failed to initiate checkout.');
+        }
+      } catch (err) {
+        alert(err?.message || 'Checkout failed. Please try again.');
+        btn.disabled = false;
+        btn.innerText = `Upgrade to ${planId.toUpperCase()}`;
+      }
+    });
+  });
+</script>

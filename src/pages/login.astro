@@ -1,0 +1,112 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCurrentUser } from '../lib/auth/jwt';
+
+const user = await getCurrentUser(Astro.request, Astro.locals);
+if (user) {
+  return Astro.redirect('/dashboard');
+}
+---
+
+<BaseLayout title="Log In" noIndex={true}>
+  <div class="min-h-[70vh] flex items-center justify-center px-4 py-12">
+    <div class="max-w-sm w-full bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-card space-y-5">
+      <div class="text-center space-y-1.5">
+        <div class="w-8 h-8 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center mx-auto mb-2 font-black">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm13-2h3v3h-3v-3zm-5 5h3v3h-3v-3zm5 0h3v3h-3v-3zm-5-5h3v3h-3v-3z"/>
+          </svg>
+        </div>
+        <h1 class="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">Log In to Workspace</h1>
+        <p class="text-xs text-slate-500">Access your saved QR configurations and scan analytics.</p>
+      </div>
+
+      <form id="login-form" class="space-y-3.5" novalidate>
+        <div id="login-error" class="hidden p-2.5 rounded-lg text-xs bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-300" role="alert"></div>
+
+        <div>
+          <label for="email" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            autocomplete="email"
+            required
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-slate-900 dark:focus:ring-white"
+            placeholder="you@example.com"
+          />
+        </div>
+
+        <div>
+          <label for="password" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Password</label>
+          <input
+            type="password"
+            id="password"
+            autocomplete="current-password"
+            required
+            class="w-full px-3.5 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-slate-900 dark:focus:ring-white"
+            placeholder="••••••••"
+          />
+        </div>
+
+        <button
+          type="submit"
+          id="login-submit-btn"
+          class="w-full py-2.5 px-4 rounded-lg font-bold text-xs bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-subtle cursor-pointer"
+        >
+          Sign In
+        </button>
+      </form>
+
+      <div class="text-center text-xs text-slate-500 pt-1">
+        Don't have an account?{' '}
+        <a href="/signup" class="text-slate-900 dark:text-white font-bold hover:underline">
+          Sign up
+        </a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const form = document.getElementById('login-form') as HTMLFormElement;
+  const errorDiv = document.getElementById('login-error');
+  const submitBtn = document.getElementById('login-submit-btn') as HTMLButtonElement;
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!errorDiv || !submitBtn) return;
+    errorDiv.classList.add('hidden');
+    submitBtn.disabled = true;
+    submitBtn.innerText = 'Signing in...';
+
+    const email = (document.getElementById('email') as HTMLInputElement).value;
+    const password = (document.getElementById('password') as HTMLInputElement).value;
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error?.message || 'Invalid email or password.');
+      }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectTarget = urlParams.get('redirect');
+
+      if (redirectTarget === 'save') {
+        window.location.href = '/#generator-app';
+      } else {
+        window.location.href = '/dashboard';
+      }
+    } catch (err: any) {
+      errorDiv.innerText = err?.message || 'Login failed. Please check your credentials.';
+      errorDiv.classList.remove('hidden');
+      submitBtn.disabled = false;
+      submitBtn.innerText = 'Sign In';
+    }
+  });
+</script>

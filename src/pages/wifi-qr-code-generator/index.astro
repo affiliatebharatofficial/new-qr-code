@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is a Wi-Fi QR Code Generator?';
+const overviewParagraphs = [
+  'A Wi-Fi QR code generator allows you to create a scannable 2D barcode containing your wireless network credentials, including the Network Name (SSID), password, and security encryption protocol (WPA, WPA2, WPA3, or WEP). When visitors point their smartphone camera or native device scanner at the printed code, the device automatically prompts them to join the network without requiring any manual typing.',
+  'Traditional Wi-Fi sharing requires guests to search through nearby networks, locate the correct SSID, and carefully type long passwords containing special characters. This process frequently results in typos, repeated questions to staff, and security risks from writing passwords on open whiteboards. A Wi-Fi QR code encodes the standard "WIFI:S:SSID;T:WPA;P:Password;;" protocol recognized natively by iOS, Android, macOS, and Windows operating systems.',
+  'Because our generator operates 100% client-side in your web browser using HTML5 Canvas, your network password is never transmitted across the internet, saved in cloud databases, or logged on remote servers. You can export high-resolution PNGs for on-screen display or scalable vector SVGs for crisp professional print framing.'
+];
+
+const sectors = [
+  {
+    name: 'Cafes & Coffee Shops',
+    description: 'Place tabletop Wi-Fi QR acrylic stands on every dining table to streamline customer onboarding during morning rushes.',
+    benefit: 'Eliminates counter bottlenecks and repeated staff interruptions.'
+  },
+  {
+    name: 'Hotels & Vacation Rentals',
+    description: 'Print framed Wi-Fi codes inside guest rooms, on welcome cards, and near check-in counters for smooth arrival experiences.',
+    benefit: 'Reduces front-desk inquiries and improves guest satisfaction ratings.'
+  },
+  {
+    name: 'Coworking Spaces & Offices',
+    description: 'Display dedicated guest Wi-Fi QR codes in conference rooms, reception lobbies, and hot-desk zones for visiting clients.',
+    benefit: 'Maintains strict separation between corporate networks and visitor devices.'
+  },
+  {
+    name: 'Medical Clinics & Salons',
+    description: 'Keep waiting room patients and clients comfortably entertained with fast guest network access while they wait.',
+    benefit: 'Enhances the customer waiting experience with zero staff assistance.'
+  },
+  {
+    name: 'Conferences & Trade Shows',
+    description: 'Deploy large banner Wi-Fi codes throughout exhibition halls, registration kiosks, and presentation auditoriums.',
+    benefit: 'Enables rapid, frictionless connectivity for hundreds of simultaneous attendees.'
+  },
+  {
+    name: 'Residential Homes',
+    description: 'Frame a clean, stylish Wi-Fi card in your entryway or living room for visiting family, dinner guests, and friends.',
+    benefit: 'Avoids sharing complicated router passkeys verbally.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Enter Network Credentials',
+    description: 'Type your exact Network Name (SSID), choose your encryption type (WPA/WPA2/WPA3 is standard for most routers), and input the network password.'
+  },
+  {
+    title: '2. Customize Display Styling',
+    description: 'Optionally adjust foreground colors, choose dot shapes, select rounded eye corners, or embed your venue logo in the center.'
+  },
+  {
+    title: '3. Download & Print',
+    description: 'Export as a high-definition PNG image or resolution-independent Vector SVG. Print on cards, table tents, or window decals.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Tabletop Acrylic Stands',
+    description: 'Compact 4x6 inch framed QR stands placed on dining tables, bar tops, or bedside nightstands for immediate access.',
+    example: 'Downtown Cafe placing branded Wi-Fi QR stands on 20 indoor tables.'
+  },
+  {
+    title: 'Welcome Booklet Inserts',
+    description: 'Printed welcome packages for Airbnb, Vrbo, and boutique guesthouse travelers detailing house rules and network access.',
+    example: 'Rental host including a scannable card inside the living room guidebook.'
+  },
+  {
+    title: 'Conference Room Walls',
+    description: 'Laminated cards mounted beneath display monitors in meeting spaces so visiting partners can share presentation screens.',
+    example: 'Corporate boardroom with a discrete guest network placard.'
+  },
+  {
+    title: 'Reception & Waiting Areas',
+    description: 'Front-desk counters in dental clinics, veterinary practices, and law offices where guests spend extended waiting periods.',
+    example: 'Medical center lobby counter with high-contrast acrylic signs.'
+  }
+];
+
+const tips = [
+  'Exact SSID Case Sensitivity: Ensure your Network Name matches the exact uppercase and lowercase letters configured on your Wi-Fi router.',
+  'Client-Side Security: Wi-Fi passwords are processed locally in your browser memory and are never uploaded to any remote server.',
+  'Optical Print Contrast: Maintain strong visual contrast—dark modules on a clean white background guarantee the fastest optical scanning.',
+  'Quiet Zone Margin: Keep at least a 10px white margin around the QR code so smartphone cameras can identify finder patterns reliably.',
+  'Windows & Android Camera Scanning: On Android and Windows devices, users can connect natively via the camera app or the Wi-Fi settings QR scanner.'
+];
+
+const technicalNotes = 'Standards Compliance: Generates standard MECARD-based "WIFI:S:SSID;T:WPA;P:PASSWORD;;" formatting compatible with iOS 11+, Android 9+, Windows 10/11, and modern barcode readers.';
+
+const faqs = [
+  {
+    question: 'How do guests scan and connect to Wi-Fi using a QR code?',
+    answer: 'Guests simply open their native smartphone camera app (iOS or Android) and point it at the QR code. A banner will instantly appear saying "Join [Network Name] Network". Tapping the banner connects the device immediately without typing the password.'
+  },
+  {
+    question: 'Does generating a Wi-Fi QR code expose my password to your servers?',
+    answer: 'No. Our Wi-Fi QR code generator runs 100% locally inside your web browser. All SVG/Canvas calculations happen in your device memory, meaning your private network credentials never travel across the internet.'
+  },
+  {
+    question: 'How do I connect to Wi-Fi using a QR code on Windows laptops?',
+    answer: 'On Windows 11 laptops and tablets with a built-in camera, open the native Camera app, point it at the Wi-Fi QR code, and click the network notification link that appears to connect automatically.'
+  },
+  {
+    question: 'What if my wireless network is open and does not require a password?',
+    answer: 'Select "None (Open Network)" in the encryption dropdown. The generator will produce an open Wi-Fi QR code that connects visitors directly without requesting authentication.'
+  },
+  {
+    question: 'Can I add my cafe or business logo to the center of the Wi-Fi QR code?',
+    answer: 'Yes! You can upload your brand logo in PNG, JPG, or SVG format. Our generator automatically adjusts the Reed-Solomon error correction to Level H (30%) to ensure complete optical scannability with the logo embedded.'
+  },
+  {
+    question: 'Do Wi-Fi QR codes ever expire or stop working?',
+    answer: 'No. Wi-Fi QR codes are static codes. They contain hardcoded network instructions that remain valid indefinitely as long as your router SSID and password do not change.'
+  }
+];
+
+const relatedTools = [
+  { name: 'URL QR Generator', slug: 'url-to-qr-code', description: 'Direct visitors to your website, guest portal, or online menu.' },
+  { name: 'Digital Menu QR', slug: 'restaurant-menu-qr-code', description: 'Create mobile-friendly contactless menus for dining tables.' },
+  { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Share full contact details for concierge and reception staff.' },
+  { name: 'Google Reviews QR', slug: 'google-reviews-qr-code', description: 'Collect 5-star customer reviews at checkout counters.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="Wi-Fi QR Code Generator — Connect to Wi-Fi Without Passwords"
+  description="Create free Wi-Fi QR codes for guest networks, cafes, hotels, and offices. Instant camera connection for iOS, Android, and Windows with vector SVG export."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="wifi"
+      headline="Wi-Fi QR Code Generator"
+      subheadline="Create secure, scannable Wi-Fi access cards. Let guests and customers connect instantly without typing complex passwords."
+    />
+  </div>
+
+  <LandingContent
+    heading="Wi-Fi QR Code"
+    subheading="Fast, secure, and password-free network connectivity for physical venues and residential guests."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

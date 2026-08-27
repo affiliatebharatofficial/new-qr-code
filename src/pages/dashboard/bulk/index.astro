@@ -1,0 +1,550 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import { getCurrentUser } from '../../../lib/auth/jwt';
+import { getUserEntitlements } from '../../../lib/billing/entitlements';
+import { getDb } from '../../../lib/db/client';
+
+const user = await getCurrentUser(Astro.request, Astro.locals);
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+const entitlements = await getUserEntitlements(user.id, Astro.locals);
+const canUseBulk = entitlements.canUseBulkQr;
+const bulkLimit = entitlements.bulkBatchLimit;
+
+const db = getDb(Astro.locals);
+const templatesRes = await db.prepare('SELECT id, name, style_config FROM templates WHERE user_id = ? ORDER BY name ASC').bind(user.id).all();
+const savedTemplates = (templatesRes.results || []).map((t: any) => {
+  let config = {};
+  try {
+    config = typeof t.style_config === 'string' ? JSON.parse(t.style_config) : (t.style_config || {});
+  } catch {
+    config = {};
+  }
+  return { id: t.id, name: t.name, styleConfig: config };
+});
+---
+
+<DashboardLayout title="Bulk QR Code Generator" activeNav="qr">
+  <div class="space-y-8 max-w-5xl mx-auto">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-0.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
+            Pro Feature
+          </span>
+          <span class="text-xs text-slate-400">Batch Limit: {bulkLimit} QRs / batch</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-1">
+          Bulk QR Generator
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">
+          Generate hundreds of customized static or dynamic QR codes in seconds from a CSV file.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <a
+          href="/dashboard/templates"
+          class="px-4 py-2.5 rounded-2xl text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-500 text-slate-800 dark:text-slate-200 shadow-sm transition-all"
+        >
+          Manage Templates
+        </a>
+      </div>
+    </div>
+
+    {!canUseBulk ? (
+      <!-- Free Plan Upgrade Gate Banner -->
+      <div class="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-indigo-900 via-slate-900 to-purple-950 border border-indigo-500/30 text-white shadow-xl text-center space-y-5">
+        <div class="w-14 h-14 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto border border-indigo-500/30">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+        </div>
+        <div class="space-y-2 max-w-lg mx-auto">
+          <h2 class="text-2xl font-black tracking-tight">Bulk QR Generation is a Pro Feature</h2>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Generate up to 500 QR codes per batch from a spreadsheet, apply your brand design, and download high-resolution PNG &amp; SVG ZIP archives.
+          </p>
+        </div>
+        <div>
+          <a
+            href="/pricing"
+            class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-xs sm:text-sm bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
+          >
+            Upgrade to Pro ($9/mo) &rarr;
+          </a>
+        </div>
+      </div>
+    ) : (
+      <!-- Bulk Generator Wizard Container -->
+      <div id="bulk-wizard-app" class="space-y-8" data-batch-limit={bulkLimit}>
+        <!-- Step 1: Upload / Input -->
+        <div class="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+            <div>
+              <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Step 1</span>
+              <h2 class="text-base font-bold text-slate-900 dark:text-white">Upload CSV or Paste Data</h2>
+            </div>
+
+            <!-- Download Templates Dropdown -->
+            <div class="flex items-center gap-2 text-xs">
+              <span class="text-slate-400 font-semibold">Sample CSVs:</span>
+              <button type="button" class="sample-csv-btn text-indigo-600 hover:underline font-bold" data-sample="static_url">Static URL</button>
+              <span>•</span>
+              <button type="button" class="sample-csv-btn text-indigo-600 hover:underline font-bold" data-sample="dynamic_url">Dynamic URL</button>
+              <span>•</span>
+              <button type="button" class="sample-csv-btn text-indigo-600 hover:underline font-bold" data-sample="wifi">Wi-Fi</button>
+            </div>
+          </div>
+
+          <!-- Drag and drop zone -->
+          <div
+            id="csv-dropzone"
+            class="border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-indigo-500 rounded-3xl p-8 text-center space-y-3 cursor-pointer transition-colors bg-slate-50/50 dark:bg-slate-950/40"
+          >
+            <input type="file" id="csv-file-input" accept=".csv,text/csv" class="hidden" />
+            <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+            </div>
+            <div>
+              <span class="text-xs font-bold text-indigo-600 hover:underline">Click to upload CSV</span>
+              <span class="text-xs text-slate-500"> or drag and drop</span>
+            </div>
+            <p class="text-[11px] text-slate-400">Supported formats: .csv (UTF-8) with columns: <code>name</code>, <code>type</code>, <code>data</code></p>
+          </div>
+
+          <!-- Paste Raw CSV Textarea -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center text-xs">
+              <label for="csv-raw-textarea" class="font-semibold text-slate-600 dark:text-slate-400">Or Paste CSV Text</label>
+              <button type="button" id="clear-csv-btn" class="text-slate-400 hover:text-slate-600">Clear</button>
+            </div>
+            <textarea
+              id="csv-raw-textarea"
+              rows="5"
+              placeholder="name,type,data&#10;Company Website,URL,https://example.com&#10;Social Profile,URL,https://instagram.com/mybrand"
+              class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-mono text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Step 2: Validation Results & Preview Table (Hidden until parsed) -->
+        <div id="validation-section" class="hidden p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+            <div>
+              <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Step 2</span>
+              <h2 class="text-base font-bold text-slate-900 dark:text-white">Validation &amp; Preview</h2>
+            </div>
+
+            <!-- Stats badges -->
+            <div class="flex items-center gap-2">
+              <span id="stat-total-badge" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">0 Rows</span>
+              <span id="stat-valid-badge" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">0 Valid</span>
+              <span id="stat-invalid-badge" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800">0 Errors</span>
+              <button type="button" id="dl-error-csv-btn" class="hidden px-3 py-1 rounded-xl text-xs font-bold bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-300 hover:bg-red-200 cursor-pointer">
+                Download Error CSV
+              </button>
+            </div>
+          </div>
+
+          <!-- Preview Table -->
+          <div class="overflow-x-auto max-h-60 overflow-y-auto border border-slate-100 dark:border-slate-800 rounded-2xl">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 dark:bg-slate-950 text-slate-400 font-bold uppercase sticky top-0">
+                <tr>
+                  <th class="py-2.5 px-4">Row</th>
+                  <th class="py-2.5 px-4">Name</th>
+                  <th class="py-2.5 px-4">Type</th>
+                  <th class="py-2.5 px-4">Target Data</th>
+                  <th class="py-2.5 px-4">Status</th>
+                </tr>
+              </thead>
+              <tbody id="preview-tbody" class="divide-y divide-slate-100 dark:divide-slate-800 font-mono text-[11px]">
+                <!-- Populated via script -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Step 3: Design & Mode Configuration -->
+        <div id="config-section" class="hidden p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+          <div class="pb-4 border-b border-slate-100 dark:border-slate-800">
+            <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Step 3</span>
+            <h2 class="text-base font-bold text-slate-900 dark:text-white">Configure QR Mode &amp; Styling</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Mode Selector -->
+            <div class="space-y-3">
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">QR Generation Mode</label>
+              <div class="grid grid-cols-2 gap-3">
+                <label class="flex flex-col p-4 rounded-2xl border border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/40 cursor-pointer">
+                  <div class="flex items-center gap-2">
+                    <input type="radio" name="bulk_mode" value="static" checked class="text-indigo-600 focus:ring-indigo-500" />
+                    <span class="text-xs font-bold text-slate-900 dark:text-white">Static QR</span>
+                  </div>
+                  <span class="text-[10px] text-slate-500 mt-1">Direct data, runs without redirects.</span>
+                </label>
+
+                <label class="flex flex-col p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 cursor-pointer">
+                  <div class="flex items-center gap-2">
+                    <input type="radio" name="bulk_mode" value="dynamic" class="text-purple-600 focus:ring-purple-500" />
+                    <span class="text-xs font-bold text-slate-900 dark:text-white">Dynamic QR</span>
+                  </div>
+                  <span class="text-[10px] text-slate-500 mt-1">Editable URLs + scan analytics tracking.</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Template / Style Preset Selector -->
+            <div class="space-y-3">
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Visual Design Template</label>
+              <select
+                id="template-select"
+                class="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="classic">Default Classic (Black / White Square)</option>
+                <option value="indigo">Indigo Modern (Rounded Dots)</option>
+                <option value="emerald">Emerald Brand (Circle Eyes)</option>
+                {savedTemplates.map((t) => (
+                  <option value={`custom_${t.id}`}>Custom: {t.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <!-- Batch Action Button -->
+          <div class="pt-4 flex items-center justify-end">
+            <button
+              type="button"
+              id="start-bulk-btn"
+              class="px-8 py-3.5 rounded-2xl font-bold text-xs sm:text-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/25 transition-all cursor-pointer"
+            >
+              Generate Batch &rarr;
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 4: Progress & Download Area (Hidden until triggered) -->
+        <div id="progress-section" class="hidden p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6 text-center">
+          <div class="space-y-2">
+            <h2 id="progress-title" class="text-lg font-bold text-slate-900 dark:text-white">Generating QR Codes...</h2>
+            <p id="progress-subtitle" class="text-xs text-slate-500">Processing batch items and packaging images...</p>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="max-w-md mx-auto space-y-2">
+            <div class="h-3 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+              <div id="progress-bar-fill" class="h-full bg-indigo-600 rounded-full transition-all duration-200" style="width: 0%;"></div>
+            </div>
+            <div class="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-400">
+              <span id="progress-pct">0%</span>
+              <span id="progress-count">0 / 0</span>
+            </div>
+          </div>
+
+          <!-- Download Action Buttons upon Completion -->
+          <div id="completion-actions" class="hidden pt-4 flex flex-wrap items-center justify-center gap-3">
+            <button
+              type="button"
+              id="dl-png-zip-btn"
+              class="px-6 py-3 rounded-2xl font-bold text-xs bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/20 cursor-pointer"
+            >
+              Download PNG ZIP 📦
+            </button>
+            <button
+              type="button"
+              id="dl-svg-zip-btn"
+              class="px-6 py-3 rounded-2xl font-bold text-xs bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 shadow-sm cursor-pointer"
+            >
+              Download SVG ZIP 📦
+            </button>
+            <a
+              href="/dashboard/qr"
+              class="px-6 py-3 rounded-2xl font-bold text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300"
+            >
+              View in Dashboard &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+</DashboardLayout>
+
+<!-- Client Script for CSV Parsing, Rendering, and JSZip Packaging -->
+<script define:vars={{ savedTemplates }}>
+  let validRows = [];
+  let invalidRows = [];
+  let generatedZipPng = null;
+  let generatedZipSvg = null;
+
+  const dropzone = document.getElementById('csv-dropzone');
+  const fileInput = document.getElementById('csv-file-input');
+  const textarea = document.getElementById('csv-raw-textarea');
+  const clearBtn = document.getElementById('clear-csv-btn');
+
+  // Simple CSV Splitter
+  function parseCSV(text) {
+    const lines = text.split(/\r?\n/).map((l) => l.trim()).filter((l) => l.length > 0);
+    if (lines.length < 2) return { valid: [], invalid: [] };
+
+    const headers = lines[0].split(',').map((h) => h.trim().toLowerCase().replace(/[^a-z0-9]/g, ''));
+    const nameIdx = headers.findIndex((h) => h === 'name' || h === 'title');
+    const typeIdx = headers.findIndex((h) => h === 'type' || h === 'qrtype');
+    const dataIdx = headers.findIndex((h) => h === 'data' || h === 'url' || h === 'destination' || h === 'payload');
+
+    if (dataIdx === -1) return { valid: [], invalid: [] };
+
+    const v = [];
+    const inv = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const parts = lines[i].split(',').map((p) => p.trim().replace(/^"|"$/g, ''));
+      const rowNum = i + 1;
+      const name = nameIdx !== -1 && parts[nameIdx] ? parts[nameIdx] : `QR_${rowNum - 1}`;
+      const type = typeIdx !== -1 && parts[typeIdx] ? parts[typeIdx].toLowerCase() : 'url';
+      const data = parts[dataIdx] || '';
+
+      if (!data) {
+        inv.push({ rowNumber: rowNum, name, type, data, error: 'Missing data payload' });
+      } else {
+        v.push({ rowNumber: rowNum, name, type, payload: data, destination: data });
+      }
+    }
+    return { valid: v, invalid: inv };
+  }
+
+  function handleCsvContent(content) {
+    const result = parseCSV(content);
+    validRows = result.valid;
+    invalidRows = result.invalid;
+
+    const total = validRows.length + invalidRows.length;
+    const valSection = document.getElementById('validation-section');
+    const cfgSection = document.getElementById('config-section');
+
+    if (total === 0) {
+      valSection?.classList.add('hidden');
+      cfgSection?.classList.add('hidden');
+      return;
+    }
+
+    valSection?.classList.remove('hidden');
+    cfgSection?.classList.remove('hidden');
+
+    const totalBadge = document.getElementById('stat-total-badge');
+    const validBadge = document.getElementById('stat-valid-badge');
+    const invalidBadge = document.getElementById('stat-invalid-badge');
+    const errorBtn = document.getElementById('dl-error-csv-btn');
+
+    if (totalBadge) totalBadge.innerText = `${total} Rows`;
+    if (validBadge) validBadge.innerText = `${validRows.length} Valid`;
+    if (invalidBadge) invalidBadge.innerText = `${invalidRows.length} Errors`;
+
+    if (invalidRows.length > 0) {
+      errorBtn?.classList.remove('hidden');
+    } else {
+      errorBtn?.classList.add('hidden');
+    }
+
+    // Render Preview
+    const tbody = document.getElementById('preview-tbody');
+    if (tbody) {
+      tbody.innerHTML = '';
+      const allRows = [...validRows, ...invalidRows].slice(0, 50); // Preview up to 50
+      for (const r of allRows) {
+        const tr = document.createElement('tr');
+        tr.className = r.error ? 'bg-red-50/40 dark:bg-red-950/20 text-red-700 dark:text-red-400' : 'hover:bg-slate-50/50';
+        tr.innerHTML = `
+          <td class="py-2 px-4">${r.rowNumber}</td>
+          <td class="py-2 px-4 font-bold">${r.name}</td>
+          <td class="py-2 px-4 uppercase text-[10px]">${r.type}</td>
+          <td class="py-2 px-4 truncate max-w-xs">${r.payload || r.data}</td>
+          <td class="py-2 px-4">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.error ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'}">
+              ${r.error ? 'Invalid' : 'Valid'}
+            </span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+  }
+
+  // File Upload Handlers
+  dropzone?.addEventListener('click', () => fileInput?.click());
+  fileInput?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const text = evt.target?.result || '';
+      if (textarea) textarea.value = text;
+      handleCsvContent(text);
+    };
+    reader.readAsText(file);
+  });
+
+  textarea?.addEventListener('input', () => handleCsvContent(textarea.value));
+  clearBtn?.addEventListener('click', () => {
+    if (textarea) textarea.value = '';
+    if (fileInput) fileInput.value = '';
+    handleCsvContent('');
+  });
+
+  // Sample CSV Templates
+  document.querySelectorAll('.sample-csv-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const sample = btn.getAttribute('data-sample');
+      let sampleText = '';
+      if (sample === 'static_url') {
+        sampleText = `name,type,data\nMain Website,URL,https://example.com\nStore,URL,https://store.example.com\nHelp Desk,URL,https://help.example.com`;
+      } else if (sample === 'dynamic_url') {
+        sampleText = `name,type,destination\nPromo Menu,URL,https://restaurant.com/menu\nSummer Flyer,URL,https://promo.example.com\nEvent Checkin,URL,https://event.com/welcome`;
+      } else if (sample === 'wifi') {
+        sampleText = `name,type,data\nGuest WiFi,WIFI,WIFI:S:GuestWiFi;T:WPA;P:GuestPass123;;\nOffice WiFi,WIFI,WIFI:S:OfficeWiFi;T:WPA;P:OfficePass456;;`;
+      }
+      if (textarea) textarea.value = sampleText;
+      handleCsvContent(sampleText);
+    });
+  });
+
+  // Bulk Generation Execution
+  document.getElementById('start-bulk-btn')?.addEventListener('click', async () => {
+    if (validRows.length === 0) {
+      alert('Please upload or enter at least 1 valid row.');
+      return;
+    }
+
+    const isDynamic = (document.querySelector('input[name="bulk_mode"]:checked'))?.value === 'dynamic';
+    const templateChoice = (document.getElementById('template-select'))?.value || 'classic';
+
+    let chosenStyle = {
+      colors: { foreground: '#000000', background: '#ffffff' },
+      dotType: 'square',
+      eyeFrameType: 'square',
+      eyeDotType: 'square',
+    };
+
+    if (templateChoice === 'indigo') {
+      chosenStyle = { colors: { foreground: '#4f46e5', background: '#ffffff' }, dotType: 'rounded', eyeFrameType: 'rounded', eyeDotType: 'rounded' };
+    } else if (templateChoice === 'emerald') {
+      chosenStyle = { colors: { foreground: '#059669', background: '#ffffff' }, dotType: 'dots', eyeFrameType: 'circle', eyeDotType: 'circle' };
+    } else if (templateChoice.startsWith('custom_')) {
+      const tplId = templateChoice.replace('custom_', '');
+      const found = (savedTemplates || []).find((t) => t.id === tplId);
+      if (found && found.styleConfig) chosenStyle = found.styleConfig;
+    }
+
+    // Switch to progress screen
+    document.getElementById('config-section')?.classList.add('hidden');
+    const progressSec = document.getElementById('progress-section');
+    progressSec?.classList.remove('hidden');
+
+    const barFill = document.getElementById('progress-bar-fill');
+    const pctLabel = document.getElementById('progress-pct');
+    const countLabel = document.getElementById('progress-count');
+
+    // 1. Submit Job to Server
+    let jobData;
+    try {
+      const res = await fetch('/api/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          rows: validRows,
+          isDynamic,
+          styleConfig: chosenStyle,
+        }),
+      });
+
+      jobData = await res.json();
+      if (!res.ok) throw new Error(jobData.error?.message || 'Bulk creation failed.');
+    } catch (err) {
+      alert(err?.message || 'Failed to start bulk job.');
+      progressSec?.classList.add('hidden');
+      document.getElementById('config-section')?.classList.remove('hidden');
+      return;
+    }
+
+    // 2. Client-side QR Rendering & ZIP Generation
+    const JSZipModule = await import('jszip');
+    const JSZip = JSZipModule.default;
+    const qrModule = await import('qr-code-styling');
+    const QRCodeStyling = qrModule.default;
+
+    const zipPng = new JSZip();
+    const zipSvg = new JSZip();
+
+    const dotsColor = chosenStyle.colors?.foreground || '#000000';
+    const bgColor = chosenStyle.colors?.isTransparent ? 'transparent' : (chosenStyle.colors?.background || '#ffffff');
+
+    for (let i = 0; i < validRows.length; i++) {
+      const row = validRows[i];
+      const cleanName = row.name.replace(/[^a-zA-Z0-9_-]/g, '_') || `qr_${i + 1}`;
+      const payload = row.payload;
+
+      const qr = new QRCodeStyling({
+        width: 512,
+        height: 512,
+        type: 'canvas',
+        data: payload,
+        margin: chosenStyle.margin || 10,
+        dotsOptions: { color: dotsColor, type: chosenStyle.dotType || 'square' },
+        backgroundOptions: { color: bgColor },
+        cornersSquareOptions: { type: chosenStyle.eyeFrameType || 'square', color: dotsColor },
+        cornersDotOptions: { type: chosenStyle.eyeDotType || 'square', color: dotsColor },
+      });
+
+      // Get PNG blob
+      const rawBlob = await qr.getRawData('png');
+      if (rawBlob) zipPng.file(`${cleanName}.png`, rawBlob);
+
+      // Get SVG blob
+      const rawSvgBlob = await qr.getRawData('svg');
+      if (rawSvgBlob) zipSvg.file(`${cleanName}.svg`, rawSvgBlob);
+
+      const progress = Math.round(((i + 1) / validRows.length) * 100);
+      if (barFill) barFill.style.width = `${progress}%`;
+      if (pctLabel) pctLabel.innerText = `${progress}%`;
+      if (countLabel) countLabel.innerText = `${i + 1} / ${validRows.length}`;
+    }
+
+    generatedZipPng = await zipPng.generateAsync({ type: 'blob' });
+    generatedZipSvg = await zipSvg.generateAsync({ type: 'blob' });
+
+    const title = document.getElementById('progress-title');
+    const subtitle = document.getElementById('progress-subtitle');
+    if (title) title.innerText = '✓ Bulk Generation Complete!';
+    if (subtitle) subtitle.innerText = `Successfully created ${validRows.length} QR codes. Your ZIP downloads are ready.`;
+
+    document.getElementById('completion-actions')?.classList.remove('hidden');
+  });
+
+  // Download ZIPs
+  document.getElementById('dl-png-zip-btn')?.addEventListener('click', () => {
+    if (!generatedZipPng) return;
+    const url = URL.createObjectURL(generatedZipPng);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `bulk-qr-codes-png-${Date.now()}.zip`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('dl-svg-zip-btn')?.addEventListener('click', () => {
+    if (!generatedZipSvg) return;
+    const url = URL.createObjectURL(generatedZipSvg);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `bulk-qr-codes-svg-${Date.now()}.zip`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+</script>

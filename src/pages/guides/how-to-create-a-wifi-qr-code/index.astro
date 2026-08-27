@@ -1,0 +1,63 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://qrcode.page/' },
+    { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://qrcode.page/guides' },
+    { '@type': 'ListItem', position: 3, name: 'Create Wi-Fi QR Code', item: 'https://qrcode.page/guides/how-to-create-a-wifi-qr-code' },
+  ],
+};
+---
+
+<BaseLayout
+  title="How to Create a Wi-Fi QR Code for Instant Guest Access"
+  description="Learn how to generate a secure Wi-Fi QR code for restaurants, cafes, hotels, and home guest networks without revealing passwords."
+  canonical="https://qrcode.page/guides/how-to-create-a-wifi-qr-code"
+  jsonLd={breadcrumbJsonLd}
+>
+  <article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-8">
+    <nav class="flex items-center gap-2 text-xs font-semibold text-slate-400" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-indigo-600">Home</a>
+      <span>/</span>
+      <a href="/guides" class="hover:text-indigo-600">Guides</a>
+      <span>/</span>
+      <span class="text-slate-600 dark:text-slate-300 truncate">Create Wi-Fi QR Code</span>
+    </nav>
+
+    <header class="space-y-3">
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+        How to Create a Wi-Fi QR Code for Instant Guest Connection
+      </h1>
+      <p class="text-xs text-slate-400 font-mono">Updated August 2026 • 3 min read</p>
+    </header>
+
+    <div class="prose prose-slate dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed space-y-6 text-slate-700 dark:text-slate-300">
+      <p>
+        Tired of spelling out long, complex Wi-Fi passwords to visiting guests, customers, and clients? A <strong>Wi-Fi QR code</strong> allows any modern smartphone camera to connect to your network in less than a second.
+      </p>
+
+      <h2 class="text-lg font-bold text-slate-900 dark:text-white pt-2">Step-by-Step Instructions</h2>
+      <ol class="list-decimal pl-5 space-y-2">
+        <li>Open the <a href="/wifi-qr-code-generator" class="text-indigo-600 font-bold hover:underline">Wi-Fi QR Code Generator</a>.</li>
+        <li>Enter your exact router <strong>Network Name (SSID)</strong>, paying careful attention to uppercase and lowercase letters.</li>
+        <li>Enter your <strong>Password</strong> and select your encryption type (usually <em>WPA/WPA2/WPA3</em>).</li>
+        <li>Customize the QR code with custom colors or frame text such as <em>"Scan for Free Wi-Fi"</em>.</li>
+        <li>Download the PNG or vector SVG file, frame it, and place it near your entryway or dining tables.</li>
+      </ol>
+
+      <h2 class="text-lg font-bold text-slate-900 dark:text-white pt-2">Security &amp; Privacy Guarantee</h2>
+      <p>
+        When you generate a Wi-Fi QR code on our platform, all processing takes place <strong>100% locally in your browser</strong>. Your network password is never transmitted to our servers or saved in a remote database.
+      </p>
+
+      <div class="pt-4">
+        <a href="/wifi-qr-code-generator" class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-xs bg-indigo-600 hover:bg-indigo-700 text-white shadow-md">
+          Generate Wi-Fi QR Code &rarr;
+        </a>
+      </div>
+    </div>
+  </article>
+</BaseLayout>

@@ -1,0 +1,14 @@
+---
+import QRGenerator from './QRGenerator.astro';
+import type { QRType } from '../../lib/qr/types';
+
+interface Props {
+  initialType?: QRType;
+  headline?: string;
+  subheadline?: string;
+}
+
+const props = Astro.props;
+---
+
+<QRGenerator {...props} />

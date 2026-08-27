@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is a Restaurant Menu QR Code Generator?';
+const overviewParagraphs = [
+  'A Restaurant Menu QR code generator creates a scannable tabletop 2D barcode that opens a clean, mobile-optimized digital food and drink menu on the diner’s smartphone. When guests sit down at a table or bar stool, they simply point their phone camera at the tabletop standee to browse appetizers, entrees, daily specials, dietary allergen tags, and wine lists immediately.',
+  'Traditional printed paper menus degrade quickly from food spills, require costly reprints whenever seasonal ingredients or prices fluctuate, and create operational bottlenecks when waitstaff must distribute and collect menus during peak dining hours. Digital menu QR codes eliminate printing expenses, allow instantaneous online menu updates, and provide guests with clear visual item photos and allergen filters.',
+  'Our generator supports direct PDF menu links, digital food menu landing pages, and hosted restaurant portals. You can customize colors, add your restaurant logo, and export print-ready vector SVG files for tabletop acrylic stands, wood blocks, and window decals.'
+];
+
+const sectors = [
+  {
+    name: 'Fine Dining & Casual Restaurants',
+    description: 'Place elegant engraved wood or acrylic QR stands on dining tables for contactless menu browsing.',
+    benefit: 'Eliminates paper menu reprinting costs and speeds up initial drink order turnaround.'
+  },
+  {
+    name: 'Bars, Breweries & Taprooms',
+    description: 'Display on bar counter coasters and table tents showcasing rotating craft beer taps and cocktail specials.',
+    benefit: 'Enables real-time updates as craft kegs change throughout the evening.'
+  },
+  {
+    name: 'Cafes, Bakeries & Coffee Shops',
+    description: 'Print on counter display stands and window decals showing daily fresh pastry selections and specialty beans.',
+    benefit: 'Reduces morning counter lines by letting patrons browse while queued.'
+  },
+  {
+    name: 'Food Trucks & Street Vendors',
+    description: 'Mount high-contrast outdoor signs beside the order window showing full combo prices and vegan options.',
+    benefit: 'Enables quick decision-making before customers reach the ordering counter.'
+  },
+  {
+    name: 'Hotel Room Service & Poolside Cabanas',
+    description: 'Embed on bedside tabletop cards and poolside cabana stands for in-room food delivery orders.',
+    benefit: 'Increases hotel food and beverage revenue through convenient mobile ordering.'
+  },
+  {
+    name: 'Catering Services & Event Buffets',
+    description: 'Place beside buffet banquet stations detailing ingredients, gluten-free tags, and allergen disclosures.',
+    benefit: 'Provides transparent allergen safety for guests with dietary restrictions.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Paste Menu URL or PDF',
+    description: 'Enter your online digital menu URL or link to a cloud-hosted PDF menu document.'
+  },
+  {
+    title: '2. Style Brand & Table Stand',
+    description: 'Pick colors matching your restaurant decor, choose rounded eye frames, and upload your dining logo.'
+  },
+  {
+    title: '3. Download & Print Standees',
+    description: 'Download in scalable Vector SVG for laser wood engraving or high-DPI PNG for tabletop acrylic stands.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Tabletop Acrylic Standees',
+    description: 'Durable 4x6 acrylic stands placed centrally on each dining table with a "Scan for Food & Wine Menu" callout.',
+    example: 'Italian bistro with 30 indoor and patio dining tables.'
+  },
+  {
+    title: 'Bar Counter Coasters',
+    description: 'Absorbent branded beverage coasters printed with high-contrast QR codes for drink specials.',
+    example: 'Craft beer taproom showcasing 24 rotating draught beers.'
+  },
+  {
+    title: 'Storefront Window Menus',
+    description: 'Laminated outdoor decals allowing evening passersby to inspect menus and prices after closing hours.',
+    example: 'Neighborhood restaurant attracting next-day lunch reservations.'
+  },
+  {
+    title: 'Hotel Room Bedside Placards',
+    description: 'Placed beside guest room nightstands for late-night room service orders.',
+    example: 'Resort hotel boosting late-night dining orders.'
+  }
+];
+
+const tips = [
+  'Mobile-Optimized Menu Pages: Ensure your linked menu page loads fast on mobile 4G/5G connections and has readable text without pinching and zooming.',
+  'Durable Table Materials: For long-term restaurant use, print on waterproof synthetic paper or enclose QR prints inside sealed acrylic stands.',
+  'High Contrast for Ambient Dining: Keep modules dark against a white background so cameras can scan under dim evening candlelight.',
+  'Add Clear Call to Action: Include explicit text such as "Scan with phone camera to view our digital menu".',
+  'Dynamic QR Codes for Future Updates: Use Dynamic QR codes if you want to swap the destination menu URL in the future without reprinting physical table stands.'
+];
+
+const technicalNotes = 'Standards Compliance: Standard ISO/IEC 18004 QR symbols compatible with all iOS and Android smartphone camera apps and barcode scanners.';
+
+const faqs = [
+  {
+    question: 'How do customers view my restaurant menu using a QR code?',
+    answer: 'Customers open their native smartphone camera app, point it at the tabletop QR code, and tap the notification link on screen. The digital menu opens immediately in their mobile web browser.'
+  },
+  {
+    question: 'Can I link the QR code directly to a PDF menu document?',
+    answer: 'Yes! You can link the QR code directly to any online PDF file hosted on your website, Google Drive, or cloud storage.'
+  },
+  {
+    question: 'What is the best way to print QR codes for restaurant tables?',
+    answer: 'For restaurant environments, 4x6 inch acrylic table tents, engraved wooden blocks, or laminated tabletop stickers are most durable against drink spills and frequent cleaning.'
+  },
+  {
+    question: 'Can I change my food prices or dishes without reprinting the table QR codes?',
+    answer: 'If your QR code points to your website menu URL or a dynamic QR code, you can update your online food prices anytime—the physical tabletop QR codes will continue to work seamlessly.'
+  },
+  {
+    question: 'Do restaurant menu QR codes expire?',
+    answer: 'Static QR codes never expire. They remain active indefinitely as long as your destination website or online menu remains published.'
+  },
+  {
+    question: 'Can I add my restaurant logo to the center of the menu QR code?',
+    answer: 'Yes. Upload your restaurant logo in PNG or SVG format. Our generator automatically applies Level H error correction (30%) so the code scans quickly with the logo centered.'
+  }
+];
+
+const relatedTools = [
+  { name: 'Wi-Fi QR Generator', slug: 'wifi-qr-code-generator', description: 'Offer frictionless guest Wi-Fi on dining tables.' },
+  { name: 'Google Reviews QR', slug: 'google-reviews-qr-code', description: 'Collect 5-star Google reviews right from dining receipts.' },
+  { name: 'UPI Payment QR', slug: 'upi-qr-code-generator', description: 'Accept instant zero-commission table payments in India.' },
+  { name: 'URL QR Generator', slug: 'url-to-qr-code', description: 'Direct traffic to your website, blog, or reservation form.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="Restaurant Menu QR Code Generator — Digital Contactless Menus"
+  description="Generate free Restaurant Menu QR codes for dining tables, bars, and cafes. Link to digital menus or PDFs with instant vector SVG & PNG download."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="url"
+      headline="Restaurant Menu QR Code Generator"
+      subheadline="Create contactless digital menu QR codes for dining tables, bar tops, and takeout windows. Instant mobile menu browsing in one scan."
+    />
+  </div>
+
+  <LandingContent
+    heading="Restaurant Menu QR Code"
+    subheading="Modernize tabletop dining with contactless, eco-friendly digital menus."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

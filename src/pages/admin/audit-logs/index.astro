@@ -1,0 +1,79 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getDb } from '../../../lib/db/client';
+
+const db = getDb(Astro.locals);
+
+const res = await db.prepare(`
+  SELECT a.*, u.email as admin_email
+  FROM admin_audit_logs a
+  LEFT JOIN users u ON a.admin_user_id = u.id
+  ORDER BY a.created_at DESC
+  LIMIT 100
+`).all();
+
+const logs = res.results || [];
+---
+
+<AdminLayout title="Audit Trail" activeNav="audit_logs">
+  <div class="space-y-6">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Immutable Audit Trail</h1>
+      <p class="text-xs text-slate-400 mt-1">Append-only chronological record of all administrative operations, moderation actions, and account state changes.</p>
+    </div>
+
+    <div class="bg-slate-950 rounded-3xl border border-slate-800 overflow-hidden shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-900/60 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+            <tr>
+              <th class="py-3.5 px-6">Timestamp</th>
+              <th class="py-3.5 px-6">Admin</th>
+              <th class="py-3.5 px-6">Action</th>
+              <th class="py-3.5 px-6">Target Resource</th>
+              <th class="py-3.5 px-6">Details / Reason</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/80 font-mono text-[11px]">
+            {logs.length === 0 ? (
+              <tr>
+                <td colspan="5" class="py-8 text-center text-slate-500 font-sans">No admin actions recorded yet.</td>
+              </tr>
+            ) : (
+              logs.map((l: any) => {
+                let metaObj: any = {};
+                try {
+                  metaObj = l.metadata ? (typeof l.metadata === 'string' ? JSON.parse(l.metadata) : l.metadata) : {};
+                } catch {
+                  metaObj = {};
+                }
+
+                return (
+                  <tr class="hover:bg-slate-900/40 transition-colors">
+                    <td class="py-3.5 px-6 text-slate-400 whitespace-nowrap">
+                      {new Date(l.created_at).toLocaleString()}
+                    </td>
+                    <td class="py-3.5 px-6 font-bold text-white">
+                      {l.admin_email || l.admin_user_id}
+                    </td>
+                    <td class="py-3.5 px-6">
+                      <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-indigo-900/40 text-indigo-300">
+                        {l.action}
+                      </span>
+                    </td>
+                    <td class="py-3.5 px-6 text-slate-300">
+                      {l.resource_type}: <span class="text-slate-400">{l.resource_id}</span>
+                    </td>
+                    <td class="py-3.5 px-6 text-slate-400 max-w-sm truncate">
+                      {metaObj.reason || metaObj.notes || JSON.stringify(metaObj) || '—'}
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</AdminLayout>

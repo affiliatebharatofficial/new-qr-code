@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is a Digital Business Card QR Code?';
+const overviewParagraphs = [
+  'A Digital Business Card QR code links directly to a personalized, mobile-responsive contact profile hosting your professional headshot, name, executive title, company bio, phone numbers, direct email, website links, social media handles, and an instant "Save Contact" (.vcf) download button. When scanned at networking events or client meetings, the recipient accesses a rich interactive profile that never gets lost or thrown away.',
+  'While traditional paper business cards provide limited space and quickly become obsolete whenever your phone number or title changes, a Digital Business Card landing page provides an interactive, multimedia hub. Contacts can save your details straight into their phone book, connect on LinkedIn, schedule appointments on Calendly, and view your portfolio in one seamless mobile view.',
+  'Our platform allows you to create both standalone static vCard codes and dynamic hosted digital business card profiles. Customize colors, embed corporate branding, and download print-ready vector SVG or PNG files for physical cards, badge lanyards, and digital phone wallpaper.'
+];
+
+const sectors = [
+  {
+    name: 'Real Estate Brokers & Developers',
+    description: 'Print on high-end business cards and property brochures with direct links to active MLS listings.',
+    benefit: 'Enables prospective home buyers to contact agents and inspect virtual tours instantly.'
+  },
+  {
+    name: 'Corporate Sales & Account Teams',
+    description: 'Deploy across sales forces to standardize corporate branding, LinkedIn links, and booking schedules.',
+    benefit: 'Streamlines prospect follow-ups and increases meeting booking rates.'
+  },
+  {
+    name: 'Tech Founders & Freelance Creators',
+    description: 'Display on phone lock-screen backgrounds and conference badges linking to GitHub and portfolios.',
+    benefit: 'Eliminates paper waste while projecting an innovative, tech-forward brand image.'
+  },
+  {
+    name: 'Healthcare & Wellness Practitioners',
+    description: 'Provide to patients on appointment cards with direct patient portal links and clinic phone lines.',
+    benefit: 'Gives patients a clear, accessible contact hub for questions and booking.'
+  },
+  {
+    name: 'Legal & Wealth Advisory Partners',
+    description: 'Equip senior partners with elegant contactless cards for high-net-worth client meetings.',
+    benefit: 'Provides clients with immediate access to direct phone lines and office coordinates.'
+  },
+  {
+    name: 'Conference Speakers & Industry Panellists',
+    description: 'Feature on closing presentation slides allowing hundreds of attendees to connect in seconds.',
+    benefit: 'Captures maximum networking value from public speaking engagements.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Enter Professional Details',
+    description: 'Input your name, company, title, phone, email, website, and relevant social media links.'
+  },
+  {
+    title: '2. Customize Card Styling',
+    description: 'Choose your brand color scheme, rounded or dot modules, and upload your profile photo or corporate logo.'
+  },
+  {
+    title: '3. Export for Print & Screen',
+    description: 'Download Vector SVG for letterpress cards or high-definition PNG for lock-screen wallpapers.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Back of Physical Business Cards',
+    description: 'Printed on the back of luxury paper cards providing a digital backup with 1-tap contact saving.',
+    example: 'Luxury real estate agent card with an elegant monochrome QR.'
+  },
+  {
+    title: 'Smartphone Lock-Screen Wallpaper',
+    description: 'Saved as phone background image during networking events so peers can scan directly from your screen.',
+    example: 'Tech founder networking at industry mixers without carrying paper cards.'
+  },
+  {
+    title: 'Conference Lanyard Name Tags',
+    description: 'Printed on summit badge inserts allowing fast peer-to-peer contact exchange in expo halls.',
+    example: 'Summit attendee connecting with 80+ potential partners in one day.'
+  },
+  {
+    title: 'Email Signature Banners',
+    description: 'Embedded at the bottom of outgoing professional emails for mobile email recipients.',
+    example: 'Consultant email signature with a "Scan to save my direct mobile" link.'
+  }
+];
+
+const tips = [
+  'International Phone Notation: Always include country codes (e.g., +1 555 123 4567) to ensure seamless dialing across global networks.',
+  'High Contrast for Screen Scanning: When displaying the QR code on your phone screen, use high-contrast dark modules on pure white for fast camera capture.',
+  'Minimum Physical Card Size: When printing on business cards, keep the QR code at least 25 x 25 mm (1 x 1 inch) for fast camera autofocus.',
+  'Vector SVG for Premium Print Finishes: Use Vector SVG format for spot UV, foil stamping, or embossed business cards.',
+  'Test Across iOS and Android: Verify that scanning opens the profile and downloads the vCard contact cleanly on both operating systems.'
+];
+
+const technicalNotes = 'Standards Compliance: Supports both client-side vCard 3.0 serialization and responsive HTML5 microdata contact cards.';
+
+const faqs = [
+  {
+    question: 'How does a Digital Business Card QR code work when scanned?',
+    answer: 'When scanned with a smartphone camera, the recipient\'s phone immediately opens your interactive profile page or presents an "Add to Contacts" prompt with all your details pre-filled for 1-tap saving.'
+  },
+  {
+    question: 'Does the recipient need a special app to save my contact info?',
+    answer: 'No! The built-in camera app on all modern iPhones and Android smartphones reads the QR code natively without any third-party app downloads.'
+  },
+  {
+    question: 'Can I include my photo and company logo?',
+    answer: 'Yes! You can upload your profile photo or company logo. Our tool automatically applies Level H error correction (30%) so the QR code scans reliably with your image centered.'
+  },
+  {
+    question: 'Can I use this as my phone lock-screen wallpaper?',
+    answer: 'Yes! Download the high-resolution PNG file, set it as your smartphone lock screen, and let people scan your phone directly during networking events.'
+  },
+  {
+    question: 'Do Digital Business Card QR codes expire?',
+    answer: 'No. Static contact codes encode your details permanently and will work indefinitely. Dynamic digital business cards hosted on our platform remain active according to your account.'
+  },
+  {
+    question: 'Is my personal contact data kept private?',
+    answer: 'Yes. Static vCard codes are generated 100% locally in your browser memory and are never uploaded to remote databases.'
+  }
+];
+
+const relatedTools = [
+  { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Create lightweight offline vCard 3.0 contact codes.' },
+  { name: 'Social Media QR', slug: 'social-media-qr-code', description: 'Connect all your social profiles in one landing hub.' },
+  { name: 'Email QR Generator', slug: 'email-qr-code-generator', description: 'Create pre-addressed email drafts for business inquiries.' },
+  { name: 'WhatsApp QR Generator', slug: 'whatsapp-qr-code-generator', description: 'Start instant WhatsApp conversations with prospective clients.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="Digital Business Card QR Code Generator — Contactless vCard QR"
+  description="Create digital business card QR codes with full contact details, phone, email, and social links. Compatible with iOS & Android. Free vector SVG & PNG."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="vcard"
+      headline="Digital Business Card QR Code Generator"
+      subheadline="Create modern contactless business cards. Let clients and networking contacts save your credentials with a single camera tap."
+    />
+  </div>
+
+  <LandingContent
+    heading="Digital Business Card QR Code"
+    subheading="Upgrade your professional networking with instant, eco-friendly digital contact sharing."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

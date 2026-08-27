@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is a Google Maps QR Code Generator?';
+const overviewParagraphs = [
+  'A Google Maps QR code generator converts your business address, Google Business Profile location, or custom map route into a scannable 2D barcode. When customers scan the code with their smartphone camera, their device instantly launches Google Maps with turn-by-turn driving, walking, or public transit directions pre-loaded.',
+  'Finding retail stores, doctor offices, dental clinics, restaurant patios, pop-up events, and service centers in crowded commercial areas is much simpler when customers don\'t have to manually type street addresses or search through similarly named businesses. A direct Google Maps QR code connects physical print media directly to accurate GPS navigation.',
+  'Our browser-based tool allows you to customize colors, add your brand logo, and download high-resolution Vector SVG files or PNG images for store windows, print flyers, business cards, and outdoor signboards.'
+];
+
+const sectors = [
+  {
+    name: 'Retail Stores & Boutiques',
+    description: 'Print on promotional flyers, postcards, and shopping bags to guide nearby shoppers directly to your storefront.',
+    benefit: 'Turns local neighborhood promotions into foot traffic.'
+  },
+  {
+    name: 'Restaurants, Cafes & Bars',
+    description: 'Place on festival handouts and tourist brochures for easy navigation to dining spots.',
+    benefit: 'Helps tourists and locals find your venue in bustling nightlife districts.'
+  },
+  {
+    name: 'Medical & Dental Practices',
+    description: 'Include on new patient appointment confirmation cards and referral brochures.',
+    benefit: 'Ensures patients arrive on time for medical appointments without getting lost.'
+  },
+  {
+    name: 'Real Estate Open Houses',
+    description: 'Print on directional street signs and property flyers guiding visitors to weekend showings.',
+    benefit: 'Provides accurate driving directions directly to neighborhood properties.'
+  },
+  {
+    name: 'Automotive Dealerships & Garages',
+    description: 'Display on service reminder flyers and tow truck cards for straightforward routing to service bays.',
+    benefit: 'Guides drivers directly to the correct service entrance.'
+  },
+  {
+    name: 'Event Centers & Wedding Venues',
+    description: 'Include on formal wedding invitations and corporate conference agendas.',
+    benefit: 'Prevents guest arrival delays at scenic, off-the-beaten-path venues.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Paste Google Maps Link or Address',
+    description: 'Paste your Google Maps share link (e.g., https://maps.app.goo.gl/... or https://google.com/maps/place/...).'
+  },
+  {
+    title: '2. Customize Styling & Colors',
+    description: 'Match your business color palette, pick rounded eye frames, and upload a central map pin icon or logo.'
+  },
+  {
+    title: '3. Export Vector SVG or PNG',
+    description: 'Download in scalable Vector SVG for print flyers and banners or high-DPI PNG for digital assets.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Storefront Window Decals',
+    description: 'Placed on storefront windows allowing pedestrians to bookmark the store location for future visits.',
+    example: 'Clothing boutique on a high-traffic pedestrian street.'
+  },
+  {
+    title: 'Print Marketing Postcards',
+    description: 'Direct mail postcards sent to neighborhood households with a "Visit Our Showroom" QR code.',
+    example: 'Furniture store launching a neighborhood grand opening.'
+  },
+  {
+    title: 'Wedding Invitation Inserts',
+    description: 'Enclosed with formal invitations directing out-of-town guests to ceremony and reception halls.',
+    example: 'Couples guiding out-of-town family to wedding venues.'
+  },
+  {
+    title: 'Tourist City Guide Maps',
+    description: 'Printed in hotel lobby guides pointing guests to local restaurants and historical landmarks.',
+    example: 'Boutique hotel providing curated local dining maps.'
+  }
+];
+
+const tips = [
+  'Use Google Maps Share Links: In Google Maps, search for your business, click the "Share" button, and copy the short link for a cleaner QR matrix.',
+  'High Contrast for Distant Scanning: Use dark foreground modules on a pure white background for fast camera autofocus.',
+  'Vector SVG for Physical Signage: Export in SVG vector format when sending files to sign makers or print shops.',
+  'Verify Exact Pin Placement: Always test scan the QR code to verify that navigation leads to the main customer entrance.',
+  'Clear Action Callout: Accompany the code with copy such as "Scan for Turn-by-Turn Google Maps Directions".'
+];
+
+const technicalNotes = 'Standards Compliance: Compatible with standard Google Maps URLs and universal geo-intent links on iOS and Android.';
+
+const faqs = [
+  {
+    question: 'How do I get my Google Maps share link?',
+    answer: 'Search for your business on Google Maps, click the "Share" button in the left panel, and copy the generated short link (e.g., https://maps.app.goo.gl/...). Paste this link into our generator.'
+  },
+  {
+    question: 'What happens when someone scans a Google Maps QR code?',
+    answer: 'The scanner\'s phone immediately opens the Google Maps app (or web maps in browser) with your exact location pinned and a "Directions" button ready to start turn-by-turn navigation.'
+  },
+  {
+    question: 'Does this work on iPhones as well as Android phones?',
+    answer: 'Yes! On iPhones, scanning the code opens Google Maps if installed, or the Google Maps web interface in Safari, with full navigation support.'
+  },
+  {
+    question: 'Can I use a Google Maps QR code for a specific entrance or parking lot?',
+    answer: 'Yes! You can right-click any exact parking gate or rear entrance on Google Maps, copy the coordinates, or share that specific pin to create an exact waypoint QR code.'
+  },
+  {
+    question: 'Do Google Maps QR codes expire?',
+    answer: 'No. Static Google Maps QR codes encode your map URL directly and have no expiration date. They will work permanently as long as the map listing is active.'
+  },
+  {
+    question: 'Can I customize the QR code with my company logo?',
+    answer: 'Yes. You can upload your business logo or a custom map marker icon in the Customization panel. Our tool automatically applies Level H error correction for reliable scanning.'
+  }
+];
+
+const relatedTools = [
+  { name: 'Location QR Generator', slug: 'location-qr-code-generator', description: 'Create raw GPS latitude and longitude coordinate QR codes.' },
+  { name: 'Google Reviews QR', slug: 'google-reviews-qr-code', description: 'Direct customers to your 5-star Google review form.' },
+  { name: 'URL QR Generator', slug: 'url-to-qr-code', description: 'Direct traffic to your website, blog, or booking form.' },
+  { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Share full contact credentials and physical office address.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="Google Maps QR Code Generator — Directions & Location QR Code"
+  description="Generate free Google Maps QR codes that open turn-by-turn driving directions in 1 scan. Free vector SVG & PNG download for storefronts & invitations."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="location"
+      headline="Google Maps QR Code Generator"
+      subheadline="Create scannable map QR codes that launch turn-by-turn directions to your storefront or event venue in Google Maps."
+    />
+  </div>
+
+  <LandingContent
+    heading="Google Maps QR Code"
+    subheading="Guide customers and event guests straight to your physical doorstep with one scan."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

@@ -1,0 +1,99 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://qrcode.page/' },
+    { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://qrcode.page/guides' },
+    { '@type': 'ListItem', position: 3, name: 'Static vs Dynamic QR', item: 'https://qrcode.page/guides/static-vs-dynamic-qr' },
+  ],
+};
+---
+
+<BaseLayout
+  title="Static vs Dynamic QR Codes: Which Should You Use?"
+  description="Compare static and dynamic QR codes. Learn the key differences in editability, scan analytics, lifetime validity, and printing costs."
+  canonical="https://qrcode.page/guides/static-vs-dynamic-qr"
+  jsonLd={breadcrumbJsonLd}
+>
+  <article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-8">
+    <nav class="flex items-center gap-2 text-xs font-semibold text-slate-400" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-indigo-600">Home</a>
+      <span>/</span>
+      <a href="/guides" class="hover:text-indigo-600">Guides</a>
+      <span>/</span>
+      <span class="text-slate-600 dark:text-slate-300 truncate">Static vs Dynamic QR</span>
+    </nav>
+
+    <header class="space-y-3">
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+        Static vs Dynamic QR Codes: A Comprehensive Comparison
+      </h1>
+      <p class="text-xs text-slate-400 font-mono">Updated August 2026 • 5 min read</p>
+    </header>
+
+    <div class="prose prose-slate dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed space-y-6 text-slate-700 dark:text-slate-300">
+      <p>
+        When generating a QR code, you will encounter two fundamental architectures: <strong>Static QR codes</strong> and <strong>Dynamic QR codes</strong>. Choosing the right type depends on your need for post-print editing and scan tracking.
+      </p>
+
+      <!-- Comparison Table -->
+      <div class="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-2xl">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50 dark:bg-slate-900 text-slate-400 uppercase font-bold">
+            <tr>
+              <th class="p-3">Feature</th>
+              <th class="p-3">Static QR Code</th>
+              <th class="p-3">Dynamic QR Code</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+            <tr>
+              <td class="p-3 font-bold">Data Storage</td>
+              <td class="p-3">Hard-coded inside the pattern modules</td>
+              <td class="p-3">Redirect URL pointing to cloud destination</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-bold">Editable Destination?</td>
+              <td class="p-3 text-red-500 font-bold">No (Requires reprinting)</td>
+              <td class="p-3 text-emerald-500 font-bold">Yes (Instant real-time updates)</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-bold">Scan Analytics &amp; Tracking</td>
+              <td class="p-3 text-red-500">Not possible</td>
+              <td class="p-3 text-emerald-500 font-bold">Full telemetry (scans, device, date)</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-bold">Code Density</td>
+              <td class="p-3">Denser with large data</td>
+              <td class="p-3 font-semibold text-indigo-600">Clean &amp; low density (always short URL)</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-bold">Works 100% Offline?</td>
+              <td class="p-3 text-emerald-500 font-bold">Yes (Wi-Fi, text, vCard)</td>
+              <td class="p-3">Requires internet for redirect</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="text-lg font-bold text-slate-900 dark:text-white pt-4">When to Choose Static QR</h2>
+      <p>
+        Static QR codes are ideal for permanent, offline data that will never change, such as personal Wi-Fi passwords, raw text notes, static contact cards, or one-off personal projects.
+      </p>
+
+      <h2 class="text-lg font-bold text-slate-900 dark:text-white pt-4">When to Choose Dynamic QR</h2>
+      <p>
+        Dynamic QR codes are the industry standard for business marketing, restaurant menus, product retail packaging, billboards, and campaigns where tracking ROI and updating URLs is essential.
+      </p>
+
+      <div class="pt-4">
+        <a href="/" class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-xs bg-indigo-600 hover:bg-indigo-700 text-white shadow-md">
+          Create a Dynamic QR Code &rarr;
+        </a>
+      </div>
+    </div>
+  </article>
+</BaseLayout>

@@ -1,0 +1,1011 @@
+---
+import QRTypeSelector from './QRTypeSelector.astro';
+import DynamicQRForm from './DynamicQRForm.astro';
+import QRCustomization from './QRCustomization.astro';
+import QRPreview from './QRPreview.astro';
+import QRDownload from './QRDownload.astro';
+import type { QRType } from '../../lib/qr/types';
+
+interface Props {
+  initialType?: QRType;
+  headline?: string;
+  subheadline?: string;
+}
+
+const {
+  initialType = 'url',
+  headline = 'Free QR Code Generator',
+  subheadline = 'Create high-resolution, branded QR codes instantly. 100% free, runs entirely in your browser.',
+} = Astro.props;
+---
+
+<section id="generator-app" class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8" data-initial-type={initialType}>
+  <!-- Section Title -->
+  <div class="text-center max-w-3xl mx-auto mb-8">
+    <h1 id="generator-heading" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+      {headline}
+    </h1>
+    <p id="generator-subheading" class="mt-3 text-base sm:text-lg text-slate-600 dark:text-slate-400">
+      {subheadline}
+    </p>
+  </div>
+
+  <!-- Generator Main Layout -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+    
+    <!-- LEFT PANEL: Type Selector, Inputs, & Customization (7 Cols) -->
+    <div class="lg:col-span-7 space-y-6">
+      <QRTypeSelector initialType={initialType} />
+      <DynamicQRForm initialType={initialType} />
+      <QRCustomization />
+    </div>
+
+    <!-- RIGHT PANEL: Live QR Code Preview & Downloads (5 Cols Sticky) -->
+    <div class="lg:col-span-5 lg:sticky lg:top-24 space-y-4">
+      <QRPreview>
+        <QRDownload />
+      </QRPreview>
+    </div>
+
+  </div>
+
+  <!-- Save QR Code Modal -->
+  <div id="save-qr-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="save-modal-title">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl max-w-md w-full p-6 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+        <h3 id="save-modal-title" class="text-base font-bold text-slate-900 dark:text-white">Save QR Code to Account</h3>
+        <button type="button" id="close-save-modal-btn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer p-1">✕</button>
+      </div>
+
+      <div id="save-modal-error" class="hidden p-2.5 rounded-xl text-xs bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-300 border border-red-200 dark:border-red-800"></div>
+
+      <form id="save-qr-form" class="space-y-4" onsubmit="return false;">
+        <div>
+          <label for="save-qr-name-input" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+            QR Code Name / Label <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="save-qr-name-input"
+            required
+            placeholder="e.g. Company Website Campaign"
+            class="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        <!-- Static vs Dynamic QR Selection -->
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+            QR Code Mode
+          </label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="flex flex-col p-3 rounded-2xl border border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/40 cursor-pointer transition-all has-[:checked]:border-indigo-600 has-[:checked]:ring-2 has-[:checked]:ring-indigo-500/20">
+              <div class="flex items-center gap-2">
+                <input type="radio" name="qr_mode" value="static" checked class="text-indigo-600 focus:ring-indigo-500" />
+                <span class="text-xs font-bold text-slate-900 dark:text-white">Static QR</span>
+              </div>
+              <span class="text-[10px] text-slate-500 mt-1">Direct data, never expires, no redirects.</span>
+            </label>
+
+            <label id="dynamic-mode-label" class="flex flex-col p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 cursor-pointer transition-all has-[:checked]:border-purple-600 has-[:checked]:ring-2 has-[:checked]:ring-purple-500/20">
+              <div class="flex items-center gap-2">
+                <input type="radio" name="qr_mode" value="dynamic" id="radio-dynamic" class="text-purple-600 focus:ring-purple-500" />
+                <span class="text-xs font-bold text-slate-900 dark:text-white">Dynamic QR</span>
+              </div>
+              <span class="text-[10px] text-slate-500 mt-1">Editable destination + real-time scan analytics.</span>
+            </label>
+          </div>
+          <p id="dynamic-type-notice" class="hidden text-[11px] text-amber-600 dark:text-amber-400">
+            Note: Dynamic redirects are available for URL and web-based QR codes.
+          </p>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button
+            type="button"
+            id="cancel-save-modal-btn"
+            class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            id="confirm-save-modal-btn"
+            class="px-5 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm cursor-pointer focus:ring-2 focus:ring-indigo-500"
+          >
+            Save QR Code
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Client-side Pure Static Engine -->
+<script>
+  import {
+    buildUrlPayload,
+    buildTextPayload,
+    buildWifiPayload,
+    buildVCardPayload,
+    buildEmailPayload,
+    buildPhonePayload,
+    buildSmsPayload,
+    buildWhatsAppPayload,
+    buildLocationPayload,
+    buildUpiPayload,
+    buildVenmoPayload,
+    buildPayPalPayload,
+    buildZellePayload,
+    buildCashAppPayload,
+    buildSocialPayload,
+    buildAppPayload,
+    buildEventPayload,
+    buildReviewPayload,
+  } from '../../lib/qr/payloads';
+  import { checkScannability } from '../../lib/qr/contrast';
+  import { copyQrToClipboard, shareQrCode } from '../../lib/qr/export';
+  import type { QRType, QRDesignOptions, DotType, EyeFrameType, EyeDotType, ErrorCorrectionLevel } from '../../lib/qr/types';
+
+  // State Management
+  const appEl = document.getElementById('generator-app');
+  let currentType: QRType = (appEl?.getAttribute('data-initial-type') as QRType) || 'url';
+  let qrCodeInstance: any = null;
+  let QRCodeStylingClass: any = null;
+  let editingQrId: string | null = null;
+
+  const defaultDesignState: QRDesignOptions = {
+    type: currentType,
+    payload: 'https://example.com',
+    size: 512,
+    margin: 10,
+    errorCorrection: 'M',
+    dotType: 'square',
+    eyeFrameType: 'square',
+    eyeDotType: 'square',
+    colors: {
+      foreground: '#000000',
+      background: '#ffffff',
+      isTransparent: false,
+      useGradient: false,
+    },
+    logo: {
+      src: undefined,
+      sizeRatio: 0.25,
+      margin: 4,
+      hideBackgroundDots: true,
+      backgroundBadge: false,
+      badgeColor: '#ffffff',
+      badgeRadius: 8,
+    },
+  };
+
+  let designState: QRDesignOptions = JSON.parse(JSON.stringify(defaultDesignState));
+
+  // Sanitize file names
+  function getSanitizedFilename(extension: string): string {
+    const rawType = currentType.replace(/[^a-zA-Z0-9_-]/g, '').toLowerCase() || 'qrcode';
+    return `${rawType}-qr-code.${extension}`;
+  }
+
+  // Show subtle status feedback
+  function showStatusFeedback(message = 'Downloaded successfully') {
+    const statusEl = document.getElementById('download-success-status');
+    const textEl = document.getElementById('download-status-text');
+    if (statusEl && textEl) {
+      textEl.innerText = message;
+      statusEl.classList.remove('hidden');
+      statusEl.classList.add('flex');
+      setTimeout(() => {
+        statusEl.classList.add('hidden');
+        statusEl.classList.remove('flex');
+      }, 3500);
+    }
+  }
+
+  // Helper to retrieve value across standard and legacy IDs
+  function getVal(ids: string[]): string {
+    for (const id of ids) {
+      const el = document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+      if (el && typeof el.value === 'string' && el.value.trim().length > 0) {
+        return el.value.trim();
+      }
+    }
+    return '';
+  }
+
+  // Build Payload from active form inputs with inline error validation
+  function getPayloadForType(type: QRType): { payload: string; error?: string } {
+    try {
+      switch (type) {
+        case 'url': {
+          const val = getVal(['input-url', 'url']) || 'https://example.com';
+          if (!val) return { payload: '', error: 'Please enter a website URL.' };
+          return { payload: buildUrlPayload(val) };
+        }
+        case 'text': {
+          const val = getVal(['input-text', 'text']) || 'Hello World from QR Generator!';
+          if (!val) return { payload: '', error: 'Please enter text content.' };
+          return { payload: buildTextPayload(val) };
+        }
+        case 'wifi': {
+          const ssid = getVal(['input-wifi-ssid', 'wifi-ssid']) || 'MyHomeWiFi';
+          const password = getVal(['input-wifi-pass', 'input-wifi-password', 'wifi-pass']) || 'SecretPass123';
+          const security = (getVal(['input-wifi-auth', 'input-wifi-security', 'wifi-auth']) as any) || 'WPA';
+          const hidden = (document.getElementById('input-wifi-hidden') as HTMLInputElement)?.checked || false;
+          if (!ssid) return { payload: '', error: 'Network name (SSID) is required.' };
+          return { payload: buildWifiPayload({ ssid, password, security, hidden }) };
+        }
+        case 'vcard': {
+          const firstName = getVal(['input-vcard-fn', 'vcard-fn', 'vcard-first-name']) || 'John';
+          const lastName = getVal(['input-vcard-ln', 'vcard-ln', 'vcard-last-name']) || 'Doe';
+          const company = getVal(['input-vcard-org', 'vcard-org', 'vcard-company']) || 'Acme Corp';
+          const jobTitle = getVal(['input-vcard-title', 'vcard-title', 'vcard-job-title']) || 'Director';
+          const phone = getVal(['input-vcard-tel', 'vcard-tel', 'vcard-phone']) || '+15551234567';
+          const email = getVal(['input-vcard-email', 'vcard-email']) || 'john@example.com';
+          const website = getVal(['input-vcard-url', 'vcard-url', 'vcard-website']) || 'https://example.com';
+          const city = getVal(['input-vcard-city', 'vcard-city']);
+          const state = getVal(['input-vcard-state', 'vcard-state']);
+          const country = getVal(['input-vcard-country', 'vcard-country']);
+          if (!firstName) return { payload: '', error: 'First name is required.' };
+          return { payload: buildVCardPayload({ firstName, lastName, company, jobTitle, phone, email, website, city, state, country }) };
+        }
+        case 'email': {
+          const email = getVal(['input-email-to', 'email-to', 'email-address']) || 'hello@example.com';
+          const subject = getVal(['input-email-subject', 'email-subject']) || 'Inquiry';
+          const message = getVal(['input-email-body', 'email-body', 'email-message']) || 'Hello!';
+          if (!email) return { payload: '', error: 'Recipient email address is required.' };
+          return { payload: buildEmailPayload({ email, subject, message }) };
+        }
+        case 'phone': {
+          const phone = getVal(['input-phone-number', 'phone-number', 'input-phone']) || '+15551234567';
+          if (!phone) return { payload: '', error: 'Phone number is required.' };
+          return { payload: buildPhonePayload(phone) };
+        }
+        case 'sms': {
+          const phone = getVal(['input-sms-phone', 'sms-phone', 'sms-number']) || '+15551234567';
+          const message = getVal(['input-sms-message', 'sms-message', 'sms-text']) || 'Hello!';
+          if (!phone) return { payload: '', error: 'Recipient phone number is required.' };
+          return { payload: buildSmsPayload({ phone, message }) };
+        }
+        case 'whatsapp': {
+          const phone = getVal(['input-whatsapp-phone', 'wa-phone', 'whatsapp-phone']) || '919876543210';
+          const message = getVal(['input-whatsapp-message', 'wa-message', 'whatsapp-message']) || 'Hi!';
+          if (!phone) return { payload: '', error: 'WhatsApp phone number with country code is required.' };
+          return { payload: buildWhatsAppPayload({ phone, message }) };
+        }
+        case 'location': {
+          const lat = getVal(['input-location-lat', 'loc-lat']) || '37.7749';
+          const lng = getVal(['input-location-lng', 'loc-lng']) || '-122.4194';
+          const query = getVal(['input-location-query', 'loc-query']);
+          return { payload: buildLocationPayload({ latitude: lat, longitude: lng, query }) };
+        }
+        case 'upi': {
+          const upiId = getVal(['input-upi-vpa', 'upi-id', 'input-upi-id']) || 'merchant@upi';
+          const payeeName = getVal(['input-upi-name', 'upi-name']) || 'Merchant';
+          const amount = getVal(['input-upi-amount', 'upi-amount']);
+          const note = getVal(['input-upi-note', 'upi-note']);
+          if (!upiId) return { payload: '', error: 'UPI ID (e.g. name@bank) is required.' };
+          return { payload: buildUpiPayload({ upiId, payeeName, amount, note }) };
+        }
+        case 'venmo': {
+          const username = getVal(['input-venmo-username', 'venmo-username']) || 'yourusername';
+          const amount = getVal(['input-venmo-amount', 'venmo-amount']);
+          const note = getVal(['input-venmo-note', 'venmo-note']);
+          if (!username) return { payload: '', error: 'Venmo username or profile URL is required.' };
+          return { payload: buildVenmoPayload({ username, amount, note }) };
+        }
+        case 'paypal': {
+          const input = getVal(['input-paypal-input', 'paypal-input', 'paypal-username']) || 'yourusername';
+          const amount = getVal(['input-paypal-amount', 'paypal-amount']);
+          const currency = getVal(['input-paypal-currency', 'paypal-currency']) || 'USD';
+          if (!input) return { payload: '', error: 'PayPal.Me username, email, or payment link is required.' };
+          return { payload: buildPayPalPayload({ input, amount, currency }) };
+        }
+        case 'zelle': {
+          const recipient = getVal(['input-zelle-recipient', 'zelle-recipient']) || 'recipient@example.com';
+          const name = getVal(['input-zelle-name', 'zelle-name']) || 'Payee';
+          const note = getVal(['input-zelle-note', 'zelle-note']);
+          if (!recipient) return { payload: '', error: 'Zelle email, phone number, or recipient link is required.' };
+          return { payload: buildZellePayload({ recipient, name, note }) };
+        }
+        case 'cash_app': {
+          const cashtag = getVal(['input-cashapp-cashtag', 'cashapp-cashtag', 'cashtag']) || '$yourcashtag';
+          const amount = getVal(['input-cashapp-amount', 'cashapp-amount']);
+          const note = getVal(['input-cashapp-note', 'cashapp-note']);
+          if (!cashtag) return { payload: '', error: 'Cash App $Cashtag or profile URL is required.' };
+          return { payload: buildCashAppPayload({ cashtag, amount, note }) };
+        }
+        case 'social': {
+          const platform = (getVal(['input-social-platform', 'social-platform']) as any) || 'instagram';
+          const input = getVal(['input-social-handle', 'social-input', 'social-handle']) || 'brandhandle';
+          if (!input) return { payload: '', error: 'Username or profile URL is required.' };
+          return { payload: buildSocialPayload({ platform, input }) };
+        }
+        case 'review': {
+          const businessName = getVal(['input-review-business', 'review-name', 'review-business']) || 'Business';
+          const reviewUrl = getVal(['input-review-url', 'review-url']) || 'https://google.com/maps';
+          if (!reviewUrl) return { payload: '', error: 'Review destination URL is required.' };
+          return { payload: buildReviewPayload({ businessName, reviewUrl }) };
+        }
+        case 'event': {
+          const title = getVal(['input-event-title', 'event-title']) || 'Event 2026';
+          const startDate = getVal(['input-event-start-date', 'event-start-date']) || '2026-10-01';
+          const startTime = getVal(['input-event-start-time', 'event-start-time']);
+          const endDate = getVal(['input-event-end-date', 'event-end-date']);
+          const endTime = getVal(['input-event-end-time', 'event-end-time']);
+          const location = getVal(['input-event-location', 'event-location']) || 'Convention Center';
+          if (!title) return { payload: '', error: 'Event title is required.' };
+          return { payload: buildEventPayload({ title, startDate, startTime, endDate, endTime, location }) };
+        }
+        case 'app': {
+          const appName = getVal(['input-app-name', 'app-name']) || 'Mobile App';
+          const iosUrl = getVal(['input-app-ios', 'app-ios-url']) || 'https://apps.apple.com';
+          const androidUrl = getVal(['input-app-android', 'app-android-url']) || 'https://play.google.com';
+          return { payload: buildAppPayload({ appName, iosUrl, androidUrl }) };
+        }
+        default:
+          return { payload: 'https://example.com' };
+      }
+    } catch (err: any) {
+      return { payload: '', error: err?.message || 'Invalid input.' };
+    }
+  }
+
+  // Render or update QR Code Canvas
+  async function renderQR() {
+    if (!QRCodeStylingClass) {
+      const module = await import('qr-code-styling');
+      QRCodeStylingClass = module.default;
+    }
+
+    const { payload, error } = getPayloadForType(currentType);
+    const inlineErrorBanner = document.getElementById('form-inline-error');
+    const inlineErrorText = document.getElementById('form-inline-error-text');
+    const emptyState = document.getElementById('qr-empty-state');
+    const viewport = document.getElementById('qr-code-viewport');
+
+    if (error || !payload) {
+      if (inlineErrorBanner && inlineErrorText) {
+        inlineErrorText.innerText = error || 'Please enter valid information.';
+        inlineErrorBanner.classList.remove('hidden');
+      }
+      emptyState?.classList.remove('hidden');
+      emptyState?.classList.add('flex');
+      if (viewport) viewport.innerHTML = '';
+      qrCodeInstance = null;
+      return;
+    } else {
+      inlineErrorBanner?.classList.add('hidden');
+      emptyState?.classList.add('hidden');
+      emptyState?.classList.remove('flex');
+    }
+
+    designState.payload = payload;
+
+    // Scannability heuristic check
+    const warnings = checkScannability(designState);
+    const warningBanner = document.getElementById('scan-warning-banner');
+    const warningText = document.getElementById('scan-warning-text');
+    if (warnings.length > 0 && warningBanner && warningText) {
+      warningText.innerText = warnings.map((w) => w.message).join(' ');
+      warningBanner.classList.remove('hidden');
+    } else if (warningBanner) {
+      warningBanner.classList.add('hidden');
+    }
+
+    const dotsColor = designState.colors.foreground;
+    const bgColor = designState.colors.isTransparent ? 'transparent' : designState.colors.background;
+
+    const qrOptions: any = {
+      width: designState.size,
+      height: designState.size,
+      type: 'canvas',
+      data: designState.payload,
+      margin: designState.margin,
+      qrOptions: {
+        errorCorrectionLevel: designState.errorCorrection,
+      },
+      dotsOptions: {
+        color: dotsColor,
+        type: designState.dotType,
+      },
+      backgroundOptions: {
+        color: bgColor,
+      },
+      cornersSquareOptions: {
+        type: designState.eyeFrameType,
+        color: dotsColor,
+      },
+      cornersDotOptions: {
+        type: designState.eyeDotType,
+        color: dotsColor,
+      },
+    };
+
+    if (designState.logo?.src) {
+      qrOptions.image = designState.logo.src;
+      qrOptions.imageOptions = {
+        hideBackgroundDots: designState.logo.hideBackgroundDots,
+        imageSize: designState.logo.sizeRatio,
+        margin: designState.logo.margin,
+        crossOrigin: 'anonymous',
+      };
+    }
+
+    if (!viewport) return;
+
+    if (!qrCodeInstance) {
+      qrCodeInstance = new QRCodeStylingClass(qrOptions);
+      viewport.innerHTML = '';
+      qrCodeInstance.append(viewport);
+    } else {
+      qrCodeInstance.update(qrOptions);
+    }
+  }
+
+  // Switch Active QR Type
+  function setType(type: QRType) {
+    currentType = type;
+    designState.type = type;
+
+    // Check if type is eligible for dynamic redirect
+    const isUrlBased = ['url', 'social', 'location', 'whatsapp', 'venmo', 'paypal', 'cash_app'].includes(type);
+    const radioDynamic = document.getElementById('radio-dynamic') as HTMLInputElement;
+    const dynamicNotice = document.getElementById('dynamic-type-notice');
+
+    if (!isUrlBased) {
+      if (radioDynamic && radioDynamic.checked) {
+        (document.querySelector('input[name="qr_mode"][value="static"]') as HTMLInputElement).checked = true;
+      }
+      if (radioDynamic) radioDynamic.disabled = true;
+      dynamicNotice?.classList.remove('hidden');
+    } else {
+      if (radioDynamic) radioDynamic.disabled = false;
+      dynamicNotice?.classList.add('hidden');
+    }
+
+    // Update Tab Buttons UI
+    document.querySelectorAll('[data-type-btn]').forEach((btn) => {
+      const btnType = btn.getAttribute('data-type-btn');
+      if (btnType === type) {
+        btn.className = 'qr-type-item flex flex-col items-center justify-center p-3 rounded-2xl text-xs font-semibold bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-500/20 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer';
+        btn.setAttribute('aria-selected', 'true');
+      } else {
+        btn.className = 'qr-type-item flex flex-col items-center justify-center p-3 rounded-2xl text-xs font-semibold bg-slate-50 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 border-slate-200/80 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer';
+        btn.setAttribute('aria-selected', 'false');
+      }
+    });
+
+    // Toggle Form Inputs
+    document.querySelectorAll('.type-form').forEach((f) => f.classList.add('hidden'));
+    document.getElementById(`form-${type}`)?.classList.remove('hidden');
+
+    const friendlyTitles: Record<string, string> = {
+      url: '2. Enter Website URL',
+      text: '2. Enter Text Content',
+      wifi: '2. Enter Wi-Fi Details',
+      vcard: '2. Enter Contact Information',
+      email: '2. Enter Email Message',
+      phone: '2. Enter Phone Number',
+      sms: '2. Enter SMS Message',
+      whatsapp: '2. Enter WhatsApp Details',
+      location: '2. Enter Map Coordinates',
+      upi: '2. Enter UPI Payment Details',
+      venmo: '2. Enter Venmo Details',
+      paypal: '2. Enter PayPal Details',
+      zelle: '2. Enter Zelle Details',
+      cash_app: '2. Enter Cash App Details',
+      social: '2. Enter Social Profile',
+      review: '2. Enter Review Link',
+      event: '2. Enter Event Details',
+      app: '2. Enter App Store Links',
+    };
+
+    const titleEl = document.getElementById('current-type-title');
+    if (titleEl) {
+      titleEl.innerText = friendlyTitles[type] || '2. Enter QR Details';
+    }
+
+    const badge = document.getElementById('active-type-badge');
+    if (badge) badge.innerText = type.toUpperCase();
+
+    renderQR();
+  }
+
+  // Reset Functionality
+  function resetGenerator() {
+    designState = JSON.parse(JSON.stringify(defaultDesignState));
+    designState.logo.src = undefined;
+    editingQrId = null;
+
+    // Reset Inputs
+    (document.getElementById('input-url') as HTMLInputElement).value = 'https://example.com';
+    (document.getElementById('input-text') as HTMLTextAreaElement).value = 'Hello World from QR Generator!';
+    (document.getElementById('input-wifi-ssid') as HTMLInputElement).value = 'MyHomeWiFi';
+    (document.getElementById('input-wifi-password') as HTMLInputElement).value = 'SuperSecretPass123';
+    (document.getElementById('input-wifi-security') as HTMLSelectElement).value = 'WPA';
+    (document.getElementById('input-wifi-hidden') as HTMLInputElement).checked = false;
+
+    // Reset Colors
+    (document.getElementById('color-fg') as HTMLInputElement).value = '#000000';
+    (document.getElementById('color-fg-hex') as HTMLInputElement).value = '#000000';
+    (document.getElementById('color-bg') as HTMLInputElement).value = '#ffffff';
+    (document.getElementById('color-bg-hex') as HTMLInputElement).value = '#ffffff';
+    (document.getElementById('color-transparent-bg') as HTMLInputElement).checked = false;
+
+    // Reset Quality & Margin
+    (document.getElementById('error-correction-select') as HTMLSelectElement).value = 'M';
+    (document.getElementById('margin-range') as HTMLInputElement).value = '10';
+    const marginVal = document.getElementById('margin-val');
+    if (marginVal) marginVal.innerText = '10px';
+
+    // Reset Logo
+    const logoInput = document.getElementById('logo-file-input') as HTMLInputElement;
+    if (logoInput) logoInput.value = '';
+    document.getElementById('logo-controls')?.classList.add('hidden');
+
+    // Reset Resolution
+    document.querySelectorAll('.size-preset-btn').forEach((b) => {
+      if (b.getAttribute('data-size') === '512') {
+        b.className = 'size-preset-btn py-2 px-3 rounded-xl border border-indigo-600 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-300 font-semibold font-mono cursor-pointer';
+      } else {
+        b.className = 'size-preset-btn py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-500 font-mono cursor-pointer';
+      }
+    });
+
+    const resBadge = document.getElementById('resolution-badge');
+    if (resBadge) resBadge.innerText = '512 x 512 px';
+
+    setType('url');
+  }
+
+  // Save QR flow
+  const saveModal = document.getElementById('save-qr-modal');
+  const saveModalError = document.getElementById('save-modal-error');
+  const saveNameInput = document.getElementById('save-qr-name-input') as HTMLInputElement;
+  const closeSaveModalBtn = document.getElementById('close-save-modal-btn');
+  const cancelSaveModalBtn = document.getElementById('cancel-save-modal-btn');
+  const saveForm = document.getElementById('save-qr-form');
+
+  closeSaveModalBtn?.addEventListener('click', () => saveModal?.classList.add('hidden'));
+  cancelSaveModalBtn?.addEventListener('click', () => saveModal?.classList.add('hidden'));
+
+  document.getElementById('save-qr-btn')?.addEventListener('click', async () => {
+    const { payload, error } = getPayloadForType(currentType);
+    if (error || !payload) {
+      alert('Please fill in the required fields before saving.');
+      return;
+    }
+
+    // Check if user is logged in
+    try {
+      const userRes = await fetch('/api/auth/me');
+      const userData = await userRes.json();
+
+      if (!userData.authenticated) {
+        // Persist unsaved configuration to sessionStorage
+        sessionStorage.setItem('pending_qr_save', JSON.stringify({
+          type: currentType,
+          payload,
+          designState,
+        }));
+        window.location.href = '/login?redirect=save';
+        return;
+      }
+
+      // Pre-populate sensible name if empty
+      if (saveNameInput) {
+        const formattedType = currentType.charAt(0).toUpperCase() + currentType.slice(1);
+        saveNameInput.value = `My ${formattedType} QR`;
+      }
+      saveModal?.classList.remove('hidden');
+      saveModal?.classList.add('flex');
+    } catch {
+      alert('Failed to verify session status.');
+    }
+  });
+
+  saveForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = saveNameInput.value.trim();
+    if (!name) return;
+
+    const { payload } = getPayloadForType(currentType);
+    const selectedMode = (document.querySelector('input[name="qr_mode"]:checked') as HTMLInputElement)?.value || 'static';
+    const isDynamic = selectedMode === 'dynamic';
+
+    const saveBtn = document.getElementById('confirm-save-modal-btn') as HTMLButtonElement;
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.innerText = 'Saving...';
+    }
+
+    try {
+      let res;
+      if (editingQrId) {
+        res = await fetch(`/api/qr/${editingQrId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            destination: isDynamic ? payload : undefined,
+            payload: !isDynamic ? payload : undefined,
+            styleConfig: designState,
+          }),
+        });
+      } else {
+        res = await fetch('/api/qr', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            type: currentType,
+            payload,
+            destination: isDynamic ? payload : undefined,
+            styleConfig: designState,
+            isDynamic,
+          }),
+        });
+      }
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || 'Failed to save QR code.');
+
+      saveModal?.classList.add('hidden');
+      sessionStorage.removeItem('pending_qr_save');
+
+      if (data.qr?.shortCode) {
+        designState.payload = data.qr.payload;
+        renderQR();
+      }
+
+      showStatusFeedback(isDynamic ? '✓ Dynamic QR created! Scans are now tracked.' : '✓ Saved to Dashboard successfully!');
+    } catch (err: any) {
+      if (saveModalError) {
+        saveModalError.innerText = err?.message || 'Error saving QR code.';
+        saveModalError.classList.remove('hidden');
+      }
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.innerText = 'Save QR Code';
+      }
+    }
+  });
+
+  // Setup Event Listeners & Hydration
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Type tab clicks
+    document.querySelectorAll('[data-type-btn]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const type = btn.getAttribute('data-type-btn') as QRType;
+        if (type) setType(type);
+      });
+    });
+
+    // Form inputs change (debounced live updates + character counters)
+    let debounceTimer: any;
+    const textInput = document.getElementById('input-text') as HTMLTextAreaElement;
+    const charCounter = document.getElementById('text-char-count');
+
+    document.getElementById('qr-input-form')?.addEventListener('input', () => {
+      if (textInput && charCounter) {
+        charCounter.innerText = `${textInput.value.length} chars`;
+      }
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(renderQR, 100);
+    });
+
+    // Reset button
+    document.getElementById('generator-reset-btn')?.addEventListener('click', resetGenerator);
+
+    // Customization Sub-tabs
+    document.querySelectorAll('.custom-tab-btn').forEach((tabBtn) => {
+      tabBtn.addEventListener('click', () => {
+        const targetTab = tabBtn.getAttribute('data-tab');
+        document.querySelectorAll('.custom-tab-btn').forEach((b) => {
+          b.className = 'custom-tab-btn text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 pb-1 cursor-pointer';
+          b.setAttribute('aria-selected', 'false');
+        });
+        tabBtn.className = 'custom-tab-btn text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 pb-1 cursor-pointer';
+        tabBtn.setAttribute('aria-selected', 'true');
+
+        document.querySelectorAll('.custom-tab-pane').forEach((p) => p.classList.add('hidden'));
+        document.getElementById(`tab-content-${targetTab}`)?.classList.remove('hidden');
+      });
+    });
+
+    // Preset Buttons
+    document.querySelectorAll('.preset-btn').forEach((presetBtn) => {
+      presetBtn.addEventListener('click', () => {
+        const preset = presetBtn.getAttribute('data-preset');
+        if (preset === 'classic') {
+          designState.colors.foreground = '#000000';
+          designState.colors.background = '#ffffff';
+          designState.dotType = 'square';
+          designState.eyeFrameType = 'square';
+          designState.eyeDotType = 'square';
+        } else if (preset === 'indigo') {
+          designState.colors.foreground = '#4f46e5';
+          designState.colors.background = '#ffffff';
+          designState.dotType = 'rounded';
+          designState.eyeFrameType = 'rounded';
+          designState.eyeDotType = 'rounded';
+        } else if (preset === 'emerald') {
+          designState.colors.foreground = '#059669';
+          designState.colors.background = '#ffffff';
+          designState.dotType = 'dots';
+          designState.eyeFrameType = 'circle';
+          designState.eyeDotType = 'circle';
+        } else if (preset === 'sunset') {
+          designState.colors.foreground = '#ea580c';
+          designState.colors.background = '#fff7ed';
+          designState.dotType = 'classy-rounded';
+          designState.eyeFrameType = 'rounded';
+          designState.eyeDotType = 'circle';
+        } else if (preset === 'midnight') {
+          designState.colors.foreground = '#0f172a';
+          designState.colors.background = '#f8fafc';
+          designState.dotType = 'extra-rounded';
+          designState.eyeFrameType = 'square';
+          designState.eyeDotType = 'rounded';
+        } else if (preset === 'ocean') {
+          designState.colors.foreground = '#0284c7';
+          designState.colors.background = '#f0f9ff';
+          designState.dotType = 'rounded';
+          designState.eyeFrameType = 'circle';
+          designState.eyeDotType = 'circle';
+        }
+
+        (document.getElementById('color-fg') as HTMLInputElement).value = designState.colors.foreground;
+        (document.getElementById('color-fg-hex') as HTMLInputElement).value = designState.colors.foreground;
+        (document.getElementById('color-bg') as HTMLInputElement).value = designState.colors.background;
+        (document.getElementById('color-bg-hex') as HTMLInputElement).value = designState.colors.background;
+
+        renderQR();
+      });
+    });
+
+    // Colors
+    const fgInput = document.getElementById('color-fg') as HTMLInputElement;
+    const fgHexInput = document.getElementById('color-fg-hex') as HTMLInputElement;
+    const bgInput = document.getElementById('color-bg') as HTMLInputElement;
+    const bgHexInput = document.getElementById('color-bg-hex') as HTMLInputElement;
+    const transparentBg = document.getElementById('color-transparent-bg') as HTMLInputElement;
+
+    fgInput?.addEventListener('input', () => {
+      designState.colors.foreground = fgInput.value;
+      fgHexInput.value = fgInput.value;
+      renderQR();
+    });
+    fgHexInput?.addEventListener('change', () => {
+      designState.colors.foreground = fgHexInput.value;
+      fgInput.value = fgHexInput.value;
+      renderQR();
+    });
+    bgInput?.addEventListener('input', () => {
+      designState.colors.background = bgInput.value;
+      bgHexInput.value = bgInput.value;
+      renderQR();
+    });
+    bgHexInput?.addEventListener('change', () => {
+      designState.colors.background = bgHexInput.value;
+      bgInput.value = bgHexInput.value;
+      renderQR();
+    });
+    transparentBg?.addEventListener('change', () => {
+      designState.colors.isTransparent = transparentBg.checked;
+      renderQR();
+    });
+
+    // Shapes & Eyes
+    document.querySelectorAll('[data-shape-type]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const shapeType = btn.getAttribute('data-shape-type');
+        const val = btn.getAttribute('data-val');
+        if (shapeType === 'dot') designState.dotType = val as DotType;
+        if (shapeType === 'eye-frame') designState.eyeFrameType = val as EyeFrameType;
+        if (shapeType === 'eye-dot') designState.eyeDotType = val as EyeDotType;
+
+        document.querySelectorAll(`[data-shape-type="${shapeType}"]`).forEach((b) => {
+          b.className = 'shape-btn px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-500 cursor-pointer';
+        });
+        btn.className = 'shape-btn px-3 py-2 rounded-xl border border-indigo-600 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-300 font-semibold cursor-pointer';
+
+        renderQR();
+      });
+    });
+
+    // Logo Handlers
+    const logoFileInput = document.getElementById('logo-file-input') as HTMLInputElement;
+    const logoControls = document.getElementById('logo-controls');
+    const logoSizeRange = document.getElementById('logo-size-range') as HTMLInputElement;
+    const logoSizeVal = document.getElementById('logo-size-val');
+    const logoClearDots = document.getElementById('logo-clear-dots') as HTMLInputElement;
+    const logoRemoveBtn = document.getElementById('logo-remove-btn');
+
+    logoFileInput?.addEventListener('change', (e: any) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      if (file.size > 2 * 1024 * 1024) {
+        alert('Logo file size must be under 2 MB.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        designState.logo.src = event.target?.result as string;
+        designState.errorCorrection = 'H';
+        (document.getElementById('error-correction-select') as HTMLSelectElement).value = 'H';
+
+        logoControls?.classList.remove('hidden');
+        renderQR();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    logoSizeRange?.addEventListener('input', () => {
+      const pct = Number(logoSizeRange.value);
+      designState.logo.sizeRatio = pct / 100;
+      if (logoSizeVal) logoSizeVal.innerText = `${pct}%`;
+      renderQR();
+    });
+
+    logoClearDots?.addEventListener('change', () => {
+      designState.logo.hideBackgroundDots = logoClearDots.checked;
+      renderQR();
+    });
+
+    logoRemoveBtn?.addEventListener('click', () => {
+      designState.logo.src = undefined;
+      logoFileInput.value = '';
+      logoControls?.classList.add('hidden');
+      renderQR();
+    });
+
+    // Size Presets
+    document.querySelectorAll('.size-preset-btn').forEach((sizeBtn) => {
+      sizeBtn.addEventListener('click', () => {
+        const size = Number(sizeBtn.getAttribute('data-size'));
+        designState.size = size;
+
+        document.querySelectorAll('.size-preset-btn').forEach((b) => {
+          b.className = 'size-preset-btn py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-500 font-mono cursor-pointer';
+        });
+        sizeBtn.className = 'size-preset-btn py-2 px-3 rounded-xl border border-indigo-600 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-300 font-semibold font-mono cursor-pointer';
+
+        const resBadge = document.getElementById('resolution-badge');
+        if (resBadge) resBadge.innerText = `${size} x ${size} px`;
+
+        renderQR();
+      });
+    });
+
+    // Quality & Margin
+    const ecSelect = document.getElementById('error-correction-select') as HTMLSelectElement;
+    const marginRange = document.getElementById('margin-range') as HTMLInputElement;
+    const marginVal = document.getElementById('margin-val');
+
+    ecSelect?.addEventListener('change', () => {
+      designState.errorCorrection = ecSelect.value as ErrorCorrectionLevel;
+      renderQR();
+    });
+
+    marginRange?.addEventListener('input', () => {
+      designState.margin = Number(marginRange.value);
+      if (marginVal) marginVal.innerText = `${designState.margin}px`;
+      renderQR();
+    });
+
+    // Download Actions
+    document.getElementById('download-png-btn')?.addEventListener('click', () => {
+      const fileName = getSanitizedFilename('png');
+      qrCodeInstance?.download({ name: fileName.replace('.png', ''), extension: 'png' });
+      showStatusFeedback('Downloaded PNG successfully');
+    });
+
+    document.getElementById('download-svg-btn')?.addEventListener('click', () => {
+      const fileName = getSanitizedFilename('svg');
+      qrCodeInstance?.download({ name: fileName.replace('.svg', ''), extension: 'svg' });
+      showStatusFeedback('Downloaded SVG successfully');
+    });
+
+    document.getElementById('download-jpg-btn')?.addEventListener('click', () => {
+      const fileName = getSanitizedFilename('jpeg');
+      qrCodeInstance?.download({ name: fileName.replace('.jpeg', ''), extension: 'jpeg' });
+      showStatusFeedback('Downloaded JPG successfully');
+    });
+
+    // Copy to Clipboard
+    const copyBtn = document.getElementById('copy-qr-btn');
+    const copyTooltip = document.getElementById('copy-success-tooltip');
+
+    copyBtn?.addEventListener('click', async () => {
+      const canvas = document.querySelector('#qr-code-viewport canvas') as HTMLCanvasElement;
+      if (!canvas) return;
+      try {
+        await copyQrToClipboard(canvas);
+        if (copyTooltip) {
+          copyTooltip.classList.remove('hidden');
+          setTimeout(() => copyTooltip.classList.add('hidden'), 2000);
+        }
+      } catch (err: any) {
+        alert(err?.message || 'Clipboard copy is not supported in this browser.');
+      }
+    });
+
+    // Share QR Code
+    document.getElementById('share-qr-btn')?.addEventListener('click', async () => {
+      const canvas = document.querySelector('#qr-code-viewport canvas') as HTMLCanvasElement;
+      if (!canvas) return;
+      try {
+        await shareQrCode(canvas, `My ${currentType.toUpperCase()} QR Code`);
+      } catch (err: any) {
+        if (err?.name !== 'AbortError') {
+          if (navigator.clipboard) {
+            await navigator.clipboard.writeText(window.location.href);
+            alert('✓ Page link copied to clipboard!');
+          }
+        }
+      }
+    });
+
+    // Check for edit query parameter (?edit=[id])
+    const urlParams = new URLSearchParams(window.location.search);
+    const editId = urlParams.get('edit');
+    if (editId) {
+      try {
+        const res = await fetch(`/api/qr/${editId}`);
+        const data = await res.json();
+        if (res.ok && data.qr) {
+          editingQrId = editId;
+          const qr = data.qr;
+          setType(qr.type);
+
+          const targetInput = qr.destination || qr.payload;
+          if (qr.type === 'url' && document.getElementById('input-url')) {
+            (document.getElementById('input-url') as HTMLInputElement).value = targetInput;
+          } else if (qr.type === 'text' && document.getElementById('input-text')) {
+            (document.getElementById('input-text') as HTMLTextAreaElement).value = targetInput;
+          }
+
+          if (qr.style_config) {
+            designState = { ...designState, ...qr.style_config };
+            if (designState.colors?.foreground) {
+              (document.getElementById('color-fg') as HTMLInputElement).value = designState.colors.foreground;
+              (document.getElementById('color-fg-hex') as HTMLInputElement).value = designState.colors.foreground;
+            }
+            if (designState.colors?.background) {
+              (document.getElementById('color-bg') as HTMLInputElement).value = designState.colors.background;
+              (document.getElementById('color-bg-hex') as HTMLInputElement).value = designState.colors.background;
+            }
+          }
+
+          const heading = document.getElementById('generator-heading');
+          if (heading) heading.innerText = `Editing: ${qr.name}`;
+          renderQR();
+        }
+      } catch {
+        // Fallback to default
+      }
+    } else {
+      // Check for pending unsaved QR in sessionStorage
+      const pendingSave = sessionStorage.getItem('pending_qr_save');
+      if (pendingSave) {
+        try {
+          const parsed = JSON.parse(pendingSave);
+          if (parsed.type) setType(parsed.type);
+          if (parsed.designState) designState = parsed.designState;
+          renderQR();
+          showStatusFeedback('Restored your unsaved QR. Click "Save QR" to save to your account.');
+        } catch {
+          // Ignore parse errors
+        }
+      } else {
+        setType(currentType);
+      }
+    }
+  });
+</script>

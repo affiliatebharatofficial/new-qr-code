@@ -1,0 +1,142 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import { getCurrentUser } from '../../lib/auth/jwt';
+import { getDb } from '../../lib/db/client';
+
+const user = await getCurrentUser(Astro.request, Astro.locals);
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+const db = getDb(Astro.locals);
+
+const [countRes, dynRes, scansRes, recentRes] = await Promise.all([
+  db.prepare('SELECT COUNT(*) as total FROM qr_codes WHERE user_id = ?').bind(user.id).all(),
+  db.prepare('SELECT COUNT(*) as total FROM qr_codes WHERE user_id = ? AND is_dynamic = 1').bind(user.id).all(),
+  db.prepare('SELECT COALESCE(SUM(scans_count), 0) as total FROM qr_codes WHERE user_id = ?').bind(user.id).all(),
+  db.prepare('SELECT * FROM qr_codes WHERE user_id = ? ORDER BY created_at DESC LIMIT 5').bind(user.id).all(),
+]);
+
+const totalQrs = (countRes.results?.[0] as any)?.total || 0;
+const dynamicQrs = (dynRes.results?.[0] as any)?.total || 0;
+const totalScans = (scansRes.results?.[0] as any)?.total || 0;
+const recentQrs = recentRes.results || [];
+---
+
+<DashboardLayout title="Workspace Overview" activeNav="overview">
+  <div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          Welcome, {user.name || 'User'}
+        </h1>
+        <p class="text-xs text-slate-500 mt-0.5">
+          Workspace overview for your active QR configurations and telemetry.
+        </p>
+      </div>
+
+      <a
+        href="/"
+        class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-subtle cursor-pointer"
+      >
+        <span>+ Generate QR Code</span>
+      </a>
+    </div>
+
+    <!-- Overview Stats Cards -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-1">
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Total QR Codes</div>
+        <div class="text-2xl font-black text-slate-900 dark:text-white">{totalQrs}</div>
+      </div>
+
+      <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-1">
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Dynamic Links</div>
+        <div class="text-2xl font-black text-indigo-600 dark:text-indigo-400">{dynamicQrs}</div>
+      </div>
+
+      <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-1">
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Total Scans</div>
+        <div class="text-2xl font-black text-emerald-600 dark:text-emerald-400">{totalScans}</div>
+      </div>
+
+      <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-1">
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Plan Tier</div>
+        <div class="text-2xl font-black text-slate-900 dark:text-white uppercase">{user.plan}</div>
+      </div>
+    </div>
+
+    <!-- Recently Created QR Codes -->
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-card overflow-hidden">
+      <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Recent QR Codes</h2>
+        <a href="/dashboard/qr" class="text-xs font-bold text-slate-600 dark:text-slate-400 hover:underline">
+          View All &rarr;
+        </a>
+      </div>
+
+      {recentQrs.length === 0 ? (
+        <div class="text-center py-10 px-4 space-y-2">
+          <p class="text-xs text-slate-500">No QR codes created yet.</p>
+          <a
+            href="/"
+            class="inline-block px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900"
+          >
+            Create Your First QR
+          </a>
+        </div>
+      ) : (
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800 text-slate-500 font-bold uppercase tracking-wider">
+              <tr>
+                <th class="py-3 px-4">Name</th>
+                <th class="py-3 px-4">Type</th>
+                <th class="py-3 px-4">Destination</th>
+                <th class="py-3 px-4">Scans</th>
+                <th class="py-3 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800/80">
+              {recentQrs.map((qr: any) => (
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30">
+                  <td class="py-3.5 px-4 font-bold text-slate-900 dark:text-white">
+                    <a href={`/dashboard/qr/${qr.id}`} class="hover:text-indigo-600 dark:hover:text-indigo-400">
+                      {qr.name}
+                    </a>
+                  </td>
+                  <td class="py-3.5 px-4">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                      {qr.type} {qr.is_dynamic ? '• Dyn' : ''}
+                    </span>
+                  </td>
+                  <td class="py-3.5 px-4 text-slate-500 truncate max-w-xs font-mono text-[11px]">
+                    {qr.destination || qr.payload}
+                  </td>
+                  <td class="py-3.5 px-4 font-bold text-slate-700 dark:text-slate-300">
+                    {qr.scans_count || 0}
+                  </td>
+                  <td class="py-3.5 px-4 text-right space-x-1">
+                    <a
+                      href={`/dashboard/qr/${qr.id}`}
+                      class="px-2 py-1 rounded text-[11px] font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    >
+                      Details
+                    </a>
+                    <a
+                      href={`/?edit=${qr.id}`}
+                      class="px-2 py-1 rounded text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    >
+                      Edit
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  </div>
+</DashboardLayout>

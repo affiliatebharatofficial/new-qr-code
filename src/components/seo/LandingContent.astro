@@ -1,0 +1,353 @@
+---
+import { getLocalizedPath } from '../../lib/i18n/routes';
+import type { Locale } from '../../lib/i18n/config';
+
+interface Step {
+  title: string;
+  description: string;
+}
+
+interface SectorItem {
+  name: string;
+  description: string;
+  benefit?: string;
+}
+
+interface UseCase {
+  title: string;
+  description: string;
+  example?: string;
+}
+
+interface FaqItem {
+  question: string;
+  answer: string;
+}
+
+interface RelatedTool {
+  name: string;
+  slug: string;
+  description: string;
+}
+
+interface Props {
+  heading: string;
+  subheading: string;
+  overviewTitle?: string;
+  overviewParagraphs?: string[];
+  sectors?: SectorItem[];
+  howItWorks: Step[];
+  useCases: UseCase[];
+  tips: string[];
+  technicalNotes?: string;
+  faqs: FaqItem[];
+  relatedTools: RelatedTool[];
+  locale?: Locale;
+}
+
+const {
+  heading,
+  subheading,
+  overviewTitle,
+  overviewParagraphs = [],
+  sectors = [],
+  howItWorks,
+  useCases,
+  tips,
+  technicalNotes,
+  faqs,
+  relatedTools,
+  locale = 'en',
+} = Astro.props;
+
+const sectionHeaders = {
+  en: {
+    benefits: `Who Can Benefit from a ${heading}?`,
+    benefitsSub: 'Tailored applications across commercial, professional, and consumer environments.',
+    howItWorks: `How to Generate and Use Your ${heading}`,
+    howItWorksSub: 'Three simple steps from configuration to vector export.',
+    examples: 'Real-World Deployment Examples',
+    examplesSub: 'Practical workflows where this format delivers high scan reliability.',
+    production: 'Production & Printing Considerations',
+    faqs: 'Frequently Asked Questions',
+    faqsSub: 'Everything you need to know about generating, formatting, and scanning this QR format.',
+    related: 'Related QR Code Tools',
+    benefitLabel: 'Benefit:',
+    exampleLabel: 'Example:',
+  },
+  es: {
+    benefits: `¿Quién se beneficia del ${heading}?`,
+    benefitsSub: 'Aplicaciones adaptadas a entornos comerciales, profesionales y personales.',
+    howItWorks: `Cómo generar y utilizar tu ${heading}`,
+    howItWorksSub: 'Tres sencillos pasos desde la configuración hasta la exportación.',
+    examples: 'Ejemplos Prácticos de Implementación',
+    examplesSub: 'Casos reales con máxima fiabilidad de escaneo.',
+    production: 'Consideraciones de Impresión y Producción',
+    faqs: 'Preguntas Frecuentes',
+    faqsSub: 'Todo lo que necesitas saber sobre generación, formatos y escaneo.',
+    related: 'Herramientas QR Relacionadas',
+    benefitLabel: 'Ventaja:',
+    exampleLabel: 'Ejemplo:',
+  },
+  de: {
+    benefits: `Wer profitiert vom ${heading}?`,
+    benefitsSub: 'Maßgeschneiderte Lösungen für Unternehmen, Gastronomie und Privatanwender.',
+    howItWorks: `So erstellen und nutzen Sie Ihren ${heading}`,
+    howItWorksSub: 'Drei einfache Schritte von der Eingabe bis zum Vektor-Export.',
+    examples: 'Praktische Einsatzbeispiele',
+    examplesSub: 'Reale Workflows für höchste Scan-Zuverlässigkeit.',
+    production: 'Druck- und Produktionshinweise',
+    faqs: 'Häufig gestellte Fragen (FAQ)',
+    faqsSub: 'Alles Wissenswerte rund um Erstellung, Formate und Scannen.',
+    related: 'Verwandte QR-Code-Tools',
+    benefitLabel: 'Vorteil:',
+    exampleLabel: 'Beispiel:',
+  },
+  fr: {
+    benefits: `Qui peut bénéficier du ${heading} ?`,
+    benefitsSub: 'Applications adaptées aux environnements professionnels et commerciaux.',
+    howItWorks: `Comment créer et utiliser votre ${heading}`,
+    howItWorksSub: 'Trois étapes simples de la configuration à l\'export.',
+    examples: 'Exemples Concrets d\'Utilisation',
+    examplesSub: 'Cas pratiques offrant une fiabilité de scan optimale.',
+    production: 'Conseils d\'Impression et de Production',
+    faqs: 'Foire Aux Questions (FAQ)',
+    faqsSub: 'Tout ce que vous devez savoir sur la création et le scan.',
+    related: 'Outils QR Associés',
+    benefitLabel: 'Avantage :',
+    exampleLabel: 'Exemple :',
+  },
+  pt: {
+    benefits: `Quem pode se beneficiar do ${heading}?`,
+    benefitsSub: 'Aplicações para ambientes comerciais, profissionais e pessoais.',
+    howItWorks: `Como gerar e usar seu ${heading}`,
+    howItWorksSub: 'Três passos simples da configuração à exportação.',
+    examples: 'Exemplos Práticos de Aplicação',
+    examplesSub: 'Fluxos reais com alta confiabilidade de leitura.',
+    production: 'Considerações de Impressão e Produção',
+    faqs: 'Perguntas Frequentes',
+    faqsSub: 'Tudo o que você precisa saber sobre geração e impressão.',
+    related: 'Ferramentas QR Relacionadas',
+    benefitLabel: 'Benefício:',
+    exampleLabel: 'Exemplo:',
+  },
+  it: {
+    benefits: `Chi può trarre vantaggio dal ${heading}?`,
+    benefitsSub: 'Applicazioni su misura per aziende, locali e professionisti.',
+    howItWorks: `Come creare e utilizzare il tuo ${heading}`,
+    howItWorksSub: 'Tre semplici passaggi dalla configurazione all\'esportazione.',
+    examples: 'Esempi Pratici di Utilizzo',
+    examplesSub: 'Casi reali con la massima affidabilità di scansione.',
+    production: 'Consigli per Stampa e Produzione',
+    faqs: 'Domande Frequenti (FAQ)',
+    faqsSub: 'Tutto quello che c\'è da sapere su creazione e formati.',
+    related: 'Strumenti QR Correlati',
+    benefitLabel: 'Vantaggio:',
+    exampleLabel: 'Esempio:',
+  },
+  hi: {
+    benefits: `${heading} किसके लिए उपयोगी है?`,
+    benefitsSub: 'व्यावसायिक, व्यक्तिगत और औद्योगिक उपयोग के लिए विशेष अनुप्रयोग।',
+    howItWorks: `${heading} कैसे बनाएं और उपयोग करें`,
+    howItWorksSub: 'कन्फ़िगरेशन से लेकर वेक्टर एक्सपोर्ट तक 3 आसान चरण।',
+    examples: 'वास्तविक उपयोग के उदाहरण',
+    examplesSub: 'व्यावहारिक परिदृश्य जहाँ यह फॉर्मेट सबसे तेज़ स्कैन होता है।',
+    production: 'प्रिंटिंग और प्रोडक्शन से जुड़ी महत्वपूर्ण बातें',
+    faqs: 'अक्सर पूछे जाने वाले सवाल (FAQs)',
+    faqsSub: 'इस QR फॉर्मेट को बनाने, स्कैन करने और प्रिंट करने की पूरी जानकारी।',
+    related: 'संबंधित QR कोड टूल्स',
+    benefitLabel: 'लाभ:',
+    exampleLabel: 'उदाहरण:',
+  },
+}[locale] || {
+  benefits: `Who Can Benefit from a ${heading}?`,
+  benefitsSub: 'Tailored applications across commercial, professional, and consumer environments.',
+  howItWorks: `How to Generate and Use Your ${heading}`,
+  howItWorksSub: 'Three simple steps from configuration to vector export.',
+  examples: 'Real-World Deployment Examples',
+  examplesSub: 'Practical workflows where this format delivers high scan reliability.',
+  production: 'Production & Printing Considerations',
+  faqs: 'Frequently Asked Questions',
+  faqsSub: 'Everything you need to know about generating, formatting, and scanning this QR format.',
+  related: 'Related QR Code Tools',
+  benefitLabel: 'Benefit:',
+  exampleLabel: 'Example:',
+};
+---
+
+<div class="space-y-16 py-12">
+  
+  <!-- 1. Deep Overview & Technical Explanation -->
+  {overviewParagraphs.length > 0 && (
+    <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+      <div class="space-y-2">
+        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          {overviewTitle || `What is a ${heading}?`}
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
+          {subheading}
+        </p>
+      </div>
+
+      <div class="prose dark:prose-invert max-w-none text-xs sm:text-sm text-slate-600 dark:text-slate-300 space-y-3 leading-relaxed">
+        {overviewParagraphs.map((para) => (
+          <p>{para}</p>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- 2. Who Can Use It & Sector Benefits -->
+  {sectors.length > 0 && (
+    <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      <div class="space-y-1">
+        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          {sectionHeaders.benefits}
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-500">
+          {sectionHeaders.benefitsSub}
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {sectors.map((sec) => (
+          <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-2">
+            <h3 class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-900 dark:bg-white"></span>
+              {sec.name}
+            </h3>
+            <p class="text-[11px] text-slate-500 leading-relaxed">{sec.description}</p>
+            {sec.benefit && (
+              <div class="pt-1.5 border-t border-slate-100 dark:border-slate-800 text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold">
+                {sectionHeaders.benefitLabel} {sec.benefit}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- 3. How It Works Section -->
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div class="space-y-1">
+      <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+        {sectionHeaders.howItWorks}
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-500">
+        {sectionHeaders.howItWorksSub}
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {howItWorks.map((step, idx) => (
+        <div class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-2">
+          <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-mono font-bold text-xs text-slate-800 dark:text-slate-200">
+            0{idx + 1}
+          </div>
+          <h3 class="text-xs font-bold text-slate-900 dark:text-white">{step.title}</h3>
+          <p class="text-[11px] text-slate-500 leading-relaxed">{step.description}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- 4. Real-World Practical Examples -->
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div class="space-y-1">
+      <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+        {sectionHeaders.examples}
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-500">
+        {sectionHeaders.examplesSub}
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      {useCases.map((uc) => (
+        <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-1.5">
+          <h3 class="text-xs font-bold text-slate-900 dark:text-white">
+            {uc.title}
+          </h3>
+          <p class="text-[11px] text-slate-500 leading-relaxed">{uc.description}</p>
+          {uc.example && (
+            <div class="text-[10px] font-mono text-slate-400 pt-1">
+              {sectionHeaders.exampleLabel} {uc.example}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- 5. Printing & Scannability Considerations -->
+  <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="p-5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-3">
+      <h3 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+        {sectionHeaders.production}
+      </h3>
+      <ul class="space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
+        {tips.map((tip) => (
+          <li class="flex items-start gap-2">
+            <span class="text-indigo-600 dark:text-indigo-400 font-bold">✓</span>
+            <span class="leading-relaxed">{tip}</span>
+          </li>
+        ))}
+      </ul>
+      {technicalNotes && (
+        <p class="text-[11px] text-slate-500 pt-2 border-t border-slate-200 dark:border-slate-800 leading-relaxed">
+          {technicalNotes}
+        </p>
+      )}
+    </div>
+  </section>
+
+  <!-- 6. Visible FAQ Accordion Section (5-7 questions) -->
+  <section class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div class="space-y-1">
+      <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+        {sectionHeaders.faqs}
+      </h2>
+      <p class="text-xs text-slate-500">
+        {sectionHeaders.faqsSub}
+      </p>
+    </div>
+
+    <div class="space-y-2">
+      {faqs.map((faq) => (
+        <details class="group bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-card">
+          <summary class="flex justify-between items-center font-bold text-xs text-slate-900 dark:text-white cursor-pointer list-none">
+            <span>{faq.question}</span>
+            <span class="text-slate-400 group-open:rotate-180 transition-transform duration-150">▾</span>
+          </summary>
+          <p class="text-xs text-slate-500 leading-relaxed mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+            {faq.answer}
+          </p>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <!-- 7. Contextual Internal Linking / Related QR Tools -->
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="border-t border-slate-200 dark:border-slate-800 pt-8 space-y-4">
+      <h3 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">{sectionHeaders.related}</h3>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        {relatedTools.map((tool) => (
+          <a
+            href={getLocalizedPath(`/${tool.slug}`, locale)}
+            class="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-900 dark:hover:border-white shadow-card transition-colors group"
+          >
+            <div class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+              {tool.name} &rarr;
+            </div>
+            <div class="text-[10px] text-slate-500 mt-0.5 line-clamp-2">
+              {tool.description}
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+</div>

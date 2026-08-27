@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Terms of Service" description="Terms of service and acceptable use guidelines for the QR Code Generator.">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 sm:p-12 shadow-sm space-y-8">
+      <div>
+        <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white">Terms of Service</h1>
+        <p class="text-xs text-slate-400 mt-1">Last Updated: August 2026</p>
+      </div>
+
+      <section class="space-y-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">1. Acceptable Use</h2>
+        <p>
+          You agree not to use the QR Code Generator for any unlawful activities, phishing, malware distribution, harassment, spam campaigns, or infringing intellectual property.
+        </p>
+      </section>
+
+      <section class="space-y-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">2. Prohibited Link Destinations</h2>
+        <p>
+          Dynamic QR codes pointing to dangerous protocols (including <code>javascript:</code>, <code>data:</code>, or <code>file:</code> URIs) or known malicious phishing domains will be immediately disabled by our automated moderation filters.
+        </p>
+      </section>
+
+      <section class="space-y-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">3. Disclaimer of Warranties</h2>
+        <p>
+          The service is provided "AS IS" without warranties of any kind. You are responsible for testing scannability and contrast on your target print medium before running large print production runs.
+        </p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>

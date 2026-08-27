@@ -1,0 +1,108 @@
+---
+import { getCurrentUser } from '../lib/auth/jwt';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  activeNav?: 'overview' | 'users' | 'qr_codes' | 'landing_pages' | 'abuse_reports' | 'storage' | 'subscriptions' | 'audit_logs' | 'system_health';
+}
+
+const { title, activeNav = 'overview' } = Astro.props;
+const user = await getCurrentUser(Astro.request, Astro.locals);
+
+if (!user || user.role !== 'admin') {
+  return Astro.redirect('/dashboard');
+}
+
+const navItems = [
+  { id: 'overview', name: 'Overview', href: '/admin', icon: '📊' },
+  { id: 'users', name: 'Users', href: '/admin/users', icon: '👥' },
+  { id: 'qr_codes', name: 'QR Codes', href: '/admin/qr-codes', icon: '🏁' },
+  { id: 'landing_pages', name: 'Landing Pages', href: '/admin/landing-pages', icon: '📱' },
+  { id: 'abuse_reports', name: 'Abuse Reports', href: '/admin/abuse-reports', icon: '🚨' },
+  { id: 'storage', name: 'Storage', href: '/admin/storage', icon: '💾' },
+  { id: 'subscriptions', name: 'Subscriptions', href: '/admin/subscriptions', icon: '💳' },
+  { id: 'audit_logs', name: 'Audit Logs', href: '/admin/audit-logs', icon: '📜' },
+  { id: 'system_health', name: 'System Health', href: '/admin/system-health', icon: '💚' },
+];
+---
+
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>{title} | Platform Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <script is:inline>
+    const theme = (() => {
+      if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+        return localStorage.getItem('theme');
+      }
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+      return 'light';
+    })();
+    if (theme === 'dark') document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+  </script>
+</head>
+<body class="min-h-full bg-slate-900 text-slate-100 flex flex-col md:flex-row antialiased selection:bg-indigo-500 selection:text-white">
+  <!-- Desktop Sidebar -->
+  <aside class="w-64 bg-slate-950 border-r border-slate-800 p-6 flex flex-col justify-between hidden md:flex min-h-screen">
+    <div class="space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center font-black text-white text-xs">
+          ADM
+        </div>
+        <div>
+          <span class="font-extrabold text-sm text-white tracking-tight">Admin Console</span>
+          <span class="block text-[10px] text-emerald-400 font-mono">● Cloudflare Production</span>
+        </div>
+      </div>
+
+      <nav class="space-y-1" aria-label="Admin Navigation">
+        {navItems.map((item) => (
+          <a
+            href={item.href}
+            class={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+              activeNav === item.id
+                ? 'bg-indigo-600 text-white shadow-sm'
+                : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+            }`}
+          >
+            <span>{item.icon}</span>
+            <span>{item.name}</span>
+          </a>
+        ))}
+      </nav>
+    </div>
+
+    <!-- Back to user dashboard & logout -->
+    <div class="pt-6 border-t border-slate-800 space-y-2 text-xs">
+      <a href="/dashboard" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white">
+        <span>&larr;</span> User Dashboard
+      </a>
+      <div class="px-3.5 py-2 text-[11px] text-slate-500 truncate">
+        {user.email}
+      </div>
+    </div>
+  </aside>
+
+  <!-- Mobile Top Bar -->
+  <div class="md:hidden bg-slate-950 border-b border-slate-800 p-4 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="font-bold text-xs text-white">Platform Admin</span>
+    </div>
+    <div class="flex items-center gap-2 text-xs">
+      <a href="/admin" class="p-2 rounded-lg bg-slate-900 text-slate-300">Overview</a>
+      <a href="/dashboard" class="p-2 rounded-lg bg-slate-900 text-slate-300">Dashboard &rarr;</a>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 p-6 md:p-10 max-w-7xl w-full mx-auto space-y-8 overflow-y-auto">
+    <slot />
+  </main>
+</body>
+</html>

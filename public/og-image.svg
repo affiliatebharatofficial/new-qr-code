@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Subtle grid pattern -->
+  <g opacity="0.1" stroke="#ffffff" stroke-width="1">
+    <path d="M0 70h1200M0 140h1200M0 210h1200M0 280h1200M0 350h1200M0 420h1200M0 490h1200M0 560h1200"/>
+    <path d="M100 0v630M200 0v630M300 0v630M400 0v630M500 0v630M600 0v630M700 0v630M800 0v630M900 0v630M1000 0v630M1100 0v630"/>
+  </g>
+
+  <!-- Left Content -->
+  <g transform="translate(100, 180)">
+    <!-- Badge -->
+    <rect width="220" height="40" rx="20" fill="rgba(99, 102, 241, 0.2)" stroke="rgba(99, 102, 241, 0.5)" stroke-width="1.5"/>
+    <text x="110" y="25" fill="#a5b4fc" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="700" text-anchor="middle" letter-spacing="1">100% FREE &amp; CLIENT-SIDE</text>
+
+    <!-- Main Headline -->
+    <text x="0" y="100" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-size="54" font-weight="900" letter-spacing="-1">Free QR Code Generator</text>
+    
+    <!-- Subtitle -->
+    <text x="0" y="160" fill="#94a3b8" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="400">Create high-resolution, branded QR codes instantly.</text>
+    <text x="0" y="195" fill="#94a3b8" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="400">URL, Wi-Fi, vCard, Email, UPI &amp; Social profiles.</text>
+
+    <!-- Features Pill List -->
+    <g transform="translate(0, 240)">
+      <text x="0" y="20" fill="#38bdf8" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600">✓ Vector SVG &amp; PNG</text>
+      <text x="200" y="20" fill="#38bdf8" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600">✓ Custom Colors &amp; Logos</text>
+      <text x="440" y="20" fill="#38bdf8" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600">✓ No Sign-up Required</text>
+    </g>
+  </g>
+
+  <!-- Right Visual QR Graphic -->
+  <g transform="translate(820, 165)">
+    <!-- QR Card Container -->
+    <rect width="280" height="280" rx="32" fill="#ffffff" filter="drop-shadow(0 20px 40px rgba(0,0,0,0.5))"/>
+    
+    <!-- Stylized QR Elements -->
+    <!-- Top-Left Finder -->
+    <rect x="35" y="35" width="60" height="60" rx="12" fill="none" stroke="#4f46e5" stroke-width="12"/>
+    <rect x="52" y="52" width="26" height="26" rx="6" fill="#4f46e5"/>
+
+    <!-- Top-Right Finder -->
+    <rect x="185" y="35" width="60" height="60" rx="12" fill="none" stroke="#4f46e5" stroke-width="12"/>
+    <rect x="202" y="52" width="26" height="26" rx="6" fill="#4f46e5"/>
+
+    <!-- Bottom-Left Finder -->
+    <rect x="35" y="185" width="60" height="60" rx="12" fill="none" stroke="#4f46e5" stroke-width="12"/>
+    <rect x="52" y="202" width="26" height="26" rx="6" fill="#4f46e5"/>
+
+    <!-- Data Pattern Dots -->
+    <circle cx="120" cy="50" r="7" fill="#6366f1"/>
+    <circle cx="145" cy="50" r="7" fill="#6366f1"/>
+    <circle cx="120" cy="75" r="7" fill="#6366f1"/>
+    <circle cx="145" cy="75" r="7" fill="#6366f1"/>
+    
+    <circle cx="50" cy="120" r="7" fill="#6366f1"/>
+    <circle cx="75" cy="120" r="7" fill="#6366f1"/>
+    <circle cx="50" cy="145" r="7" fill="#6366f1"/>
+    
+    <circle cx="210" cy="120" r="7" fill="#6366f1"/>
+    <circle cx="235" cy="120" r="7" fill="#6366f1"/>
+    <circle cx="210" cy="145" r="7" fill="#6366f1"/>
+    
+    <circle cx="120" cy="210" r="7" fill="#6366f1"/>
+    <circle cx="145" cy="210" r="7" fill="#6366f1"/>
+    <circle cx="210" cy="210" r="7" fill="#6366f1"/>
+    <circle cx="235" cy="235" r="7" fill="#6366f1"/>
+
+    <!-- Center Logo Shield -->
+    <rect x="110" y="110" width="60" height="60" rx="16" fill="#4f46e5"/>
+    <path d="M128 130h24v20h-24z" fill="#ffffff"/>
+  </g>
+</svg>

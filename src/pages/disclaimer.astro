@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Disclaimer" description="Important disclaimers regarding QR code generation, scannability testing, and third-party trademarks.">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 sm:p-12 shadow-sm space-y-8">
+      <div>
+        <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white">Service Disclaimer</h1>
+        <p class="text-xs text-slate-400 mt-1">Last Updated: August 2026</p>
+      </div>
+
+      <section class="space-y-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">1. Pre-Print Scannability Verification</h2>
+        <p>
+          While our generator includes real-time WCAG contrast analyzers and ISO/IEC 18004 validation warnings, optical scanning depends on print resolution, lighting, surface reflection, and phone camera sensor quality. We strongly urge all users to perform test scans on printed proofs before large-scale commercial printing.
+        </p>
+      </section>
+
+      <section class="space-y-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">2. Payment & UPI Disclaimer</h2>
+        <p>
+          Our UPI generator formats standard URI schemes according to NPCI guidelines. We do not act as a payment gateway, payment processor, or bank. We do not touch or hold any monetary transactions.
+        </p>
+      </section>
+
+      <section class="space-y-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">3. Trademarks</h2>
+        <p>
+          "QR Code" is a registered trademark of DENSO WAVE INCORPORATED. All third-party logos (Instagram, WhatsApp, Google, LinkedIn) belong to their respective owners.
+        </p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>

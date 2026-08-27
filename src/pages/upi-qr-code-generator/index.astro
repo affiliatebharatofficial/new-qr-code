@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is a UPI QR Code Generator?';
+const overviewParagraphs = [
+  'A UPI QR code generator creates an official NPCI (National Payments Corporation of India) compliant payment QR code that allows Indian merchants, freelancers, small businesses, and retail shop owners to accept instant bank-to-bank payments without card swipe terminals or platform commission deductions. The code encodes the standard "upi://pay?pa=[VPA]&pn=[Name]&am=[Amount]&cu=INR" URI specification.',
+  'When scanned using any UPI-enabled mobile app—such as Google Pay (GPay), PhonePe, Paytm, BHIM, CRED, Amazon Pay, or bank apps (HDFC, ICICI, SBI, Axis)—the application instantly pre-fills the payee Virtual Payment Address (VPA) and verified business name. If an amount is specified, the customer simply enters their secret 4-digit or 6-digit UPI PIN to settle the transaction immediately.',
+  'Because our generator produces static, decentralized UPI barcodes directly in your browser, transactions occur directly between the buyer’s bank account and your bank account via the Unified Payments Interface. There are zero intermediary gateways, zero percentage transaction cuts, and zero subscription fees. You can download high-resolution vector SVG standees or PNG images ready for counter display.'
+];
+
+const sectors = [
+  {
+    name: 'Local Kirana Stores & Supermarkets',
+    description: 'Place acrylic payment standees at billing counters to accept instant micro-payments without cash change hassles.',
+    benefit: 'Eliminates card machine rental fees and speeds up checkout line throughput.'
+  },
+  {
+    name: 'Restaurants, Cafes & Food Trucks',
+    description: 'Print UPI QR codes directly on customer dining bills or counter table tents for fast, contactless table settlements.',
+    benefit: 'Reduces wait times for bill settlement during peak lunch and dinner rushes.'
+  },
+  {
+    name: 'Freelancers, Designers & Consultants',
+    description: 'Embed fixed-amount UPI QR codes directly into PDF client invoices for same-day electronic bank settlements.',
+    benefit: 'Bypasses multi-day NEFT/IMPS manual beneficiary additions.'
+  },
+  {
+    name: 'Salons, Spas & Wellness Clinics',
+    description: 'Display personalized UPI payment standees at front desks for service payments and optional staff tips.',
+    benefit: 'Provides transparent, instant payment confirmation directly on the customer’s phone.'
+  },
+  {
+    name: 'Event Ticket Counters & Stalls',
+    description: 'Deploy laminated UPI QR codes at festival booths, college fests, and trade expo entrance gates.',
+    benefit: 'Facilitates fast, queue-free ticketing without handling physical cash.'
+  },
+  {
+    name: 'NGOs & Charitable Trusts',
+    description: 'Print donation UPI codes on campaign brochures, charity donation boxes, and social media banners.',
+    benefit: 'Allows donors to contribute any amount directly to the foundation’s verified bank account.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Enter UPI VPA & Payee Name',
+    description: 'Type your verified UPI Virtual Payment Address (e.g. merchant@okhdfcbank or yourname@paytm) and legal business name.'
+  },
+  {
+    title: '2. Set Amount (Optional)',
+    description: 'Specify a fixed payment amount for a set invoice or product price, or leave it blank to allow dynamic customer entry.'
+  },
+  {
+    title: '3. Download & Print Standee',
+    description: 'Export in vector SVG for crisp offset print stands or high-definition PNG for digital invoices and display signage.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Retail Billing Counter Acrylics',
+    description: 'Tabletop acrylic stands placed beside POS screens allowing customers to scan and pay while items are bagged.',
+    example: 'Neighborhood grocery store with a branded countertop UPI stand.'
+  },
+  {
+    title: 'PDF Service Invoices',
+    description: 'Directly printed in the payment section of monthly billing invoices sent to freelance clients.',
+    example: 'Web designer attaching a ₹15,000 fixed-amount UPI QR code to final project invoice.'
+  },
+  {
+    title: 'Restaurant Guest Bill Folders',
+    description: 'Printed at the bottom of thermal receipt slips with the exact order total for seamless table checkout.',
+    example: 'Bistro printing dynamic UPI payment codes on receipt footers.'
+  },
+  {
+    title: 'Delivery Box & Courier Parcels',
+    description: 'Printed on Cash-on-Delivery parcel tags allowing delivery drivers to collect digital payment upon handover.',
+    example: 'E-commerce local courier collecting delivery payment via UPI scan.'
+  }
+];
+
+const tips = [
+  'Verify UPI VPA Accuracy: Double check your UPI ID (e.g., username@bankname) with a small test scan before printing hundred-unit counter standees.',
+  'Optional Amount Flexibility: Leaving the amount field empty allows customers to type their own total, making one standee reusable for all transactions.',
+  'High Contrast for Dim Lighting: Ensure crisp black or dark navy modules on pure white backgrounds so phone cameras can read the code under evening store lighting.',
+  'Transaction Notes: Use the optional transaction note field (e.g., "Order Payment") to help identify incoming credits on your bank statement.',
+  'Compatible with All Payment Apps: A standard UPI QR code works seamlessly across Google Pay, PhonePe, Paytm, BHIM, CRED, and all Indian banking apps.'
+];
+
+const technicalNotes = 'Standards Compliance: Adheres to official NPCI UPI Deep Linking specifications ("upi://pay?pa=...&pn=...&am=...&cu=INR") supported by all RBI-authorized UPI payment applications.';
+
+const faqs = [
+  {
+    question: 'Which payment apps can scan this UPI QR code?',
+    answer: 'All official UPI-enabled apps in India support this standard format, including Google Pay (GPay), PhonePe, Paytm, BHIM, Amazon Pay, CRED, and mobile banking apps from HDFC, ICICI, SBI, Axis, and Kotak.'
+  },
+  {
+    question: 'Are there any platform transaction fees or middleman commissions?',
+    answer: 'No. Because our tool generates standard decentralized static UPI payment strings, funds transfer directly peer-to-peer between the customer\'s bank and your bank account with 0% platform commission.'
+  },
+  {
+    question: 'Can I set a fixed payment amount on the UPI QR code?',
+    answer: 'Yes. You can specify a fixed payment amount (e.g., 500.00). When customers scan the code, their payment app automatically locks in that exact amount so they only need to enter their UPI PIN.'
+  },
+  {
+    question: 'Can I leave the payment amount empty for open customer entry?',
+    answer: 'Yes! If you leave the amount field blank, customers can type any custom amount upon scanning, making it ideal for general retail counters and flexible donations.'
+  },
+  {
+    question: 'Does this UPI QR code generator work for international payments?',
+    answer: 'UPI is the official payment infrastructure for India. It works seamlessly for anyone with an active Indian bank account and UPI app. International users traveling in India can also scan if their foreign payment app supports UPI Global.'
+  },
+  {
+    question: 'Do generated UPI QR codes expire?',
+    answer: 'No. Static UPI QR codes encode your bank VPA and have no expiration date. They function indefinitely as long as your underlying UPI bank account remains active.'
+  }
+];
+
+const relatedTools = [
+  { name: 'URL QR Generator', slug: 'url-to-qr-code', description: 'Direct customers to your e-commerce store or digital menu.' },
+  { name: 'WhatsApp QR Generator', slug: 'whatsapp-qr-code-generator', description: 'Let customers text payment screenshots or order confirmations.' },
+  { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Share merchant contact details and store location cards.' },
+  { name: 'Google Reviews QR', slug: 'google-reviews-qr-code', description: 'Collect 5-star Google customer reviews right at the checkout counter.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="UPI QR Code Generator — Accept UPI Payments with Zero Commission"
+  description="Generate official UPI payment QR codes for Google Pay, PhonePe, Paytm, and BHIM. Accept direct bank payments with zero fees. Free vector SVG & PNG."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="upi"
+      headline="UPI Payment QR Code Generator"
+      subheadline="Accept instant payments directly into your bank account with zero platform fees. Compatible with GPay, PhonePe, Paytm, and all UPI apps."
+    />
+  </div>
+
+  <LandingContent
+    heading="UPI Payment QR Code"
+    subheading="Standard-compliant NPCI payment codes for retail counters, invoices, and donation drives."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

@@ -1,0 +1,279 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import { getCurrentUser } from '../../../lib/auth/jwt';
+import { getUserEntitlements } from '../../../lib/billing/entitlements';
+
+const user = await getCurrentUser(Astro.request, Astro.locals);
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+const entitlements = await getUserEntitlements(user.id, Astro.locals);
+if (!entitlements.canCreateLandingPage) {
+  return Astro.redirect('/dashboard/landing-pages?limit_reached=1');
+}
+
+const pageTypes = [
+  { id: 'business_card', name: 'Digital Business Card', icon: '👤', desc: 'Share bio, contact details, social links & 1-tap phone contact save.' },
+  { id: 'menu', name: 'Restaurant Menu', icon: '🍽️', desc: 'Mobile menu with starters, mains, drinks, prices, and dietary tags.' },
+  { id: 'social_profile', name: 'Social Profile Bio', icon: '✨', desc: 'Connect followers to Instagram, TikTok, YouTube, X, and websites.' },
+  { id: 'app_download', name: 'App Download Page', icon: '📱', desc: 'Unified store download link for Apple iOS and Google Play Store.' },
+  { id: 'review', name: 'Business Review Page', icon: '⭐', desc: 'Direct customers to leave 5-star reviews on Google and TripAdvisor.' },
+  { id: 'event', name: 'Event & Conference', icon: '📅', desc: 'Event details with 1-tap add to Apple / Google / Outlook calendars.' },
+  { id: 'product', name: 'Product Showcase', icon: '📦', desc: 'Product imagery, specs, pricing, and custom call-to-action buttons.' },
+  { id: 'contact', name: 'Simple Contact Page', icon: '📞', desc: 'Minimalist contact portal with instant dialing and vCard download.' },
+];
+---
+
+<DashboardLayout title="Create QR Landing Page" activeNav="qr">
+  <div class="space-y-8 max-w-3xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <div>
+        <a href="/dashboard/landing-pages" class="text-xs font-semibold text-indigo-600 hover:underline">
+          &larr; Back to Landing Pages
+        </a>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-1">
+          Create QR Landing Page
+        </h1>
+      </div>
+    </div>
+
+    <!-- Form Wizard -->
+    <form id="create-page-form" class="space-y-6" onsubmit="return false;">
+      <!-- Step 1: Type Selection -->
+      <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+          1. Choose Page Type
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="type-selector-grid">
+          {pageTypes.map((t, idx) => (
+            <label class={`flex items-start gap-3 p-4 rounded-2xl border cursor-pointer transition-all ${
+              idx === 0
+                ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/40'
+                : 'border-slate-200 dark:border-slate-800 hover:border-slate-300'
+            }`}>
+              <input type="radio" name="page_type" value={t.id} checked={idx === 0} class="mt-1 text-indigo-600 focus:ring-indigo-500" />
+              <div class="space-y-0.5">
+                <div class="flex items-center gap-1.5 font-bold text-xs text-slate-900 dark:text-white">
+                  <span>{t.icon}</span>
+                  <span>{t.name}</span>
+                </div>
+                <p class="text-[11px] text-slate-500 leading-snug">{t.desc}</p>
+              </div>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <!-- Step 2: Basic Details -->
+      <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+          2. Page Information
+        </h2>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+            Page Title / Heading <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="page-title"
+            required
+            placeholder="e.g. John Doe — Product Director"
+            class="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+              Contact / Display Name
+            </label>
+            <input
+              type="text"
+              id="field-name"
+              placeholder="e.g. John Doe"
+              class="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+              Job Title / Subtitle
+            </label>
+            <input
+              type="text"
+              id="field-subtitle"
+              placeholder="e.g. Founder &amp; CEO"
+              class="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+            Bio / Description
+          </label>
+          <textarea
+            id="field-bio"
+            rows="3"
+            placeholder="A brief description or welcome note..."
+            class="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
+          ></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              id="field-phone"
+              placeholder="+1 (555) 123-4567"
+              class="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+              Email Address
+            </label>
+            <input
+              type="email"
+              id="field-email"
+              placeholder="john@example.com"
+              class="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+            Website URL
+          </label>
+          <input
+            type="url"
+            id="field-website"
+            placeholder="https://example.com"
+            class="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
+          />
+        </div>
+      </div>
+
+      <!-- Step 3: Design Styling -->
+      <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+          3. Styling &amp; Theme
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+              Theme Mode
+            </label>
+            <select id="field-theme" class="w-full px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white">
+              <option value="light">Light Theme (Clean White)</option>
+              <option value="dark">Dark Theme (Modern Slate)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+              Primary Accent Color
+            </label>
+            <div class="flex items-center gap-2">
+              <input type="color" id="field-color" value="#4f46e5" class="w-10 h-10 rounded-xl cursor-pointer border border-slate-300" />
+              <span class="text-xs font-mono text-slate-500">CTA Button Color</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <a href="/dashboard/landing-pages" class="px-5 py-3 rounded-2xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100">
+          Cancel
+        </a>
+        <button
+          type="submit"
+          id="submit-page-btn"
+          class="px-8 py-3.5 rounded-2xl font-bold text-xs sm:text-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/25 transition-all cursor-pointer"
+        >
+          Publish &amp; Connect Dynamic QR &rarr;
+        </button>
+      </div>
+    </form>
+  </div>
+</DashboardLayout>
+
+<script>
+  document.getElementById('create-page-form')?.addEventListener('submit', async () => {
+    const title = (document.getElementById('page-title') as HTMLInputElement)?.value;
+    const type = (document.querySelector('input[name="page_type"]:checked') as HTMLInputElement)?.value || 'business_card';
+    const name = (document.getElementById('field-name') as HTMLInputElement)?.value || title;
+    const subtitle = (document.getElementById('field-subtitle') as HTMLInputElement)?.value || '';
+    const bio = (document.getElementById('field-bio') as HTMLTextAreaElement)?.value || '';
+    const phone = (document.getElementById('field-phone') as HTMLInputElement)?.value || '';
+    const email = (document.getElementById('field-email') as HTMLInputElement)?.value || '';
+    const website = (document.getElementById('field-website') as HTMLInputElement)?.value || '';
+    const theme = (document.getElementById('field-theme') as HTMLSelectElement)?.value || 'light';
+    const primaryColor = (document.getElementById('field-color') as HTMLInputElement)?.value || '#4f46e5';
+
+    const content: any = {
+      name,
+      title: subtitle,
+      bio,
+      phone,
+      email,
+      website,
+    };
+
+    if (type === 'menu') {
+      content.restaurantName = name;
+      content.sections = [
+        {
+          title: 'Starters & Appetizers',
+          items: [
+            { name: 'Crispy Truffle Fries', description: 'Fresh parmesan and truffle aioli', price: '9.50', isVegetarian: true },
+            { name: 'Bruschetta Trio', description: 'Heirloom tomatoes, basil, and balsamic reduction', price: '12.00', isVegetarian: true },
+          ],
+        },
+        {
+          title: 'Main Courses',
+          items: [
+            { name: 'Pan-Seared Salmon', description: 'Asparagus risotto with lemon herb butter', price: '24.00' },
+            { name: 'Handcrafted Pasta Primavera', description: 'Seasonal vegetables in garlic olive oil', price: '18.50', isVegetarian: true },
+          ],
+        },
+      ];
+    } else if (type === 'app_download') {
+      content.appName = name;
+      content.description = bio || 'Download our app on iPhone and Android.';
+      content.iosUrl = website || 'https://apps.apple.com';
+      content.androidUrl = website || 'https://play.google.com';
+    } else if (type === 'review') {
+      content.businessName = name;
+      content.reviewUrl = website || 'https://google.com/maps';
+    }
+
+    try {
+      const res = await fetch('/api/landing-pages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type,
+          title,
+          content,
+          design: { theme, primaryColor },
+          status: 'published',
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        window.location.href = '/dashboard/landing-pages';
+      } else {
+        alert(data.error?.message || 'Failed to create landing page.');
+      }
+    } catch {
+      alert('Error creating landing page.');
+    }
+  });
+</script>

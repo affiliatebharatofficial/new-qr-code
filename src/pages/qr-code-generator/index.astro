@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is an All-in-One QR Code Generator?';
+const overviewParagraphs = [
+  'An all-in-one QR code generator is a versatile digital publishing tool that creates ISO/IEC 18004 standard-compliant 2D optical barcodes for any data format—including website URLs, Wi-Fi network credentials, electronic vCard business cards, WhatsApp chats, UPI payments, email drafts, phone dialing, SMS text messages, GPS map waypoints, event calendar invitations, and multi-link social media profiles.',
+  'While traditional static QR codes encode data permanently into the pixel matrix for lifetime offline validity with zero recurring fees, dynamic QR codes route through a lightweight redirection endpoint, allowing marketing teams to update destination links in real-time, password-protect content, and track detailed scan analytics (device types, operating systems, and scan frequency) without reprinting physical packaging.',
+  'Our platform operates client-side inside your browser for complete privacy and data security. You can customize foreground colors, select modern round or diamond module shapes, adjust corner eye geometry, embed your brand logo, and export resolution-independent Vector SVG files or high-definition PNGs ready for professional commercial print runs.'
+];
+
+const sectors = [
+  {
+    name: 'Retail Stores & E-Commerce',
+    description: 'Print on product tags, shopping bags, and unboxing inserts to direct buyers to re-order portals and customer reviews.',
+    benefit: 'Bridges physical in-store shopping directly into recurring digital sales.'
+  },
+  {
+    name: 'Restaurants, Cafes & Hospitality',
+    description: 'Deploy tabletop QR standees for contactless food menus, Wi-Fi guest access, and instant tip payments.',
+    benefit: 'Eliminates paper menu reprinting expenses and speeds up customer turnaround.'
+  },
+  {
+    name: 'Real Estate & Construction',
+    description: 'Place on property yard signs, brochures, and model home directionals linking to 3D tours and agent vCards.',
+    benefit: 'Captures drive-by buyer inquiries while interest is highest.'
+  },
+  {
+    name: 'Conferences, Expos & Event Venues',
+    description: 'Feature on attendee lanyards, stage screens, and printed agendas for instant networking and session bookmarking.',
+    benefit: 'Delivers high attendee engagement without distributing bulky printed binders.'
+  },
+  {
+    name: 'Healthcare Clinics & Salons',
+    description: 'Display on reception counters and reminder cards for patient check-in, guest Wi-Fi, and Google reviews.',
+    benefit: 'Streamlines customer waiting experiences with zero staff assistance.'
+  },
+  {
+    name: 'Education, Museums & Nonprofits',
+    description: 'Mount on museum placards, classroom worksheets, and donation flyers for interactive offline learning.',
+    benefit: 'Delivers rich multimedia content without requiring expensive proprietary hardware.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Select Your QR Code Type',
+    description: 'Choose from 14+ supported payload formats including URL, Wi-Fi, vCard, WhatsApp, UPI, Email, Phone, SMS, and Events.'
+  },
+  {
+    title: '2. Input Details & Customize',
+    description: 'Fill in your data, customize brand colors, pick rounded or dot module styles, and upload your central company logo.'
+  },
+  {
+    title: '3. Export Vector SVG or PNG',
+    description: 'Download in scalable Vector SVG for print shops or high-DPI PNG for digital media and email newsletters.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Product Packaging & Labels',
+    description: 'Printed on retail boxes and garment tags linking customers to manuals, warranty forms, and reorders.',
+    example: 'Consumer electronics brand including setup video QR on packaging.'
+  },
+  {
+    title: 'Trade Show Exhibition Banners',
+    description: 'Large roll-up banners in conference expo halls capturing attendee leads and demo requests.',
+    example: 'Enterprise software vendor driving booth visitors to interactive product demos.'
+  },
+  {
+    title: 'Direct Mail & Postcard Flyers',
+    description: 'Mailed to local households offering exclusive promotional discount codes applied automatically.',
+    example: 'HVAC repair company sending seasonal inspection mailers.'
+  },
+  {
+    title: 'Physical Business Cards & Badges',
+    description: 'Printed cleanly on the reverse of paper cards for tactile traditionalists wanting instant digital saving.',
+    example: 'Executive business card with an elegant vCard contact QR.'
+  }
+];
+
+const tips = [
+  'Maintain Strong Visual Contrast: Dark modules on a clean white background ensure the fastest optical camera scanning in low lighting.',
+  'Keep Adequate Quiet Zone Margin: Ensure at least a 10px white border surrounds the QR code so smartphone cameras can identify finder patterns.',
+  'Vector SVG for Large Print Runs: Always provide scalable Vector SVG files to commercial print shops to avoid blurry pixelation.',
+  'High Error Correction for Logos: When embedding a central logo, ensure error correction is set to Level H (30%) for maximum scan reliability.',
+  'Multi-Device Camera Field Testing: Test your printed proof across multiple iOS and Android smartphones before mass production.'
+];
+
+const technicalNotes = 'Standards Compliance: Generates standard ISO/IEC 18004 2D barcodes with configurable Reed-Solomon error correction (Levels L, M, Q, H).';
+
+const faqs = [
+  {
+    question: 'How do I create a free custom QR code?',
+    answer: 'Select your desired QR code type from the selector above (URL, Wi-Fi, vCard, WhatsApp, UPI, Email, etc.), input your data, customize the colors or shapes, upload a logo if desired, and click "Download PNG" or "Download SVG".'
+  },
+  {
+    question: 'Are there any scan limits or expiration dates on static QR codes?',
+    answer: 'No. All static QR codes generated on this platform are 100% free with unlimited lifetime scans. They do not expire and require no ongoing subscription.'
+  },
+  {
+    question: 'How does client-side QR generation protect my privacy?',
+    answer: 'Unlike traditional web generators that upload your private Wi-Fi passwords, contact addresses, or notes to remote servers, our generator runs 100% locally in your browser memory. Your data never leaves your device.'
+  },
+  {
+    question: 'Can I add my company logo to the center of the QR code?',
+    answer: 'Yes! Switch to the Logo tab in the customization panel, upload your PNG, JPG, or SVG logo, and adjust its scale. The generator automatically applies Level H error correction to maintain fast scannability.'
+  },
+  {
+    question: 'What is the difference between static and dynamic QR codes?',
+    answer: 'Static QR codes store data directly in the black-and-white pixel pattern and cannot be edited once printed. Dynamic QR codes route through a short URL, allowing you to update destination links anytime and track scan analytics.'
+  },
+  {
+    question: 'What file format is recommended for commercial printing?',
+    answer: 'Vector SVG is the recommended format for print professionals because it scales infinitely to any size (from business cards to giant billboards) with zero loss of sharpness. PNG is best for digital screens and web media.'
+  }
+];
+
+const relatedTools = [
+  { name: 'URL to QR Code', slug: 'url-to-qr-code', description: 'Convert website links, blogs, and stores into scannable codes.' },
+  { name: 'Wi-Fi QR Generator', slug: 'wifi-qr-code-generator', description: 'Let guests connect to your wireless network without typing passwords.' },
+  { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Share full contact credentials directly to smartphone address books.' },
+  { name: 'WhatsApp QR Generator', slug: 'whatsapp-qr-code-generator', description: 'Start instant WhatsApp conversations with pre-filled inquiries.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="QR Code Generator — Create Free Custom QR Codes with Logo"
+  description="Generate custom QR codes for websites, Wi-Fi, vCard contacts, emails, WhatsApp, and UPI payments. 100% free client-side tool with vector SVG & PNG export."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="url"
+      headline="All-In-One Free QR Code Generator"
+      subheadline="Create high-resolution, custom QR codes for any link, network, contact card, or payment in seconds."
+    />
+  </div>
+
+  <LandingContent
+    heading="Custom QR Code"
+    subheading="Standard-compliant, high-resolution QR codes for print media, packaging, and digital marketing."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

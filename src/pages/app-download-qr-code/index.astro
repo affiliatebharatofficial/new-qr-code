@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is an App Download QR Code Generator?';
+const overviewParagraphs = [
+  'An App Download QR code generator creates a unified, smart mobile QR code that directs smartphone users straight to your application\'s listing on the Apple App Store or Google Play Store. Instead of printing two separate QR codes (one for iOS and one for Android), a single smart App QR code routes each scanner to the correct download store automatically based on their device operating system.',
+  'Promoting mobile apps across physical advertising—such as subway posters, product packaging, in-store checkout counters, trade show banners, and television commercials—requires minimizing download friction. Having users search for your app name in app stores often exposes them to competing clone apps or spelling mistakes. An App QR code delivers immediate 1-tap installation directly from the physical touchpoint.',
+  'Our generator allows you to configure your app name, direct iOS App Store URL, and Google Play Store link with custom brand styling, app icons, and high-resolution vector SVG or PNG exports for commercial advertising print runs.'
+];
+
+const sectors = [
+  {
+    name: 'Fintech & Digital Banking Apps',
+    description: 'Print on physical debit card mailers and bank branch teller stands for immediate mobile banking onboarding.',
+    benefit: 'Accelerates customer transition to digital self-service banking.'
+  },
+  {
+    name: 'Food Delivery & Quick-Service Restaurants',
+    description: 'Place on takeout containers and counter stands with an "Order Ahead for 20% Off" promotional offer.',
+    benefit: 'Shifts recurring dining orders to high-margin proprietary mobile app channels.'
+  },
+  {
+    name: 'Fitness Trackers & Smart Hardware',
+    description: 'Embed on initial unboxing quick-start guides and physical device packaging for required pairing apps.',
+    benefit: 'Eliminates customer confusion during hardware setup and onboarding.'
+  },
+  {
+    name: 'Ride-Sharing & Micro-Mobility',
+    description: 'Attach directly to scooter handlebars, bicycle frames, and transit hub docking stations.',
+    benefit: 'Enables riders on the street to download the app and unlock vehicles within 60 seconds.'
+  },
+  {
+    name: 'E-Commerce & Retail Loyalty Apps',
+    description: 'Print on in-store shopping bags and receipts with loyalty points and exclusive in-app discount coupons.',
+    benefit: 'Drives high customer lifetime value through targeted mobile push notifications.'
+  },
+  {
+    name: 'Mobile Gaming Studios',
+    description: 'Feature in magazine ads, comic conventions, and gaming expo banners for instant game downloads.',
+    benefit: 'Converts gamer event excitement into verified app installs.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Enter App Store Links',
+    description: 'Enter your application name, Apple App Store link, and Google Play Store link into the generator form.'
+  },
+  {
+    title: '2. Customize Visual Brand',
+    description: 'Pick modern high-contrast colors, select rounded dot modules, and upload your official mobile app icon.'
+  },
+  {
+    title: '3. Export Vector SVG or PNG',
+    description: 'Download print-ready Vector SVG files for large format posters or high-definition PNGs for print packaging.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Hardware Unboxing Quick-Start Guides',
+    description: 'Printed on the inside lid of smart electronics packaging guiding buyers to the companion setup app.',
+    example: 'Smart home thermostat manufacturer enabling 1-step companion app installation.'
+  },
+  {
+    title: 'Subway & Transit Advertising Posters',
+    description: 'High-contrast QR codes on subway train platform posters catching commuters on their phones.',
+    example: 'Audiobook streaming app capturing commuters during morning subway rides.'
+  },
+  {
+    title: 'Restaurant Tabletop Tents',
+    description: 'Acrylic stands placed on dining tables encouraging diners to order and pay via the mobile app.',
+    example: 'Fast-casual restaurant chain driving 4,000+ monthly app installations.'
+  },
+  {
+    title: 'Retail Store Checkout Receipts',
+    description: 'Printed at the bottom of register receipts offering digital loyalty rewards for app users.',
+    example: 'Apparel retailer boosting loyalty club membership by 35%.'
+  }
+];
+
+const tips = [
+  'Use Direct App Store URLs: Ensure links include your exact App ID (e.g. apps.apple.com/app/id123456 and play.google.com/store/apps/details?id=com.app).',
+  'Add Clear Call to Action: Print copy such as "Scan with phone camera to download for iOS & Android" next to the code.',
+  'High Contrast for Fast Scanning: Use dark modules on a solid white background to ensure rapid scanning under low transit or ambient store lighting.',
+  'Vector SVG for Billboards & Transit: Always export in vector SVG for large format printing to avoid blurry or pixelated edges.',
+  'Test Across Both Operating Systems: Verify the QR code on an iPhone and an Android phone to ensure correct automatic store routing.'
+];
+
+const technicalNotes = 'Standards Compliance: Compatible with mobile smart-routing deep links for automatic device-aware redirection to Apple App Store (iOS) or Google Play Store (Android).';
+
+const faqs = [
+  {
+    question: 'How does an App Download QR code work for both iPhone and Android users?',
+    answer: 'When a user scans the QR code, the code detects the user\'s mobile operating system and automatically redirects iOS users to the Apple App Store and Android users to the Google Play Store, eliminating the need for two separate codes.'
+  },
+  {
+    question: 'Where can I find my Apple App Store and Google Play Store links?',
+    answer: 'Search for your app on the desktop web version of the Apple App Store and Google Play Store, and copy the full URL from the browser address bar (e.g. apps.apple.com/app/id... or play.google.com/store/apps/details?id=...).'
+  },
+  {
+    question: 'Can I include my app icon in the center of the QR code?',
+    answer: 'Yes! You can upload your app icon image (PNG, JPG, or SVG). Our generator automatically sets Reed-Solomon error correction to Level H (30%) so the QR code scans reliably with the icon centered.'
+  },
+  {
+    question: 'What happens if someone scans the QR code on a desktop computer?',
+    answer: 'Desktop users will see an elegant landing page presenting both the Apple App Store and Google Play Store badges, allowing them to choose their platform or scan with their phone.'
+  },
+  {
+    question: 'Do App Download QR codes expire?',
+    answer: 'No. Static App Store QR codes encode the download links directly and have no expiration date. They remain valid as long as your app listings are active in the app stores.'
+  },
+  {
+    question: 'Can I track how many people installed the app from the QR code?',
+    answer: 'Yes. You can add standard attribution tracking parameters (such as Apple Campaign links or Google Play Campaign parameters) directly to your store URLs before generating the QR code.'
+  }
+];
+
+const relatedTools = [
+  { name: 'URL QR Generator', slug: 'url-to-qr-code', description: 'Direct traffic to your marketing website or landing page.' },
+  { name: 'Social Media QR', slug: 'social-media-qr-code', description: 'Connect users to all your social media channels in one hub.' },
+  { name: 'Google Reviews QR', slug: 'google-reviews-qr-code', description: 'Collect 5-star Google customer reviews at point of sale.' },
+  { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Share full corporate and founder contact cards.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="App Download QR Code — Universal iOS & Android Install Links"
+  description="Generate smart App Download QR codes that route iOS and Android users to the correct app store with a single unified scan link. Free vector SVG & PNG."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="app"
+      headline="App Download QR Code Generator"
+      subheadline="Drive app installs with a single unified QR code that connects users directly to the Apple App Store or Google Play Store."
+    />
+  </div>
+
+  <LandingContent
+    heading="App Store Download QR Code"
+    subheading="A single smart QR code that routes iPhone and Android users to the right app store."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

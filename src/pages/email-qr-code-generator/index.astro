@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is an Email QR Code Generator?';
+const overviewParagraphs = [
+  'An Email QR code generator creates a scannable 2D barcode that automatically opens the user’s default email client (such as Apple Mail, Gmail, Microsoft Outlook, or Yahoo Mail) with your recipient email address, subject line, and initial body message already pre-filled. When scanned with a smartphone camera, the user simply reviews the pre-composed draft and taps "Send".',
+  'Manual email typing from physical posters, conference slides, or printed packaging frequently causes typographical errors, resulting in bounced emails and lost business leads. An Email QR code encodes standard "mailto:recipient@example.com?subject=...&body=..." URI protocols that execute natively across mobile operating systems without requiring any third-party app installations.',
+  'Whether deployed for support ticket submissions, corporate RFP requests, newsletter subscriptions, or real estate inquiries, Email QR codes streamline customer interaction. Our client-side generator allows full custom color styling, logo insertion, and high-resolution Vector SVG and PNG downloads.'
+];
+
+const sectors = [
+  {
+    name: 'Customer Support & Warranty Services',
+    description: 'Print on product packaging and user manuals with pre-filled subject lines like "Warranty Claim: Product #104".',
+    benefit: 'Routes incoming inquiries to the correct department with standardized ticket formatting.'
+  },
+  {
+    name: 'Conference Speakers & Academic Presenters',
+    description: 'Display on the final slide of conference keynote presentations allowing attendees to request slide decks.',
+    benefit: 'Generates dozens of qualified networking emails before stepping off the stage.'
+  },
+  {
+    name: 'Real Estate Brokers & Property Managers',
+    description: 'Place on property brochures with pre-configured subject lines referencing the specific property address.',
+    benefit: 'Enables interested buyers to request property disclosures in seconds.'
+  },
+  {
+    name: 'Corporate Recruitment & HR Teams',
+    description: 'Add to job fair banners and printed recruitment flyers for quick resume submissions.',
+    benefit: 'Pre-formats applicant email subjects with the relevant job opening code.'
+  },
+  {
+    name: 'Local Government & Public Utilities',
+    description: 'Print on public notices, utility bills, and municipal signage for citizen feedback and reporting.',
+    benefit: 'Provides citizens with an instant, direct line to municipal departments.'
+  },
+  {
+    name: 'Nonprofit & Charity Fundraising',
+    description: 'Include on fundraising event flyers for volunteer inquiries and corporate sponsorship proposals.',
+    benefit: 'Facilitates direct donor communications without friction.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Enter Recipient & Subject',
+    description: 'Type your recipient email address, an informative subject line, and an optional message body template.'
+  },
+  {
+    title: '2. Customize Brand Styling',
+    description: 'Match your organization’s color palette, select custom module corner eyes, and add your brand logo.'
+  },
+  {
+    title: '3. Export Vector SVG or PNG',
+    description: 'Download in print-ready Vector SVG for posters and brochures or high-resolution PNG for digital slides.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Conference Presentation Slides',
+    description: 'Displayed prominently on the concluding Q&A slide for direct email contact from auditorium attendees.',
+    example: 'Keynote speaker sharing an automated slide deck request link.'
+  },
+  {
+    title: 'Product Packaging Feedback',
+    description: 'Printed on retail product boxes inviting customer feedback or warranty claims.',
+    example: 'Appliance manufacturer enabling 1-tap support ticket creation.'
+  },
+  {
+    title: 'Recruitment Job Fair Banners',
+    description: 'Mounted on career fair pop-up displays prompting candidates to submit their portfolio.',
+    example: 'Design agency collecting candidate portfolios at university job fairs.'
+  },
+  {
+    title: 'B2B Sales One-Pagers',
+    description: 'Printed on leave-behind sales collateral requesting tailored enterprise pricing quotes.',
+    example: 'SaaS sales team attaching a pre-filled quote inquiry QR code.'
+  }
+];
+
+const tips = [
+  'Use Standard Subject Lines: Create concise, structured subject lines (e.g. "Inquiry: [Topic]") to help your email filters categorize incoming requests.',
+  'Keep Body Text Concise: Keep pre-filled body text short so the QR code matrix remains simple and fast to scan from a distance.',
+  'Test Across Multiple Email Apps: Verify your email QR code across Apple Mail, Gmail app, and Outlook to ensure smooth URI parsing.',
+  'High Contrast for Distant Scanning: Use dark foreground modules on a light background for projection screens and presentation slides.',
+  'Vector SVG for Large Banners: Use SVG vector format when printing conference backdrops or trade show roll-up banners.'
+];
+
+const technicalNotes = 'Standards Compliance: Generates standard RFC 6068 "mailto:" URI schemes compatible with iOS Mail, Android Gmail, Outlook, Thunderbird, and webmail handlers.';
+
+const faqs = [
+  {
+    question: 'How does an Email QR code work when scanned?',
+    answer: 'When scanned with a smartphone camera, the device immediately opens the user\'s default email application (such as Apple Mail, Gmail, or Outlook) with your recipient email address, subject line, and message pre-filled.'
+  },
+  {
+    question: 'Can I include a pre-written message body in the email?',
+    answer: 'Yes! You can specify both a custom subject line and an initial body message (such as "Hello, please send me more information about your services").'
+  },
+  {
+    question: 'Does the scanner need a special app to send the email?',
+    answer: 'No special app is required. Standard camera apps on iOS and Android recognize the standard "mailto:" format natively.'
+  },
+  {
+    question: 'Are my email communications logged on your servers?',
+    answer: 'No. The Email QR code is generated 100% client-side in your browser. When the user sends an email, it travels directly through their email provider to yours without touching our servers.'
+  },
+  {
+    question: 'Can I add multiple email recipients to a single QR code?',
+    answer: 'While primary recipient addresses are standard, some email clients support comma-separated CC addresses. For maximum compatibility across all mobile operating systems, we recommend one primary recipient.'
+  },
+  {
+    question: 'Do Email QR codes expire?',
+    answer: 'No. Static Email QR codes encode the mailto instructions directly into the pixel pattern and will work permanently as long as your email inbox remains open.'
+  }
+];
+
+const relatedTools = [
+  { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Share full contact credentials directly to address books.' },
+  { name: 'Phone QR Generator', slug: 'phone-qr-code-generator', description: 'Enable one-tap phone call dialing from print media.' },
+  { name: 'WhatsApp QR Generator', slug: 'whatsapp-qr-code-generator', description: 'Launch instant WhatsApp business conversations.' },
+  { name: 'URL QR Generator', slug: 'url-to-qr-code', description: 'Direct traffic to your website, blog, or contact form.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="Email QR Code Generator — Pre-filled Email QR Code"
+  description="Generate free Email QR codes with pre-filled recipient, subject, and body text. Compatible with Gmail, Apple Mail, and Outlook. Free vector SVG & PNG."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="email"
+      headline="Email QR Code Generator"
+      subheadline="Create scannable QR codes that launch pre-addressed email drafts with your custom subject line in a single tap."
+    />
+  </div>
+
+  <LandingContent
+    heading="Email QR Code"
+    subheading="Streamline customer inquiries and support tickets with pre-addressed email drafts."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>

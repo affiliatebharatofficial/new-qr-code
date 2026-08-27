@@ -1,0 +1,180 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import { getCurrentUser } from '../../../lib/auth/jwt';
+import { getUserEntitlements } from '../../../lib/billing/entitlements';
+import { formatPrice } from '../../../lib/billing/plans';
+
+const user = await getCurrentUser(Astro.request, Astro.locals);
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+const entitlements = await getUserEntitlements(user.id, Astro.locals);
+const plan = entitlements.plan;
+const usage = entitlements.usage;
+
+const renewalDate = entitlements.currentPeriodEnd
+  ? new Date(entitlements.currentPeriodEnd).toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    })
+  : null;
+
+const logoMbUsed = (usage.logoStorageBytes / (1024 * 1024)).toFixed(1);
+const logoMbLimit = Math.round(plan.logoStorageLimitBytes / (1024 * 1024));
+
+const savedQrPct = plan.savedQrLimit ? Math.min(100, Math.round((usage.savedQrCount / plan.savedQrLimit) * 100)) : 5;
+const dynamicQrPct = plan.dynamicQrLimit ? Math.min(100, Math.round((usage.dynamicQrCount / plan.dynamicQrLimit) * 100)) : 5;
+const logoStoragePct = Math.min(100, Math.round((usage.logoStorageBytes / plan.logoStorageLimitBytes) * 100));
+---
+
+<DashboardLayout title="Billing & Subscription" activeNav="account">
+  <div class="space-y-8 max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+          Billing &amp; Subscription
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">
+          Manage your subscription plan, view resource usage, and update payment methods.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        {plan.id === 'free' ? (
+          <a
+            href="/pricing"
+            class="px-5 py-2.5 rounded-2xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/20 transition-all"
+          >
+            Upgrade to Pro
+          </a>
+        ) : (
+          <button
+            type="button"
+            id="manage-billing-btn"
+            class="px-5 py-2.5 rounded-2xl text-xs font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 shadow-sm transition-all cursor-pointer"
+          >
+            Manage Billing &amp; Invoices
+          </button>
+        )}
+      </div>
+    </div>
+
+    <!-- Past Due Warning Alert -->
+    {entitlements.status === 'past_due' && (
+      <div class="p-4 rounded-2xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-xs flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <span>We couldn't process your latest subscription renewal. Please update your payment method to avoid service interruption.</span>
+        </div>
+        <button type="button" id="fix-billing-btn" class="px-3 py-1.5 rounded-xl font-bold bg-red-600 text-white hover:bg-red-700 text-xs shrink-0 cursor-pointer">
+          Update Payment
+        </button>
+      </div>
+    )}
+
+    <!-- Plan Summary Card -->
+    <div class="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Current Plan</span>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-black uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+              {plan.name}
+            </span>
+          </div>
+          <div class="text-2xl font-black text-slate-900 dark:text-white mt-1">
+            {formatPrice(plan.monthlyPrice)} <span class="text-xs font-normal text-slate-400">/ month</span>
+          </div>
+        </div>
+
+        <div class="text-left sm:text-right space-y-0.5 text-xs">
+          <div class="text-slate-400">Status</div>
+          <div class="font-bold text-slate-900 dark:text-white capitalize">
+            {entitlements.status === 'cancelled' && renewalDate
+              ? `Cancels on ${renewalDate}`
+              : entitlements.status}
+          </div>
+          {renewalDate && entitlements.status === 'active' && (
+            <div class="text-[11px] text-slate-500">Renews on {renewalDate}</div>
+          )}
+        </div>
+      </div>
+
+      <!-- Plan Usage Quotas -->
+      <div class="space-y-4">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">Resource Usage &amp; Limits</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+          <!-- Saved QRs -->
+          <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2">
+            <div class="flex justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
+              <span>Saved QR Codes</span>
+              <span>{usage.savedQrCount} / {plan.savedQrLimit === null ? '∞' : plan.savedQrLimit}</span>
+            </div>
+            <div class="h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+              <div class="h-full bg-indigo-500 rounded-full" style={`width: ${savedQrPct}%`}></div>
+            </div>
+            <div class="text-[11px] text-slate-400">
+              {entitlements.remainingSavedQrs === null ? 'Unlimited quota' : `${entitlements.remainingSavedQrs} remaining`}
+            </div>
+          </div>
+
+          <!-- Dynamic QR Campaigns -->
+          <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2">
+            <div class="flex justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
+              <span>Dynamic Campaigns</span>
+              <span>{usage.dynamicQrCount} / {plan.dynamicQrLimit === null ? '∞' : plan.dynamicQrLimit}</span>
+            </div>
+            <div class="h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+              <div class="h-full bg-purple-500 rounded-full" style={`width: ${dynamicQrPct}%`}></div>
+            </div>
+            <div class="text-[11px] text-slate-400">
+              {entitlements.remainingDynamicQrs === null ? 'Unlimited quota' : `${entitlements.remainingDynamicQrs} remaining`}
+            </div>
+          </div>
+
+          <!-- Logo Cloud Storage -->
+          <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2">
+            <div class="flex justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
+              <span>Logo Cloud Storage</span>
+              <span>{logoMbUsed} / {logoMbLimit} MB</span>
+            </div>
+            <div class="h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+              <div class="h-full bg-emerald-500 rounded-full" style={`width: ${logoStoragePct}%`}></div>
+            </div>
+            <div class="text-[11px] text-slate-400">
+              Persistent R2 logo capacity
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</DashboardLayout>
+
+<script>
+  const manageBtn = document.getElementById('manage-billing-btn');
+  const fixBtn = document.getElementById('fix-billing-btn');
+
+  async function openPortal() {
+    try {
+      const res = await fetch('/api/billing/portal');
+      const data = await res.json();
+      if (res.ok && data.portalUrl) {
+        window.location.href = data.portalUrl;
+      } else {
+        alert('Billing customer portal is unavailable. Please check back shortly.');
+      }
+    } catch {
+      alert('Error opening billing portal.');
+    }
+  }
+
+  manageBtn?.addEventListener('click', openPortal);
+  fixBtn?.addEventListener('click', openPortal);
+</script>

@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import QRGenerator from '../../components/qr/QRGenerator.astro';
+import LandingContent from '../../components/seo/LandingContent.astro';
+
+const overviewTitle = 'What is an SMS QR Code Generator?';
+const overviewParagraphs = [
+  'An SMS QR code generator creates a scannable 2D barcode that automatically opens the user’s default messaging app (such as Apple Messages or Android Messages) with your specified phone number and pre-composed text message already filled into the message field. When scanned by a smartphone camera, the user merely confirms and taps "Send".',
+  'SMS marketing campaigns, keyword opt-ins (such as "Text JOIN to 555-123"), and support requests typically suffer from friction when consumers must manually enter shortcodes and type exact keyword phrases. An SMS QR code encodes the standard "smsto:[phone]:[message]" protocol, automating the entire process with zero typing required.',
+  'Businesses use SMS QR codes for automated keyword opt-ins, contest entries, service appointment bookings, parking validation, and offline feedback surveys. Our browser-based tool allows full design customization, instant client-side rendering, and high-definition PNG and Vector SVG downloads.'
+];
+
+const sectors = [
+  {
+    name: 'Retail & E-Commerce SMS Marketing',
+    description: 'Print on shopping bags and receipts with pre-filled opt-in text like "JOIN VIP" for instant loyalty club signups.',
+    benefit: 'Grows compliance-approved SMS subscriber lists directly at physical point-of-sale.'
+  },
+  {
+    name: 'Restaurants & Table Reservations',
+    description: 'Place on waiting list placards allowing walk-in diners to text "TABLE FOR 2" to join the digital queue.',
+    benefit: 'Automates waitlist management during busy weekend dining shifts.'
+  },
+  {
+    name: 'Automotive & Valet Parking',
+    description: 'Print on parking claim tickets enabling drivers to text their ticket number 10 minutes before vehicle retrieval.',
+    benefit: 'Reduces valet bottleneck delays and improves customer pickup experience.'
+  },
+  {
+    name: 'Real Estate & Property Inquiries',
+    description: 'Display on yard sign riders with pre-filled property codes like "INFO 402" for automated listing details.',
+    benefit: 'Captures drive-by buyer phone numbers immediately into your CRM.'
+  },
+  {
+    name: 'Radio & Outdoor Billboard Advertising',
+    description: 'Feature on highway billboards and transit posters prompting contest entries or special promo codes.',
+    benefit: 'Converts outdoor visual impressions into direct mobile subscriber leads.'
+  },
+  {
+    name: 'Field Service Scheduling & Quotes',
+    description: 'Include on service door hangers allowing homeowners to text for quick estimate appointments.',
+    benefit: 'Facilitates fast, asynchronous text scheduling for busy homeowners.'
+  }
+];
+
+const howItWorks = [
+  {
+    title: '1. Enter Phone & Message',
+    description: 'Input your recipient phone number and the exact pre-filled SMS message text you want customers to send.'
+  },
+  {
+    title: '2. Customize Design Styling',
+    description: 'Select brand colors, pick modern rounded or dot modules, and upload your brand logo or SMS icon.'
+  },
+  {
+    title: '3. Export Vector SVG or PNG',
+    description: 'Download in scalable Vector SVG for print flyers and retail standees or high-resolution PNG for digital use.'
+  }
+];
+
+const useCases = [
+  {
+    title: 'Store Checkout Counter Stands',
+    description: 'Tabletop acrylic stands inviting shoppers to text an opt-in keyword for an instant 15% discount on today’s purchase.',
+    example: 'Clothing boutique driving 300+ weekly SMS marketing club opt-ins.'
+  },
+  {
+    title: 'Parking Garage Validation Signs',
+    description: 'Signs at building exits enabling drivers to text their license plate for automated parking validation.',
+    example: 'Urban parking garage enabling contactless exit validation.'
+  },
+  {
+    title: 'Live Event Contest Banners',
+    description: 'Stage screens and banners inviting attendees to text a keyword to enter prize giveaways.',
+    example: 'Music festival audience voting for favorite emerging artists via SMS.'
+  },
+  {
+    title: 'Real Estate Yard Sign Riders',
+    description: 'Small sign riders mounted above "For Sale" signs prompting buyers to text for instant property pricing.',
+    example: 'Realtor generating 40+ buyer inquiries per listing.'
+  }
+];
+
+const tips = [
+  'International Number Formatting: Always include the country code (e.g. +1 555 123 4567) so mobile carriers route messages accurately.',
+  'Keep Pre-filled Text Clear: Use standardized keywords (e.g. "JOIN", "QUOTE", "STATUS") to ensure compatibility with your automated SMS gateway.',
+  'High Contrast for Fast Scanning: Use dark modules against light backgrounds so cameras can read the code from across a counter in dim lighting.',
+  'Prominent Instructions: Always add clear human instructions beside the code such as "Scan to text our team directly".',
+  'Test with Both iOS and Android: Verify that your pre-filled text opens seamlessly in Apple Messages and Google Android Messages.'
+];
+
+const technicalNotes = 'Standards Compliance: Generates standard "smsto:+15551234567:MessageText" URI formatting recognized natively by iOS Messages, Android Messages, and Samsung Messaging.';
+
+const faqs = [
+  {
+    question: 'How does an SMS QR code work when scanned by a customer?',
+    answer: 'When scanned with a smartphone camera, the device automatically opens the native SMS messaging app with your destination phone number and pre-written message text pre-populated in the compose window.'
+  },
+  {
+    question: 'Does scanning the QR code send the SMS message automatically?',
+    answer: 'No. For security and consent reasons, iOS and Android require the user to manually review the pre-filled message and tap the "Send" button.'
+  },
+  {
+    question: 'Can I use an SMS QR code for automated marketing opt-ins?',
+    answer: 'Yes! You can configure the pre-filled message to contain an exact opt-in keyword (e.g., "SUBSCRIBE" or "VIPDEALS") that triggers automated welcome flows in your SMS marketing software.'
+  },
+  {
+    question: 'Does this work on both iPhones and Android smartphones?',
+    answer: 'Yes. All modern iPhones running iOS 11+ and Android smartphones running Android 9+ support the standard SMSTO protocol natively in their camera apps.'
+  },
+  {
+    question: 'Do SMS QR codes expire?',
+    answer: 'No. Static SMS QR codes encode the destination number and message directly into the barcode matrix. They have no expiration date and will work indefinitely.'
+  },
+  {
+    question: 'Are there any platform messaging fees to use this generator?',
+    answer: 'No. Generating the QR code is 100% free. Standard telecom SMS rates apply only between the user and their cellular carrier when they hit send.'
+  }
+];
+
+const relatedTools = [
+  { name: 'WhatsApp QR Generator', slug: 'whatsapp-qr-code-generator', description: 'Start instant WhatsApp business conversations with pre-filled messages.' },
+  { name: 'Phone QR Generator', slug: 'phone-qr-code-generator', description: 'Enable one-tap phone call dialing from print collateral.' },
+  { name: 'Email QR Generator', slug: 'email-qr-code-generator', description: 'Pre-address email drafts with custom subject lines.' },
+  { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Share full contact credentials directly to smartphone address books.' }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="SMS QR Code Generator — Pre-filled Text Message QR Code"
+  description="Generate free SMS QR codes with pre-filled recipient phone number and text message. Compatible with iOS and Android. Free vector SVG & PNG download."
+  jsonLd={faqJsonLd}
+>
+  <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
+    <QRGenerator
+      initialType="sms"
+      headline="SMS Text Message QR Code Generator"
+      subheadline="Let customers send pre-formatted SMS text inquiries or marketing opt-ins to your number in a single tap."
+    />
+  </div>
+
+  <LandingContent
+    heading="SMS Text Message QR Code"
+    subheading="Streamline mobile SMS opt-ins, customer inquiries, and support requests."
+    overviewTitle={overviewTitle}
+    overviewParagraphs={overviewParagraphs}
+    sectors={sectors}
+    howItWorks={howItWorks}
+    useCases={useCases}
+    tips={tips}
+    technicalNotes={technicalNotes}
+    faqs={faqs}
+    relatedTools={relatedTools}
+  />
+</BaseLayout>
