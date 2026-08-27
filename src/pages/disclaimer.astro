@@ -2,34 +2,123 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Disclaimer" description="Important disclaimers regarding QR code generation, scannability testing, and third-party trademarks.">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 sm:p-12 shadow-sm space-y-8">
-      <div>
-        <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white">Service Disclaimer</h1>
-        <p class="text-xs text-slate-400 mt-1">Last Updated: August 2026</p>
+<BaseLayout 
+  title="Legal Disclaimer & Trademark Notices — Free QR Code Generator" 
+  description="Official Legal, Technical, Financial, and Trademark Disclaimers for freeqrcode-generator.com covering optical scannability, payment protocols, and nominative fair use."
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-12 shadow-card space-y-10">
+      
+      <!-- Document Header -->
+      <div class="border-b border-slate-100 dark:border-slate-800 pb-6 space-y-2">
+        <span class="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Legal Disclosures</span>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          Service Disclaimer
+        </h1>
+        <div class="flex flex-wrap items-center gap-4 text-xs text-slate-500 pt-1 font-mono">
+          <span>Effective Date: August 27, 2026</span>
+          <span>•</span>
+          <span>Domain: freeqrcode-generator.com</span>
+          <span>•</span>
+          <span>Scope: Technical, Financial & Trademark Disclosures</span>
+        </div>
       </div>
 
-      <section class="space-y-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-        <h2 class="text-lg font-bold text-slate-900 dark:text-white">1. Pre-Print Scannability Verification</h2>
+      <!-- Overview Box -->
+      <div class="p-4 sm:p-5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+        This Disclaimer governs your use of all software tools, generators, dynamic short link routers, mobile landing pages, and associated content hosted on or provided via <strong class="text-slate-900 dark:text-white">freeqrcode-generator.com</strong>. Please review these technical and operational disclaimers carefully prior to deploying QR codes in commercial, print, or digital media.
+      </div>
+
+      <!-- Section 1 -->
+      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 1. Pre-Print Commercial Proofing & Optical Scannability Disclaimer
+        </h2>
         <p>
-          While our generator includes real-time WCAG contrast analyzers and ISO/IEC 18004 validation warnings, optical scanning depends on print resolution, lighting, surface reflection, and phone camera sensor quality. We strongly urge all users to perform test scans on printed proofs before large-scale commercial printing.
+          While <strong class="text-slate-800 dark:text-slate-200">freeqrcode-generator.com</strong> integrates advanced automated ISO/IEC 18004 error-correction logic and Web Content Accessibility Guidelines (WCAG) contrast analyzers, the actual optical readability and scan-success rate of a physical QR code depend upon numerous external mechanical and environmental factors beyond our control.
+        </p>
+        <p>These external factors include, but are not limited to:</p>
+        <ul class="list-disc list-inside space-y-1.5 pl-2">
+          <li><strong>Physical Print Dimensions & Distance:</strong> Inadequate physical size relative to the expected scanning distance (minimum recommended ratio is 1:10 scanning distance).</li>
+          <li><strong>Color Saturation & Substrate Contrast:</strong> Low contrast between foreground dots and background substrate, transparent backgrounds placed over busy textures, or metallic/glossy ink reflections.</li>
+          <li><strong>Curved or Flexible Surfaces:</strong> Printing on curved bottles, fabrics, corrugated cardboard, or moving vehicles resulting in optical geometric distortion.</li>
+          <li><strong>Embedded Custom Logos:</strong> Embedding oversized central logos or badges that occlude modules beyond the error-correction threshold (e.g. Level L = 7%, Level M = 15%, Level Q = 25%, Level H = 30%).</li>
+          <li><strong>Camera Sensor & Ambient Lighting:</strong> Hardware lens resolution, focus capabilities, low ambient lighting, and dirty camera lenses of scanning devices.</li>
+        </ul>
+        <div class="p-3.5 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/40 text-red-700 dark:text-red-300 font-semibold text-xs">
+          ⚠️ MANDATORY ACTION: You must conduct empirical physical test scans using multiple real-world iOS and Android devices under diverse lighting conditions on printed physical proofs BEFORE initiating large-scale commercial print runs. freeqrcode-generator.com expressly disclaims any financial or legal liability for print production, packaging, billboard, or distribution costs incurred as a result of unverified prints.
+        </div>
+      </section>
+
+      <!-- Section 2 -->
+      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 2. Financial & Payment Protocol Disclaimer (Venmo, PayPal, Zelle, Cash App, UPI)
+        </h2>
+        <p>
+          Our platform provides specialized QR generation tools that encode standard web URLs, username destinations, and standardized URI formats for supported payment services (including Venmo, PayPal, Zelle, Cash App, and Unified Payments Interface - UPI / NPCI).
+        </p>
+        <p>With respect to all payment QR tools:</p>
+        <ul class="list-disc list-inside space-y-1.5 pl-2">
+          <li><strong>We Are Not a Bank or Payment Processor:</strong> <strong class="text-slate-800 dark:text-slate-200">freeqrcode-generator.com</strong> is strictly an information formatting and barcode encoding utility. We do NOT operate as a money transmitter, payment gateway, escrow agent, financial institution, or bank.</li>
+          <li><strong>Zero Custody of Funds:</strong> We do not touch, transmit, hold, process, or reconcile monetary payments or fund transfers. All financial transactions are executed exclusively between the payer, payee, and their respective payment services or banking applications.</li>
+          <li><strong>User Accuracy Responsibility:</strong> You are solely responsible for verifying the complete accuracy of any recipient username, $Cashtag, email address, Virtual Payment Address (VPA), and encoded amount prior to publishing or distributing payment QR codes. We accept no liability for misdirected funds resulting from incorrect user input.</li>
+        </ul>
+      </section>
+
+      <!-- Section 3 -->
+      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 3. Third-Party Trademarks & Nominative Fair Use Statement
+        </h2>
+        <p>
+          All product names, logos, brands, service marks, and registered trademarks displayed on freeqrcode-generator.com belong exclusively to their respective trademark holders.
+        </p>
+        <ul class="list-disc list-inside space-y-1.5 pl-2">
+          <li><strong>"QR Code"</strong> is a registered trademark of <strong>DENSO WAVE INCORPORATED</strong>.</li>
+          <li><strong>Venmo</strong> is a registered trademark of PayPal, Inc.</li>
+          <li><strong>PayPal</strong> is a registered trademark of PayPal, Inc.</li>
+          <li><strong>Zelle</strong> is a registered trademark of Early Warning Services, LLC.</li>
+          <li><strong>Cash App</strong> is a registered trademark of Block, Inc.</li>
+          <li><strong>UPI</strong> is a trademark of National Payments Corporation of India (NPCI).</li>
+          <li><strong>Instagram, WhatsApp, Facebook</strong> are trademarks of Meta Platforms, Inc.</li>
+          <li><strong>Apple, App Store, iOS</strong> are trademarks of Apple Inc.</li>
+          <li><strong>Google, Google Play, Android, Google Maps</strong> are trademarks of Google LLC.</li>
+          <li><strong>LinkedIn</strong> is a trademark of LinkedIn Corporation.</li>
+        </ul>
+        <p>
+          The display of these trademarks, brand badges, and logos is strictly for <em>nominative fair use</em> to identify the interoperable destination or platform supported by the generated QR code. freeqrcode-generator.com is an independent platform and is NOT endorsed, sponsored, affiliated with, or certified by any of these entities.
         </p>
       </section>
 
-      <section class="space-y-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-        <h2 class="text-lg font-bold text-slate-900 dark:text-white">2. Payment & UPI Disclaimer</h2>
+      <!-- Section 4 -->
+      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 4. External Destination Links & Third-Party Content
+        </h2>
         <p>
-          Our UPI generator formats standard URI schemes according to NPCI guidelines. We do not act as a payment gateway, payment processor, or bank. We do not touch or hold any monetary transactions.
+          Dynamic QR codes hosted on our edge infrastructure route visitors to target URLs designated by the respective QR code creator. freeqrcode-generator.com has no editorial control over, and assumes no responsibility for, the content, privacy policies, safety, or practices of any third-party websites or services linked through our platform. Inclusion of a destination link does not imply endorsement or verification by freeqrcode-generator.com.
         </p>
       </section>
 
-      <section class="space-y-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-        <h2 class="text-lg font-bold text-slate-900 dark:text-white">3. Trademarks</h2>
+      <!-- Section 5 -->
+      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 5. Service Availability & "As Is" Operation
+        </h2>
         <p>
-          "QR Code" is a registered trademark of DENSO WAVE INCORPORATED. All third-party logos (Instagram, WhatsApp, Google, LinkedIn) belong to their respective owners.
+          We strive to maintain maximum global availability via distributed Cloudflare edge workers; however, we do not guarantee uninterrupted, error-free, or 100% continuous uptime. Scheduled maintenance, upstream DNS outages, regional telecommunication disruptions, or internet congestion may temporarily affect dynamic short link redirection or website access without prior notice.
         </p>
       </section>
+
+      <!-- Contact Box -->
+      <div class="border-t border-slate-100 dark:border-slate-800 pt-6 space-y-2 text-xs sm:text-sm text-slate-500">
+        <p class="font-bold text-slate-800 dark:text-slate-200">Legal & Compliance Department:</p>
+        <p>Free QR Code Generator Legal Team</p>
+        <p>Email: <a href="mailto:legal@freeqrcode-generator.com" class="text-indigo-600 dark:text-indigo-400 underline font-semibold">legal@freeqrcode-generator.com</a> / <a href="mailto:abuse@freeqrcode-generator.com" class="text-indigo-600 dark:text-indigo-400 underline font-semibold">abuse@freeqrcode-generator.com</a></p>
+        <p>Website: <a href="https://freeqrcode-generator.com" class="text-indigo-600 dark:text-indigo-400 underline">https://freeqrcode-generator.com</a></p>
+      </div>
+
     </div>
   </div>
 </BaseLayout>

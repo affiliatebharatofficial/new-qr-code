@@ -2,34 +2,198 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Terms of Service" description="Terms of service and acceptable use guidelines for the QR Code Generator.">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 sm:p-12 shadow-sm space-y-8">
-      <div>
-        <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white">Terms of Service</h1>
-        <p class="text-xs text-slate-400 mt-1">Last Updated: August 2026</p>
+<BaseLayout 
+  title="Terms of Service — Free QR Code Generator" 
+  description="Terms of Service, Master Service Agreement, and Acceptable Use Policy for freeqrcode-generator.com. Comprehensive legal protections, IP licensing, liability limitations, and abuse moderation."
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-12 shadow-card space-y-10">
+      
+      <!-- Document Header -->
+      <div class="border-b border-slate-100 dark:border-slate-800 pb-6 space-y-2">
+        <span class="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Master Legal Agreement</span>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          Terms of Service
+        </h1>
+        <div class="flex flex-wrap items-center gap-4 text-xs text-slate-500 pt-1 font-mono">
+          <span>Effective Date: August 27, 2026</span>
+          <span>•</span>
+          <span>Domain: freeqrcode-generator.com</span>
+          <span>•</span>
+          <span>Governing Standard: Commercial Web Services</span>
+        </div>
       </div>
 
-      <section class="space-y-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-        <h2 class="text-lg font-bold text-slate-900 dark:text-white">1. Acceptable Use</h2>
+      <!-- Notice Alert -->
+      <div class="p-4 sm:p-5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 text-xs sm:text-sm text-amber-800 dark:text-amber-300 leading-relaxed">
+        <strong class="font-bold">PLEASE READ CAREFULLY:</strong> These Terms of Service constitute a legally binding agreement between you ("User", "you", or "your") and <span class="font-bold">freeqrcode-generator.com</span> ("we", "us", or "our"). By accessing or utilizing our generator tools, APIs, dynamic redirection routes, or account dashboards, you acknowledge that you have read, understood, and irrevocably agree to be bound by these terms. If you do not agree, you must immediately cease accessing this platform.
+      </div>
+
+      <!-- Section 1 -->
+      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 1. Scope of Service & Eligibility
+        </h2>
         <p>
-          You agree not to use the QR Code Generator for any unlawful activities, phishing, malware distribution, harassment, spam campaigns, or infringing intellectual property.
+          <strong class="text-slate-800 dark:text-slate-200">freeqrcode-generator.com</strong> provides web-based software for generating, rendering, styling, and exporting two-dimensional Matrix barcodes (Quick Response Codes) conforming to international ISO/IEC 18004 standards, alongside associated dynamic redirection, telemetry analytics, and hosted mobile landing pages.
+        </p>
+        <p>
+          You represent and warrant that you are at least eighteen (18) years of age (or have reached the age of legal majority in your applicable jurisdiction) and possess the full legal capacity to enter into binding legal agreements.
         </p>
       </section>
 
-      <section class="space-y-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-        <h2 class="text-lg font-bold text-slate-900 dark:text-white">2. Prohibited Link Destinations</h2>
+      <!-- Section 2 -->
+      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 2. Account Security & User Responsibility
+        </h2>
         <p>
-          Dynamic QR codes pointing to dangerous protocols (including <code>javascript:</code>, <code>data:</code>, or <code>file:</code> URIs) or known malicious phishing domains will be immediately disabled by our automated moderation filters.
+          When you register for an account, you are solely responsible for maintaining the confidentiality of your authentication credentials and for all activities occurring under your workspace. You agree to:
+        </p>
+        <ul class="list-disc list-inside space-y-1.5 pl-2">
+          <li>Provide accurate, truthful, and current registration information.</li>
+          <li>Utilize strong, unique passwords to prevent unauthorized access.</li>
+          <li>Promptly notify our Security Incident Team at <a href="mailto:security@freeqrcode-generator.com" class="text-indigo-600 dark:text-indigo-400 underline">security@freeqrcode-generator.com</a> in the event of any suspected security breach or compromised credentials.</li>
+          <li>Assume complete legal liability for all content, link destinations, and assets published through your account.</li>
+        </ul>
+      </section>
+
+      <!-- Section 3 -->
+      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 3. Strict Acceptable Use Policy & Prohibited Activities
+        </h2>
+        <p>
+          You agree not to misuse our infrastructure or employ our QR code generation services for any unlawful, hazardous, fraudulent, or harmful purposes. Without limitation, you are strictly prohibited from:
+        </p>
+        <ul class="list-disc list-inside space-y-1.5 pl-2">
+          <li><strong>Malicious Code & Exploits:</strong> Encoding or redirecting users to malware, ransomware, spyware, trojans, malicious browser exploits, rootkits, or credential harvesting phishing sites.</li>
+          <li><strong>Dangerous URI Schemes:</strong> Utilizing dangerous URI protocols such as <code class="text-xs bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded">javascript:</code>, <code class="text-xs bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded">data:</code>, <code class="text-xs bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded">vbscript:</code>, or local file access schemes (<code class="text-xs bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded">file://</code>).</li>
+          <li><strong>Deceptive Impersonation & Fraud:</strong> Creating deceptive payment, banking, or social login prompts designed to trick end-users into disclosing financial credentials or confidential personal information.</li>
+          <li><strong>Infringing Material:</strong> Embedding or publishing trademarks, logos, copyrighted artwork, or proprietary assets without legitimate authorization or licensing.</li>
+          <li><strong>Abusive Traffic & Denial of Service:</strong> Conducting stress tests, automated high-volume scraping, link flood attacks, or denial-of-service (DoS) attempts against our edge redirection routing infrastructure.</li>
+          <li><strong>Unlawful & Explicit Content:</strong> Directing traffic to illegal narcotics distribution, non-consensual imagery, terrorist propaganda, hate speech, or content promoting violence against protected groups.</li>
+        </ul>
+        <p>
+          <strong>Enforcement:</strong> We maintain automated abuse detection filters and human moderation queues. Any QR code violating this Acceptable Use Policy will be instantly disabled, and offending user accounts will be permanently banned with immediate referral to appropriate regulatory authorities where warranted.
         </p>
       </section>
 
-      <section class="space-y-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-        <h2 class="text-lg font-bold text-slate-900 dark:text-white">3. Disclaimer of Warranties</h2>
+      <!-- Section 4 -->
+      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 4. Intellectual Property & Commercial Asset Ownership
+        </h2>
+        <div class="space-y-3 pl-2">
+          <div>
+            <h3 class="font-bold text-slate-800 dark:text-slate-200">A. User Ownership of Generated Assets:</h3>
+            <p>You retain 100% full commercial ownership of all static QR code graphic assets (SVG, PNG, EPS) generated via our service. You may utilize, print, distribute, and monetize your generated QR codes across packaging, billboards, digital media, business cards, and marketing materials worldwide with zero licensing fees or royalties owed to freeqrcode-generator.com.</p>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-800 dark:text-slate-200">B. Platform Intellectual Property:</h3>
+            <p>All software source code, visual design, custom UI components, algorithms, databases, vector design templates, documentation, and trademarks associated with freeqrcode-generator.com remain the exclusive intellectual property of freeqrcode-generator.com and its licensors. You may not reverse engineer, decompile, or create unauthorized derivative platforms from our software.</p>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-800 dark:text-slate-200">C. Registered Trademark Acknowledgment:</h3>
+            <p>"QR Code" is a registered trademark of <strong>DENSO WAVE INCORPORATED</strong> in Japan and other countries. The use of the wordmark is strictly nominative to describe standardized 2D barcode functionality.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 5 -->
+      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 5. Subscription Billing, Upgrades & Cancellations
+        </h2>
         <p>
-          The service is provided "AS IS" without warranties of any kind. You are responsible for testing scannability and contrast on your target print medium before running large print production runs.
+          Certain enterprise and advanced features (such as high-volume dynamic QR codes, custom subdomains, bulk CSV generation, and team workspaces) require a paid subscription:
+        </p>
+        <ul class="list-disc list-inside space-y-1.5 pl-2">
+          <li><strong>Billing Cycle:</strong> Subscriptions are billed in advance on a recurring monthly or annual schedule as selected during checkout.</li>
+          <li><strong>Merchant of Record:</strong> Billing and tax remittance are managed securely by Lemon Squeezy, our authorized Merchant of Record.</li>
+          <li><strong>Cancellation Policy:</strong> You may cancel your subscription at any time via your Account Billing portal. Upon cancellation, your subscription remains active until the expiration of the current billing cycle without subsequent auto-renewal charges.</li>
+          <li><strong>Refunds:</strong> Because digital services and edge redirection resources are provisioned immediately upon upgrade, fees are non-refundable except where mandated by statutory consumer protection laws.</li>
+        </ul>
+      </section>
+
+      <!-- Section 6 -->
+      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 6. Absolute Disclaimer of Warranties
+        </h2>
+        <p>
+          THE SERVICE IS PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. TO THE FULLEST EXTENT PERMISSIBLE UNDER APPLICABLE LAW, FREEQRCODE-GENERATOR.COM EXPRESSLY DISCLAIMS ALL WARRANTIES, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, ACCURACY OF OPTICAL SCANNING, SYSTEM UPTIME, AND ERROR-FREE REDIRECTION.
+        </p>
+        <p>
+          <strong class="text-slate-800 dark:text-slate-200">MANDATORY PRE-PRINT TESTING CLAUSE:</strong> Optical scannability depends upon external variables beyond our software control, including print surface reflectivity, color ink saturation, camera sensor quality, ambient lighting, scan distance, and geometric distortion. YOU ARE SOLELY RESPONSIBLE FOR CONDUCTING PHYSICAL TEST SCANS ON SAMPLE PRINT PROOFS BEFORE COMMENCING LARGE-SCALE COMMERCIAL PRINTING RUNS. WE ACCEPT ZERO LIABILITY FOR PHYSICAL PRINTING EXPENSES OR LOSSES.
         </p>
       </section>
+
+      <!-- Section 7 -->
+      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 7. Limitation of Liability
+        </h2>
+        <p>
+          TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL FREEQRCODE-GENERATOR.COM, ITS DIRECTORS, EMPLOYEES, AFFILIATES, OR SUPPLIERS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, PUNITIVE, OR EXEMPLARY DAMAGES (INCLUDING DAMAGES FOR LOSS OF PROFITS, REVENUE, GOODWILL, DATA, COMMERCIAL PRINT RUNS, OR BUSINESS INTERRUPTION) ARISING OUT OF OR IN CONNECTION WITH YOUR USE OR INABILITY TO USE THE SERVICE.
+        </p>
+        <p>
+          OUR TOTAL AGGREGATE LIABILITY FOR ALL CLAIMS ARISING UNDER THESE TERMS SHALL IN NO CIRCUMSTANCES EXCEED THE TOTAL AMOUNT ACTUALLY PAID BY YOU TO FREEQRCODE-GENERATOR.COM DURING THE TWELVE (12) MONTHS IMMEDIATELY PRECEDING THE OCCURRENCE OF THE EVENT GIVING RISE TO LIABILITY, OR FIFTY UNITED STATES DOLLARS ($50.00 USD), WHICHEVER IS LESS.
+        </p>
+      </section>
+
+      <!-- Section 8 -->
+      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 8. Indemnification Obligations
+        </h2>
+        <p>
+          You agree to defend, indemnify, and hold harmless freeqrcode-generator.com, its officers, agents, affiliates, and employees from and against any claims, liabilities, damages, judgments, losses, costs, expenses, or reasonable legal fees arising out of or relating to: (a) your violation of these Terms; (b) any content, URLs, or landing pages generated by you; (c) your infringement of any third-party intellectual property or privacy rights; or (d) any fraudulent or unlawful conduct committed through your account.
+        </p>
+      </section>
+
+      <!-- Section 9 -->
+      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 9. DMCA Copyright & Intellectual Property Notice
+        </h2>
+        <p>
+          We respect valid intellectual property rights and respond expeditiously to notices of alleged copyright infringement in accordance with the Digital Millennium Copyright Act (17 U.S.C. § 512) and international copyright legislation.
+        </p>
+        <p>
+          To submit a valid DMCA Takedown Notice, please provide our Designated Copyright Agent with the following information in writing:
+        </p>
+        <ul class="list-disc list-inside space-y-1 pl-2">
+          <li>Identification of the copyrighted work claimed to have been infringed.</li>
+          <li>Identification of the specific short code or landing page URL hosted on our domain that contains the allegedly infringing material.</li>
+          <li>Your name, address, telephone number, and official email address.</li>
+          <li>A statement that you have a good-faith belief that use of the material is not authorized by the copyright owner, its agent, or the law.</li>
+          <li>A statement under penalty of perjury that the information in the notification is accurate and that you are authorized to act on behalf of the owner.</li>
+        </ul>
+        <p>Direct all DMCA notices to: <a href="mailto:dmca@freeqrcode-generator.com" class="text-indigo-600 dark:text-indigo-400 underline font-bold">dmca@freeqrcode-generator.com</a>.</p>
+      </section>
+
+      <!-- Section 10 -->
+      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 10. Governing Law, Dispute Resolution & Class Action Waiver
+        </h2>
+        <p>
+          These Terms and any dispute or claim arising out of or related to them shall be governed by and construed in accordance with standard international commercial law principles.
+        </p>
+        <p>
+          <strong>Class Action Waiver:</strong> YOU AGREE THAT ANY DISPUTE RESOLUTION PROCEEDINGS WILL BE CONDUCTED SOLELY ON AN INDIVIDUAL BASIS AND NOT IN A CLASS, CONSOLIDATED, OR REPRESENTATIVE ACTION. YOU EXPRESSLY WAIVE ANY RIGHT TO PARTICIPATE AS A CLASS REPRESENTATIVE OR CLASS MEMBER IN ANY ARBITRATION OR COURT PROCEEDING.
+        </p>
+      </section>
+
+      <!-- Legal Contact Footer -->
+      <div class="border-t border-slate-100 dark:border-slate-800 pt-6 space-y-2 text-xs sm:text-sm text-slate-500">
+        <p class="font-bold text-slate-800 dark:text-slate-200">Legal Inquiries & Official Notices:</p>
+        <p>Free QR Code Generator Legal & Compliance Desk</p>
+        <p>Email: <a href="mailto:legal@freeqrcode-generator.com" class="text-indigo-600 dark:text-indigo-400 underline font-semibold">legal@freeqrcode-generator.com</a></p>
+        <p>Website: <a href="https://freeqrcode-generator.com" class="text-indigo-600 dark:text-indigo-400 underline">https://freeqrcode-generator.com</a></p>
+      </div>
+
     </div>
   </div>
 </BaseLayout>

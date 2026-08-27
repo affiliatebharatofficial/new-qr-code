@@ -19,4 +19,4 @@ bucket_name = "qr-assets"
 [vars]
 ENVIRONMENT = "production"
 JWT_SECRET = "production-secret-min-32-chars-long-qr-super-key"
-APP_URL = "https://example.com"
+APP_URL = "https://freeqrcode-generator.com"

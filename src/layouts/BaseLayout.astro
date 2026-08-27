@@ -29,8 +29,8 @@ const currentPath = Astro.url.pathname;
 const { locale: detectedLocale, cleanPath } = extractLocaleFromPath(currentPath);
 const currentLocale = explicitLocale || detectedLocale || DEFAULT_LOCALE;
 
-const siteName = 'QR Code Generator';
-const siteUrl = 'https://qrcode.page';
+const siteName = 'Free QR Code Generator';
+const siteUrl = 'https://freeqrcode-generator.com';
 const pageTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
 
 // Self-referencing clean canonical URL
