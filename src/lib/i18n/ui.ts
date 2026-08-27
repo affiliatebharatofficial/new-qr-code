@@ -10,6 +10,9 @@ export interface UIDictionary {
     generators: string;
     businessCards: string;
     menus: string;
+    calculators: string;
+    sizeCalc: string;
+    printCalc: string;
     guides: string;
     pricing: string;
     dashboard: string;
@@ -99,6 +102,9 @@ export const UI_TRANSLATIONS: Record<Locale, UIDictionary> = {
       generators: 'Generators',
       businessCards: 'Business Cards',
       menus: 'Digital Menus',
+      calculators: 'Calculators',
+      sizeCalc: 'QR Size Calculator',
+      printCalc: 'Print Size & DPI',
       guides: 'Guides',
       pricing: 'Pricing',
       dashboard: 'Dashboard',
@@ -186,6 +192,9 @@ export const UI_TRANSLATIONS: Record<Locale, UIDictionary> = {
       generators: 'Generadores',
       businessCards: 'Tarjetas Digitales',
       menus: 'Menús Digitales',
+      calculators: 'Calculadoras',
+      sizeCalc: 'Calculadora de Tamaño',
+      printCalc: 'Tamaño de Impresión y DPI',
       guides: 'Guías',
       pricing: 'Precios',
       dashboard: 'Panel',
@@ -273,6 +282,9 @@ export const UI_TRANSLATIONS: Record<Locale, UIDictionary> = {
       generators: 'Generatoren',
       businessCards: 'Visitenkarten',
       menus: 'Digitale Speisekarten',
+      calculators: 'Rechner',
+      sizeCalc: 'QR-Größenrechner',
+      printCalc: 'Druckgröße & DPI',
       guides: 'Anleitungen',
       pricing: 'Preise',
       dashboard: 'Dashboard',
@@ -360,6 +372,9 @@ export const UI_TRANSLATIONS: Record<Locale, UIDictionary> = {
       generators: 'Générateurs',
       businessCards: 'Cartes de Visite',
       menus: 'Menus Digitaux',
+      calculators: 'Calculateurs',
+      sizeCalc: 'Calculateur de Taille',
+      printCalc: 'Taille d\'Impression & DPI',
       guides: 'Guides',
       pricing: 'Tarifs',
       dashboard: 'Tableau de bord',
@@ -447,6 +462,9 @@ export const UI_TRANSLATIONS: Record<Locale, UIDictionary> = {
       generators: 'Geradores',
       businessCards: 'Cartões Digitais',
       menus: 'Cardápios Digitais',
+      calculators: 'Calculadoras',
+      sizeCalc: 'Calculadora de Tamanho',
+      printCalc: 'Tamanho de Impressão e DPI',
       guides: 'Guias',
       pricing: 'Preços',
       dashboard: 'Painel',
@@ -534,6 +552,9 @@ export const UI_TRANSLATIONS: Record<Locale, UIDictionary> = {
       generators: 'Generatori',
       businessCards: 'Biglietti da Visita',
       menus: 'Menu Digitali',
+      calculators: 'Calcolatori',
+      sizeCalc: 'Calcolatore Dimensioni',
+      printCalc: 'Dimensioni Stampa & DPI',
       guides: 'Guide',
       pricing: 'Prezzi',
       dashboard: 'Dashboard',
@@ -621,6 +642,9 @@ export const UI_TRANSLATIONS: Record<Locale, UIDictionary> = {
       generators: 'जेनरेटर',
       businessCards: 'डिजिटल विज़िटिंग कार्ड',
       menus: 'डिजिटल मेन्यू',
+      calculators: 'कैलकुलेटर',
+      sizeCalc: 'क्यूआर आकार कैलकुलेटर',
+      printCalc: 'प्रिंट आकार व DPI',
       guides: 'गाइड्स',
       pricing: 'प्लान व मूल्य',
       dashboard: 'डैशबोर्ड',

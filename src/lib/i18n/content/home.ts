@@ -55,6 +55,8 @@ export function getHomeContent(locale: Locale): LocalizedPageContent {
           { question: '¿Qué tamaño físico mínimo se recomienda al imprimir?', answer: 'Para lectura en mano (tarjetas o folletos) se recomienda al menos 20 x 20 mm. Para carteles a mayor distancia, mantén una proporción de 10:1 (10 cm de tamaño por cada metro de distancia).' }
         ],
         relatedTools: [
+          { name: 'Calculadora de Tamaño QR', slug: 'qr-code-size-calculator', description: 'Calcula dimensiones según distancia de escaneo.' },
+          { name: 'Calculadora de Impresión y DPI', slug: 'qr-code-print-size-calculator', description: 'Píxeles a 300 DPI y preparación para imprenta.' },
           { name: 'QR de WiFi', slug: 'wifi-qr-code-generator', description: 'Conéctate a redes WiFi sin teclear contraseñas.' },
           { name: 'QR de Contacto vCard', slug: 'vcard-qr-code-generator', description: 'Guarda contactos en la agenda en un solo toque.' },
           { name: 'QR de Reseñas de Google', slug: 'google-reviews-qr-code', description: 'Consigue más valoraciones de 5 estrellas en Google.' },
@@ -113,6 +115,8 @@ export function getHomeContent(locale: Locale): LocalizedPageContent {
           { question: 'Welche Mindestgröße wird beim Drucken empfohlen?', answer: 'Für Handzettel und Visitenkarten mindestens 20 x 20 mm. Bei Schildern gilt die Faustregel: 10 cm Codegröße pro 1 Meter Leseabstand.' }
         ],
         relatedTools: [
+          { name: 'QR-Code-Größenrechner', slug: 'qr-code-size-calculator', description: 'Optimale Maße und Scan-Distanzen berechnen.' },
+          { name: 'QR-Druckgrößen- & DPI-Rechner', slug: 'qr-code-print-size-calculator', description: 'Pixel bei 300 DPI und Druckvorstufe.' },
           { name: 'WLAN QR Generator', slug: 'wifi-qr-code-generator', description: 'Gäste-WLAN ohne Passworteingabe teilen.' },
           { name: 'vCard Visitenkarte', slug: 'vcard-qr-code-generator', description: 'Vollständige Kontaktdaten im Adressbuch speichern.' },
           { name: 'Google Bewertungen QR', slug: 'google-reviews-qr-code', description: 'Mehr 5-Sterne-Bewertungen auf Google sammeln.' },
@@ -171,6 +175,8 @@ export function getHomeContent(locale: Locale): LocalizedPageContent {
           { question: 'Quelle est la taille minimale recommandée à l\'impression ?', answer: 'Au moins 20 x 20 mm pour les cartes de visite et dépliants. Pour les affiches, comptez environ 10 cm de taille par mètre de distance de visionnage.' }
         ],
         relatedTools: [
+          { name: 'Calculateur de Taille QR', slug: 'qr-code-size-calculator', description: 'Dimensions physiques et distance de numérisation.' },
+          { name: 'Calculateur d\'Impression & DPI', slug: 'qr-code-print-size-calculator', description: 'Résolution en pixels à 300 DPI pour l\'imprimerie.' },
           { name: 'QR Code WiFi', slug: 'wifi-qr-code-generator', description: 'Partagez votre réseau WiFi sans mot de passe.' },
           { name: 'QR Code vCard', slug: 'vcard-qr-code-generator', description: 'Enregistrez des coordonnées complètes d\'un clic.' },
           { name: 'QR Code Avis Google', slug: 'google-reviews-qr-code', description: 'Collectez des avis 5 étoiles sur Google Maps.' },
@@ -229,6 +235,8 @@ export function getHomeContent(locale: Locale): LocalizedPageContent {
           { question: 'Qual o tamanho mínimo recomendado para impressão?', answer: 'Pelo menos 20 x 20 mm para cartões e panfletos. Para placas e faixas, considere 10 cm de código para cada metro de distância de leitura.' }
         ],
         relatedTools: [
+          { name: 'Calculadora de Tamanho QR', slug: 'qr-code-size-calculator', description: 'Dimensões recomendadas com base na distância.' },
+          { name: 'Calculadora de Impressão e DPI', slug: 'qr-code-print-size-calculator', description: 'Cálculo de pixels a 300 DPI e pré-impressão.' },
           { name: 'QR Code Wi-Fi', slug: 'wifi-qr-code-generator', description: 'Conecte-se ao Wi-Fi sem digitar senhas.' },
           { name: 'QR Code vCard', slug: 'vcard-qr-code-generator', description: 'Salve contatos na agenda com 1 toque.' },
           { name: 'QR Code Avaliações Google', slug: 'google-reviews-qr-code', description: 'Ganhe avaliações 5 estrelas no Google Maps.' },
@@ -287,6 +295,8 @@ export function getHomeContent(locale: Locale): LocalizedPageContent {
           { question: 'Qual è la dimensione minima consigliata per la stampa?', answer: 'Almeno 20 x 20 mm per biglietti da visita e pieghevoli. Per cartelloni e affissioni calcola circa 10 cm di codice per ogni metro di distanza.' }
         ],
         relatedTools: [
+          { name: 'Calcolatore Dimensioni QR', slug: 'qr-code-size-calculator', description: 'Dimensioni fisiche e distanza di scansione.' },
+          { name: 'Calcolatore Stampa & DPI', slug: 'qr-code-print-size-calculator', description: 'Pixel a 300 DPI e preparazione alla stampa.' },
           { name: 'QR Code WiFi', slug: 'wifi-qr-code-generator', description: 'Condividi la rete WiFi senza password.' },
           { name: 'QR Code vCard', slug: 'vcard-qr-code-generator', description: 'Salva i contatti completi in rubrica con un tocco.' },
           { name: 'QR Code Recensioni Google', slug: 'google-reviews-qr-code', description: 'Ottieni più recensioni a 5 stelle su Google Maps.' },
@@ -345,6 +355,8 @@ export function getHomeContent(locale: Locale): LocalizedPageContent {
           { question: 'कागज़ पर प्रिंट के लिए न्यूनतम साइज़ क्या होना चाहिए?', answer: 'विज़िटिंग कार्ड और पर्चों पर कम से कम 20 x 20 मिमी आकार रखें। दूर से देखने वाले बोर्ड्स के लिए 1 मीटर दूरी पर 10 सेमी साइज़ रखें।' }
         ],
         relatedTools: [
+          { name: 'क्यूआर कोड आकार कैलकुलेटर', slug: 'qr-code-size-calculator', description: 'स्कैन दूरी के आधार पर सही भौतिक आकार निकालें।' },
+          { name: 'क्यूआर प्रिंट आकार और DPI कैलकुलेटर', slug: 'qr-code-print-size-calculator', description: '300 DPI पर प्रिंट पिक्सेल और प्रीप्रेस गाइड।' },
           { name: 'Wi-Fi QR जेनरेटर', slug: 'wifi-qr-code-generator', description: 'बिना पासवर्ड के वाई-फ़ाई से कनेक्ट करें।' },
           { name: 'vCard विज़िटिंग कार्ड QR', slug: 'vcard-qr-code-generator', description: 'संपर्क विवरण सीधे फोनबुक में सेव कराएं।' },
           { name: 'गूगल रिव्यू QR कोड', slug: 'google-reviews-qr-code', description: 'Google Maps पर 5-स्टार रेटिंग प्राप्त करें।' },
@@ -403,6 +415,8 @@ export function getHomeContent(locale: Locale): LocalizedPageContent {
           { question: 'What is the minimum recommended physical print size?', answer: 'For handheld print materials like business cards or flyers, print at least 20 x 20 mm (0.8 x 0.8 inches). For signs viewed at distance, maintain a 10:1 distance-to-size ratio (10 cm size per 1 meter of viewing distance).' }
         ],
         relatedTools: [
+          { name: 'QR Code Size Calculator', slug: 'qr-code-size-calculator', description: 'Calculate physical dimensions based on scan distance and QR density.' },
+          { name: 'QR Code Print Size & DPI Calculator', slug: 'qr-code-print-size-calculator', description: 'Prepress tool to calculate pixels at 300 DPI and print material presets.' },
           { name: 'Wi-Fi QR Generator', slug: 'wifi-qr-code-generator', description: 'Let visitors connect to wireless networks without typing passwords.' },
           { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Share full contact credentials directly to address books.' },
           { name: 'Google Reviews QR', slug: 'google-reviews-qr-code', description: 'Collect 5-star customer ratings on Google Maps.' },

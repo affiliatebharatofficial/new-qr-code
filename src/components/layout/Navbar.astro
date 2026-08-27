@@ -115,6 +115,39 @@ const user = sessionToken ? await verifySessionToken(sessionToken) : null;
       <a href={getLocalizedPath('/restaurant-menu-qr-code', locale)} class="text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white transition-colors">
         {ui.nav.menus}
       </a>
+
+      <!-- Calculators Dropdown -->
+      <div class="relative group">
+        <button
+          type="button"
+          class="flex items-center gap-1 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white py-2 transition-colors cursor-pointer"
+        >
+          <span>{ui.nav.calculators}</span>
+          <svg class="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition-transform duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        <div class="absolute top-full left-0 w-64 pt-2 hidden group-hover:block transition-all z-50">
+          <div class="bg-white dark:bg-slate-900 rounded-xl p-2 shadow-elevated border border-slate-200 dark:border-slate-800 space-y-1 text-xs font-medium">
+            <a href={getLocalizedPath('/qr-code-size-calculator', locale)} class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span>📏</span>
+                <span>{ui.nav.sizeCalc}</span>
+              </div>
+              <span class="text-[10px] text-slate-400 font-mono">Distance</span>
+            </a>
+            <a href={getLocalizedPath('/qr-code-print-size-calculator', locale)} class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span>🖨️</span>
+                <span>{ui.nav.printCalc}</span>
+              </div>
+              <span class="text-[10px] text-slate-400 font-mono">300 DPI</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
       <a href="/guides" class="text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white transition-colors">
         {ui.nav.guides}
       </a>
@@ -344,6 +377,21 @@ const user = sessionToken ? await verifySessionToken(sessionToken) : null;
         <a href={getLocalizedPath('/zelle-qr-code-generator', locale)} class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/60 text-slate-800 dark:text-slate-200 font-semibold flex items-center justify-between">
           <span>Zelle</span>
           <span class="text-[10px] text-purple-500 font-bold">Z</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Calculators Section in Mobile Menu -->
+    <div>
+      <div class="font-bold text-[10px] uppercase tracking-wider text-slate-400 pb-1.5">{ui.nav.calculators}</div>
+      <div class="grid grid-cols-2 gap-1.5">
+        <a href={getLocalizedPath('/qr-code-size-calculator', locale)} class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/60 text-slate-800 dark:text-slate-200 font-semibold flex items-center gap-1.5">
+          <span>📏</span>
+          <span>{ui.nav.sizeCalc}</span>
+        </a>
+        <a href={getLocalizedPath('/qr-code-print-size-calculator', locale)} class="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/60 text-slate-800 dark:text-slate-200 font-semibold flex items-center gap-1.5">
+          <span>🖨️</span>
+          <span>{ui.nav.printCalc}</span>
         </a>
       </div>
     </div>

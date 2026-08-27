@@ -172,13 +172,13 @@ const currentYear = new Date().getFullYear();
             </a>
           </li>
           <li class="pt-2 border-t border-slate-100 dark:border-slate-800">
-            <a href="/qr-code-size-calculator" class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold flex items-center gap-1">
-              <span>📏</span> QR Size Calculator
+            <a href={getLocalizedPath('/qr-code-size-calculator', locale)} class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold flex items-center gap-1">
+              <span>📏</span> {ui.nav.sizeCalc}
             </a>
           </li>
           <li>
-            <a href="/qr-code-print-size-calculator" class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold flex items-center gap-1">
-              <span>🖨️</span> Print Size &amp; DPI Calculator
+            <a href={getLocalizedPath('/qr-code-print-size-calculator', locale)} class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold flex items-center gap-1">
+              <span>🖨️</span> {ui.nav.printCalc}
             </a>
           </li>
         </ul>
