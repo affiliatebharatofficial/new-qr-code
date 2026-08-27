@@ -18,7 +18,7 @@ if (!qr) {
   return Astro.redirect('/dashboard/qr');
 }
 
-// IDOR Protection
+// Strict IDOR Protection
 if (qr.user_id !== user.id && user.role !== 'admin') {
   return Astro.redirect('/dashboard/qr');
 }
@@ -43,11 +43,12 @@ const updatedDate = new Date(qr.updated_at).toLocaleString('en-US', {
   timeStyle: 'short',
 });
 
-const shortUrl = qr.short_code ? `https://qrcode.page/r/${qr.short_code}` : null;
+const shortUrl = qr.short_code ? `https://freeqrcode-generator.com/r/${qr.short_code}` : null;
 ---
 
 <DashboardLayout title={`QR Details: ${qr.name}`} activeNav="qr">
   <div class="space-y-6 max-w-4xl mx-auto">
+    
     <!-- Back Link & Header -->
     <div>
       <a href="/dashboard/qr" class="text-xs font-semibold text-slate-500 hover:text-indigo-600 flex items-center gap-1 mb-3">
@@ -88,24 +89,25 @@ const shortUrl = qr.short_code ? `https://qrcode.page/r/${qr.short_code}` : null
             </a>
           )}
 
+          <button
+            type="button"
+            id="open-edit-modal-btn"
+            class="px-4 py-2.5 rounded-2xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/20 transition-all cursor-pointer flex items-center gap-1.5"
+          >
+            <span>✏️</span> Edit Details
+          </button>
+
           {qr.is_dynamic && (
             <button
               type="button"
               id="toggle-status-btn"
               data-id={qr.id}
               data-current-status={qr.status}
-              class="px-4 py-2.5 rounded-2xl text-xs font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
+              class="px-3.5 py-2.5 rounded-2xl text-xs font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
             >
               {qr.status === 'active' ? 'Pause QR' : 'Activate QR'}
             </button>
           )}
-
-          <a
-            href={`/?edit=${qr.id}`}
-            class="px-4 py-2.5 rounded-2xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/20 transition-all"
-          >
-            Edit
-          </a>
 
           <button
             type="button"
@@ -129,6 +131,7 @@ const shortUrl = qr.short_code ? `https://qrcode.page/r/${qr.short_code}` : null
 
     <!-- Main QR Details Grid -->
     <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+      
       <!-- QR Preview Card (5 cols) -->
       <div class="md:col-span-5 p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4 text-center">
         <div class="relative aspect-square max-w-[280px] mx-auto rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-100 dark:border-slate-800 flex items-center justify-center p-4">
@@ -177,13 +180,18 @@ const shortUrl = qr.short_code ? `https://qrcode.page/r/${qr.short_code}` : null
           <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
             <div class="flex items-center justify-between">
               <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">Target Destination URL</h2>
-              <span class="text-[11px] text-emerald-600 font-semibold">Editable without reprinting</span>
+              <button type="button" class="trigger-edit-destination-btn text-xs font-bold text-indigo-600 hover:underline cursor-pointer">
+                ✏️ Change Destination
+              </button>
             </div>
             <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
               <a href={qr.destination} target="_blank" rel="noopener noreferrer" class="text-xs font-mono font-bold text-indigo-600 hover:underline break-all">
-                {qr.destination}
+                {qr.destination} ↗
               </a>
             </div>
+            <p class="text-[11px] text-slate-400">
+              ✓ Updating destination preserves your printed QR barcode. Scans will instantly route to the new URL.
+            </p>
           </div>
         )}
 
@@ -234,10 +242,105 @@ const shortUrl = qr.short_code ? `https://qrcode.page/r/${qr.short_code}` : null
       </div>
     </div>
   </div>
+
+  <!-- Modal: Edit QR Details & Destination -->
+  <div id="edit-qr-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white">Edit QR Code</h3>
+          <p class="text-xs text-slate-500">Update destination URL and campaign name</p>
+        </div>
+        <button type="button" id="btn-close-edit-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-white text-lg cursor-pointer">&times;</button>
+      </div>
+
+      <div id="edit-modal-error" class="hidden p-3 rounded-xl text-xs bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800"></div>
+
+      <form id="edit-qr-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            QR Campaign Name <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="edit-name-input"
+            value={qr.name}
+            required
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+          />
+        </div>
+
+        {qr.is_dynamic ? (
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              Target Destination URL <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="url"
+              id="edit-destination-input"
+              value={qr.destination || qr.payload}
+              required
+              placeholder="https://example.com/new-destination"
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            />
+            <p class="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1">
+              ✓ Destination URL will be updated without changing the physical printed QR code!
+            </p>
+          </div>
+        ) : (
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              Encoded Payload <span class="text-red-500">*</span>
+            </label>
+            <textarea
+              id="edit-payload-input"
+              rows="3"
+              required
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            >{qr.payload}</textarea>
+            <p class="text-[11px] text-amber-600 dark:text-amber-400 mt-1">
+              ⚠️ Note: Changing a Static QR payload alters its visual barcode pattern.
+            </p>
+          </div>
+        )}
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Status
+          </label>
+          <select
+            id="edit-status-select"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+          >
+            <option value="active" selected={qr.status === 'active'}>Active (Scans routed)</option>
+            <option value="paused" selected={qr.status !== 'active'}>Paused (Disabled)</option>
+          </select>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+          <button
+            type="button"
+            id="btn-cancel-edit-modal"
+            class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            id="btn-save-qr-edit"
+            class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm cursor-pointer"
+          >
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 </DashboardLayout>
 
 <!-- Client QR Renderer Script -->
-<script define:vars={{ payload: qr.payload, styleConfig, qrName: qr.name, qrId: qr.id }}>
+<script define:vars={{ payload: qr.payload, styleConfig, qrName: qr.name, qrId: qr.id, isDynamic: qr.is_dynamic }}>
   let qrCodeInstance = null;
 
   async function initQR() {
@@ -342,6 +445,74 @@ const shortUrl = qr.short_code ? `https://qrcode.page/r/${qr.short_code}` : null
         window.location.href = '/dashboard/qr';
       } else {
         alert('Failed to delete.');
+      }
+    });
+
+    // Edit Modal Logic
+    const editModal = document.getElementById('edit-qr-modal');
+    const openEditBtn = document.getElementById('open-edit-modal-btn');
+    const closeEditBtn = document.getElementById('btn-close-edit-modal');
+    const cancelEditBtn = document.getElementById('btn-cancel-edit-modal');
+    const editForm = document.getElementById('edit-qr-form');
+    const editError = document.getElementById('edit-modal-error');
+    const saveBtn = document.getElementById('btn-save-qr-edit');
+
+    const openModal = () => {
+      editModal?.classList.remove('hidden');
+      editModal?.classList.add('flex');
+    };
+
+    const closeModal = () => {
+      editModal?.classList.add('hidden');
+      editModal?.classList.remove('flex');
+      if (editError) editError.classList.add('hidden');
+    };
+
+    openEditBtn?.addEventListener('click', openModal);
+    document.querySelectorAll('.trigger-edit-destination-btn').forEach((btn) => btn.addEventListener('click', openModal));
+    closeEditBtn?.addEventListener('click', closeModal);
+    cancelEditBtn?.addEventListener('click', closeModal);
+
+    editForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!saveBtn) return;
+
+      const name = (document.getElementById('edit-name-input') as HTMLInputElement)?.value;
+      const status = (document.getElementById('edit-status-select') as HTMLSelectElement)?.value;
+      
+      const updateData: Record<string, any> = { name, status };
+
+      if (isDynamic) {
+        const destination = (document.getElementById('edit-destination-input') as HTMLInputElement)?.value;
+        updateData.destination = destination;
+      } else {
+        const payloadVal = (document.getElementById('edit-payload-input') as HTMLTextAreaElement)?.value;
+        updateData.payload = payloadVal;
+      }
+
+      saveBtn.disabled = true;
+      saveBtn.innerText = 'Saving...';
+
+      try {
+        const res = await fetch(`/api/qr/${qrId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updateData),
+        });
+
+        const json = await res.json();
+        if (!res.ok) {
+          throw new Error(json.error?.message || 'Failed to update QR code.');
+        }
+
+        window.location.reload();
+      } catch (err: any) {
+        if (editError) {
+          editError.innerText = err.message || 'An error occurred.';
+          editError.classList.remove('hidden');
+        }
+        saveBtn.disabled = false;
+        saveBtn.innerText = 'Save Changes';
       }
     });
   });
