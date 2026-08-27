@@ -35,6 +35,11 @@ License: Free for personal and commercial usage with lifetime validity
 - [Product Packaging QR](https://freeqrcode-generator.com/product-qr-code): QR codes for product packaging, user manuals, warranty registration, and authentication.
 - [Social Media All-in-One QR](https://freeqrcode-generator.com/social-media-qr-code): Aggregate Instagram, TikTok, YouTube, LinkedIn, and X profiles on a single mobile landing page.
 
+## Calculators & Technical Prepress Utilities
+
+- [QR Code Size Calculator](https://freeqrcode-generator.com/qr-code-size-calculator): Practical distance-to-size calculator (10:1 ratio), module density estimator, quiet zone analysis, and multi-DPI resolution matrices.
+- [QR Code Print Size Calculator](https://freeqrcode-generator.com/qr-code-print-size-calculator): Commercial prepress print calculator, exact raster pixel converter at 300 DPI, vector SVG recommendations, and print quality checklists.
+
 ## Educational Guides & Best Practices
 
 - [What is a QR Code? Anatomy & History](https://freeqrcode-generator.com/guides/what-is-a-qr-code): Complete guide to 2D matrix symbology, finder patterns, alignment, and timing patterns.

@@ -2,6 +2,8 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import QRGenerator from '../../components/qr/QRGenerator.astro';
 import LandingContent from '../../components/seo/LandingContent.astro';
+import QRSizeCalculator from '../../components/calculator/QRSizeCalculator.astro';
+import QRPrintSizeCalculator from '../../components/calculator/QRPrintSizeCalculator.astro';
 import { isValidLocale, DEFAULT_LOCALE, type Locale } from '../../lib/i18n/config';
 import { getLocalizedPageContent } from '../../lib/i18n/content/index';
 import type { QRType } from '../../lib/qr/types';
@@ -13,6 +15,63 @@ if (!isValidLocale(lang) || lang === DEFAULT_LOCALE) {
 }
 
 const currentSlug = slug || '';
+
+// Handle Size Calculator Route
+if (currentSlug === 'qr-code-size-calculator') {
+  const titles: Record<Locale, { title: string; desc: string; h1: string; sub: string }> = {
+    en: {
+      title: 'QR Code Size Calculator — Recommended Sizing & Distance Guide',
+      desc: 'Calculate the exact recommended physical QR code size and pixel resolution based on scan distance, error correction, and content density.',
+      h1: 'QR Code Size Calculator',
+      sub: 'Determine the optimal physical dimensions, module size, and raster pixel resolution for your QR codes based on real-world scanning distance and content complexity.',
+    },
+    es: {
+      title: 'Calculadora de Tamaño de Código QR — Guía de Distancia y Dimensiones',
+      desc: 'Calcula el tamaño físico y resolución en píxeles recomendada para códigos QR según la distancia de escaneo y densidad de datos.',
+      h1: 'Calculadora de Tamaño de Código QR',
+      sub: 'Calcula las dimensiones físicas óptimas y la resolución en píxeles para imprimir o exhibir códigos QR nítidos y fáciles de escanear.',
+    },
+    de: {
+      title: 'QR-Code-Größenrechner — Empfohlene Maße & Distanzrechner',
+      desc: 'Berechnen Sie die empfohlene physische QR-Code-Größe und Pixelauflösung basierend auf Scan-Distanz, Fehlerkorrektur und Datenkomplexität.',
+      h1: 'QR-Code-Größenrechner',
+      sub: 'Ermitteln Sie die optimalen Maße und Auflösungen für gestochen scharfe und scanbare QR-Codes.',
+    },
+    fr: {
+      title: 'Calculateur de Taille de QR Code — Guide de Distance et Dimensions',
+      desc: 'Calculez la taille physique idéale et la résolution en pixels de vos QR codes en fonction de la distance de numérisation.',
+      h1: 'Calculateur de Taille de QR Code',
+      sub: 'Déterminez les dimensions optimales pour vos QR codes imprimés et affichages grand format.',
+    },
+    pt: {
+      title: 'Calculadora de Tamanho de QR Code — Guia de Distância e Dimensões',
+      desc: 'Calcule as dimensões físicas recomendadas e a resolução em pixels para códigos QR com base na distância de leitura.',
+      h1: 'Calculadora de Tamanho de QR Code',
+      sub: 'Descubra o tamanho ideal para impressão de códigos QR com base na distância de leitura e resolução DPI.',
+    },
+    it: {
+      title: 'Calcolatore Dimensioni QR Code — Guida a Distanza e Misure',
+      desc: 'Calcola la dimensione fisica e la risoluzione in pixel consigliata per i tuoi codici QR in base alla distanza di scansione.',
+      h1: 'Calcolatore Dimensioni QR Code',
+      sub: 'Ottimizza le dimensioni di stampa e la densità dei moduli per una scansione immediata da smartphone.',
+    },
+    hi: {
+      title: 'क्यूआर कोड आकार कैलकुलेटर — दूरी और अनुशंसित आकार गाइड',
+      desc: 'स्कैनिंग दूरी और डेटा घनत्व के आधार पर अपने क्यूआर कोड का सही भौतिक आकार और रिज़ॉल्यूशन मापें।',
+      h1: 'क्यूआर कोड आकार कैलकुलेटर',
+      sub: 'स्मार्टफोन से आसान और तेज़ स्कैनिंग के लिए अपने क्यूआर कोड का सही प्रिंट आकार निर्धारित करें।',
+    },
+  };
+
+  const meta = titles[lang as Locale] || titles.en;
+  return Astro.rewrite('/qr-code-size-calculator');
+}
+
+// Handle Print Size Calculator Route
+if (currentSlug === 'qr-code-print-size-calculator') {
+  return Astro.rewrite('/qr-code-print-size-calculator');
+}
+
 const content = getLocalizedPageContent(currentSlug, lang as Locale);
 
 if (!content) {
@@ -47,7 +106,7 @@ const faqJsonLd = {
     subheadline={content.subheadline}
   />
 
-  <!-- Rich Localized SEO Content (500–800 words, Sector Benefits, Real Examples, 6 FAQs) -->
+  <!-- Rich Localized SEO Content -->
   <LandingContent
     heading={content.heading}
     subheading={content.subheading}

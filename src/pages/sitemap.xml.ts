@@ -33,6 +33,9 @@ export const GET: APIRoute = async () => {
     { path: 'product-qr-code', priority: '0.8', changefreq: 'weekly' },
     { path: 'contact-qr-code', priority: '0.8', changefreq: 'weekly' },
     { path: 'social-media-qr-code', priority: '0.8', changefreq: 'weekly' },
+    // Utilities & Sizing Calculators
+    { path: 'qr-code-size-calculator', priority: '0.9', changefreq: 'weekly' },
+    { path: 'qr-code-print-size-calculator', priority: '0.9', changefreq: 'weekly' },
     // Guides Hub & Articles
     { path: 'guides', priority: '0.8', changefreq: 'weekly' },
     { path: 'guides/what-is-a-qr-code', priority: '0.7', changefreq: 'monthly' },

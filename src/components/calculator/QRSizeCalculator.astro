@@ -1,0 +1,432 @@
+---
+import {
+  calculateQRSize,
+  SCAN_DISTANCE_REFERENCE_TABLE,
+  ERROR_CORRECTION_INFO,
+  CONTENT_TYPE_DEFAULT_VERSIONS,
+} from '../../lib/calculator/size';
+import type { DistanceUnit, ErrorCorrectionLevel, QRContentType } from '../../lib/calculator/types';
+import type { Locale } from '../../lib/i18n/config';
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'en' } = Astro.props;
+
+// Initial server-side default calculation (1 meter URL, Level M, 300 DPI)
+const initialResult = calculateQRSize({
+  scanDistance: 1,
+  distanceUnit: 'm',
+  contentType: 'url',
+  errorCorrection: 'M',
+  dpi: 300,
+});
+---
+
+<div id="size-calculator-widget" class="space-y-8">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    
+    <!-- Left Column: Interactive Inputs Form (7 Cols) -->
+    <div class="lg:col-span-7 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+      <div class="border-b border-slate-100 dark:border-slate-800 pb-4">
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span>📏</span> QR Code Size Calculator Inputs
+        </h2>
+        <p class="text-xs text-slate-500 mt-0.5">
+          Enter your viewing distance and content type to calculate recommended physical and raster dimensions.
+        </p>
+      </div>
+
+      <form id="size-calc-form" class="space-y-5" onsubmit="return false;">
+        
+        <!-- Input 1: Scan Distance -->
+        <div class="space-y-2">
+          <label for="calc-scan-distance" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            A. Expected Scan Distance <span class="text-red-500">*</span>
+          </label>
+          <div class="flex gap-2">
+            <input
+              type="number"
+              id="calc-scan-distance"
+              value="1"
+              min="0.05"
+              step="any"
+              required
+              class="flex-1 px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              placeholder="e.g. 1"
+            />
+            <select
+              id="calc-distance-unit"
+              class="w-32 px-3 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            >
+              <option value="m" selected>Meters (m)</option>
+              <option value="cm">Centimeters (cm)</option>
+              <option value="ft">Feet (ft)</option>
+              <option value="in">Inches (in)</option>
+            </select>
+          </div>
+          <p class="text-[11px] text-slate-400">
+            The typical distance between the smartphone camera lens and the QR code symbol.
+          </p>
+        </div>
+
+        <!-- Input 2: Content Type & Version -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="space-y-2">
+            <label for="calc-content-type" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              B. QR Content Type
+            </label>
+            <select
+              id="calc-content-type"
+              class="w-full px-3.5 py-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            >
+              <option value="url" selected>Website URL (e.g. https://...)</option>
+              <option value="text">Plain Text Message</option>
+              <option value="wifi">Wi-Fi Network Credentials</option>
+              <option value="vcard">vCard / Digital Contact Card (Dense)</option>
+              <option value="email">Email Address &amp; Subject</option>
+              <option value="sms">SMS Text Message</option>
+              <option value="phone">Telephone Number</option>
+              <option value="whatsapp">WhatsApp Direct Chat</option>
+              <option value="upi">UPI Payment</option>
+              <option value="location">Google Maps Location</option>
+              <option value="social">Social Media Profile</option>
+              <option value="event">Calendar Event / Invite</option>
+              <option value="product">Product Serial / SKU</option>
+              <option value="review">Google Review Link</option>
+              <option value="other">Other / Custom Payload</option>
+            </select>
+          </div>
+
+          <div class="space-y-2">
+            <label for="calc-qr-version" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              C. QR Matrix Version
+            </label>
+            <select
+              id="calc-qr-version"
+              class="w-full px-3.5 py-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            >
+              <option value="auto" selected>Automatic (Estimated by Content)</option>
+              <option value="1">Version 1 (21 × 21 modules)</option>
+              <option value="2">Version 2 (25 × 25 modules)</option>
+              <option value="3">Version 3 (29 × 29 modules)</option>
+              <option value="4">Version 4 (33 × 33 modules)</option>
+              <option value="5">Version 5 (37 × 37 modules)</option>
+              <option value="6">Version 6 (41 × 41 modules)</option>
+              <option value="7">Version 7 (45 × 45 modules)</option>
+              <option value="8">Version 8 (49 × 49 modules)</option>
+              <option value="10">Version 10 (57 × 57 modules - vCard)</option>
+              <option value="15">Version 15 (77 × 77 modules)</option>
+              <option value="20">Version 20 (97 × 97 modules)</option>
+              <option value="40">Version 40 (177 × 177 modules)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Input 3: Error Correction Level & DPI -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="space-y-2">
+            <label for="calc-ec-level" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              D. Error Correction Level
+            </label>
+            <select
+              id="calc-ec-level"
+              class="w-full px-3.5 py-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            >
+              <option value="L">L — Low (~7% recovery, smallest matrix)</option>
+              <option value="M" selected>M — Medium (~15% recovery, standard)</option>
+              <option value="Q">Q — Quartile (~25% recovery, industrial)</option>
+              <option value="H">H — High (~30% recovery, logo embedding)</option>
+            </select>
+          </div>
+
+          <div class="space-y-2">
+            <label for="calc-dpi-level" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              E. Target Raster DPI
+            </label>
+            <select
+              id="calc-dpi-level"
+              class="w-full px-3.5 py-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            >
+              <option value="72">72 DPI (Standard Web / Email)</option>
+              <option value="96">96 DPI (Standard Desktop Displays)</option>
+              <option value="150">150 DPI (Draft Proofing / Digital Signs)</option>
+              <option value="300" selected>300 DPI (Commercial Print &amp; Packaging)</option>
+              <option value="600">600 DPI (Ultra Fine Art / Lithography)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Quick Distance Presets Bar -->
+        <div class="space-y-1.5 pt-1">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Quick Distance Presets:</span>
+          <div class="flex flex-wrap gap-1.5 text-xs">
+            <button type="button" class="preset-dist-btn px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer transition-colors" data-val="15" data-unit="cm">
+              15 cm (Card)
+            </button>
+            <button type="button" class="preset-dist-btn px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer transition-colors" data-val="30" data-unit="cm">
+              30 cm (Menu)
+            </button>
+            <button type="button" class="preset-dist-btn px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer transition-colors" data-val="50" data-unit="cm">
+              50 cm (Flyer)
+            </button>
+            <button type="button" class="preset-dist-btn px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer transition-colors" data-val="1" data-unit="m">
+              1 m (Poster)
+            </button>
+            <button type="button" class="preset-dist-btn px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer transition-colors" data-val="2" data-unit="m">
+              2 m (Window)
+            </button>
+            <button type="button" class="preset-dist-btn px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer transition-colors" data-val="5" data-unit="m">
+              5 m (Banner)
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Right Column: Real-time Recommended Output Card (5 Cols) -->
+    <div class="lg:col-span-5 space-y-6">
+      
+      <!-- Primary Output Highlight Card -->
+      <div class="bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-indigo-500/30 space-y-5">
+        <div class="flex items-center justify-between border-b border-indigo-500/20 pb-3">
+          <span class="text-[10px] uppercase font-black tracking-widest text-indigo-400">
+            Recommended Starting Size
+          </span>
+          <span id="output-status-pill" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+            Optimal Sizing
+          </span>
+        </div>
+
+        <!-- Prominent Physical Dimensions -->
+        <div class="space-y-1">
+          <div id="output-size-primary" class="text-3xl sm:text-4xl font-black tracking-tight text-white">
+            {initialResult.recommendedSize.widthCm} × {initialResult.recommendedSize.heightCm} cm
+          </div>
+          <div id="output-size-secondary" class="text-xs sm:text-sm text-slate-300 font-mono">
+            {initialResult.recommendedSize.widthInches} × {initialResult.recommendedSize.heightInches} inches ({initialResult.recommendedSize.widthMm} × {initialResult.recommendedSize.heightMm} mm)
+          </div>
+        </div>
+
+        <!-- Raster Pixel Output -->
+        <div class="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2 text-xs">
+          <div class="flex justify-between items-center text-slate-300">
+            <span>Required Raster Resolution:</span>
+            <span id="output-raster-px" class="font-bold text-white font-mono">
+              {initialResult.rasterResolution.widthPx} × {initialResult.rasterResolution.heightPx} px
+            </span>
+          </div>
+          <div class="flex justify-between items-center text-slate-400 text-[11px]">
+            <span>Raster Pixel Density:</span>
+            <span id="output-raster-dpi" class="font-mono text-indigo-300">@ {initialResult.rasterResolution.dpi} DPI</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-400 text-[11px] pt-1 border-t border-white/5">
+            <span>Recommended Vector Format:</span>
+            <span class="font-bold text-emerald-400">SVG (Scalable Vector)</span>
+          </div>
+        </div>
+
+        <!-- Matrix Specifications -->
+        <div class="grid grid-cols-2 gap-3 text-xs pt-1">
+          <div class="p-3 rounded-xl bg-white/5 border border-white/5">
+            <span class="text-[10px] text-slate-400 block uppercase">Est. Module Size</span>
+            <span id="output-module-size" class="font-bold text-white font-mono">
+              {initialResult.qrSpecs.estimatedModuleSizeMm} mm
+            </span>
+          </div>
+          <div class="p-3 rounded-xl bg-white/5 border border-white/5">
+            <span class="text-[10px] text-slate-400 block uppercase">Quiet Zone (4 mod)</span>
+            <span id="output-quiet-zone" class="font-bold text-white font-mono">
+              {initialResult.qrSpecs.quietZoneWidthMm} mm
+            </span>
+          </div>
+        </div>
+
+        <!-- Contextual Warnings Box -->
+        <div id="output-warnings-container" class="space-y-2">
+          {initialResult.warnings.map((w) => (
+            <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs leading-relaxed flex items-start gap-2">
+              <span class="text-amber-400 font-bold shrink-0">⚠️</span>
+              <span>{w}</span>
+            </div>
+          ))}
+        </div>
+
+        <!-- Call to Action Buttons -->
+        <div class="pt-2 space-y-2.5">
+          <a
+            id="create-qr-cta"
+            href="/?utm_source=size_calculator"
+            class="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl font-bold text-xs sm:text-sm bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
+          >
+            <span>+</span> Create Your QR Code Now &rarr;
+          </a>
+
+          <a
+            href="/qr-code-print-size-calculator"
+            class="w-full flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+          >
+            <span>🖨️</span> Need print-specific DPI math? Try Print Size Calculator &rarr;
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Multi-DPI Resolution Breakdown Card -->
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          Raster Resolution by DPI Setting
+        </h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs font-mono">
+            <thead class="bg-slate-50 dark:bg-slate-950 text-slate-400 font-bold">
+              <tr>
+                <th class="py-2 px-3">DPI</th>
+                <th class="py-2 px-3">Resolution (px)</th>
+                <th class="py-2 px-3">Recommended For</th>
+              </tr>
+            </thead>
+            <tbody id="dpi-table-body" class="divide-y divide-slate-100 dark:divide-slate-800 text-[11px]">
+              {initialResult.allDpiResolutions.map((r) => (
+                <tr class={r.dpi === 300 ? 'bg-indigo-50/40 dark:bg-indigo-950/20 font-bold text-indigo-700 dark:text-indigo-300' : ''}>
+                  <td class="py-2 px-3">{r.dpi} DPI</td>
+                  <td class="py-2 px-3">{r.pixels} × {r.pixels} px</td>
+                  <td class="py-2 px-3 font-sans text-slate-500">{r.useCase}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p class="text-[10px] text-slate-400">
+          Formula: <code>Pixels = Physical Inches × DPI</code>. For professional offset printing, always prefer SVG.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- Real-Time Client Calculator Script -->
+<script>
+  import { calculateQRSize } from '../../lib/calculator/size';
+  import type { DistanceUnit, ErrorCorrectionLevel, QRContentType } from '../../lib/calculator/types';
+
+  function runCalculation() {
+    const distInput = document.getElementById('calc-scan-distance') as HTMLInputElement | null;
+    const unitSelect = document.getElementById('calc-distance-unit') as HTMLSelectElement | null;
+    const contentSelect = document.getElementById('calc-content-type') as HTMLSelectElement | null;
+    const versionSelect = document.getElementById('calc-qr-version') as HTMLSelectElement | null;
+    const ecSelect = document.getElementById('calc-ec-level') as HTMLSelectElement | null;
+    const dpiSelect = document.getElementById('calc-dpi-level') as HTMLSelectElement | null;
+
+    if (!distInput || !unitSelect || !contentSelect || !versionSelect || !ecSelect || !dpiSelect) return;
+
+    const rawDist = parseFloat(distInput.value);
+    if (isNaN(rawDist) || rawDist <= 0) return;
+
+    const distanceUnit = (unitSelect.value as DistanceUnit) || 'm';
+    const contentType = (contentSelect.value as QRContentType) || 'url';
+    const errorCorrection = (ecSelect.value as ErrorCorrectionLevel) || 'M';
+    const qrVersion = versionSelect.value === 'auto' ? 'auto' : parseInt(versionSelect.value, 10);
+    const dpi = parseInt(dpiSelect.value, 10) || 300;
+
+    const res = calculateQRSize({
+      scanDistance: rawDist,
+      distanceUnit,
+      contentType,
+      errorCorrection,
+      qrVersion,
+      dpi,
+    });
+
+    // Update DOM
+    const sizePrimary = document.getElementById('output-size-primary');
+    const sizeSecondary = document.getElementById('output-size-secondary');
+    const rasterPx = document.getElementById('output-raster-px');
+    const rasterDpi = document.getElementById('output-raster-dpi');
+    const modSize = document.getElementById('output-module-size');
+    const quietZone = document.getElementById('output-quiet-zone');
+    const warningsContainer = document.getElementById('output-warnings-container');
+    const dpiTableBody = document.getElementById('dpi-table-body');
+    const ctaLink = document.getElementById('create-qr-cta') as HTMLAnchorElement | null;
+
+    if (sizePrimary) sizePrimary.innerText = `${res.recommendedSize.widthCm} × ${res.recommendedSize.heightCm} cm`;
+    if (sizeSecondary) {
+      sizeSecondary.innerText = `${res.recommendedSize.widthInches} × ${res.recommendedSize.heightInches} inches (${res.recommendedSize.widthMm} × ${res.recommendedSize.heightMm} mm)`;
+    }
+    if (rasterPx) rasterPx.innerText = `${res.rasterResolution.widthPx} × ${res.rasterResolution.heightPx} px`;
+    if (rasterDpi) rasterDpi.innerText = `@ ${res.rasterResolution.dpi} DPI`;
+    if (modSize) modSize.innerText = `${res.qrSpecs.estimatedModuleSizeMm} mm`;
+    if (quietZone) quietZone.innerText = `${res.qrSpecs.quietZoneWidthMm} mm`;
+
+    // Warnings
+    if (warningsContainer) {
+      if (res.warnings.length === 0) {
+        warningsContainer.innerHTML = '';
+      } else {
+        warningsContainer.innerHTML = res.warnings
+          .map(
+            (w) => `
+            <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs leading-relaxed flex items-start gap-2">
+              <span class="text-amber-400 font-bold shrink-0">⚠️</span>
+              <span>${w}</span>
+            </div>
+          `
+          )
+          .join('');
+      }
+    }
+
+    // DPI Table update
+    if (dpiTableBody) {
+      dpiTableBody.innerHTML = res.allDpiResolutions
+        .map(
+          (r) => `
+          <tr class="${r.dpi === dpi ? 'bg-indigo-50/40 dark:bg-indigo-950/20 font-bold text-indigo-700 dark:text-indigo-300' : ''}">
+            <td class="py-2 px-3">${r.dpi} DPI</td>
+            <td class="py-2 px-3">${r.pixels} × ${r.pixels} px</td>
+            <td class="py-2 px-3 font-sans text-slate-500">${r.useCase}</td>
+          </tr>
+        `
+        )
+        .join('');
+    }
+
+    // CTA href update
+    if (ctaLink) {
+      ctaLink.href = `/?type=${contentType}&ec=${errorCorrection}&size=${res.recommendedSize.widthCm * 10}`;
+    }
+  }
+
+  // Attach live event listeners
+  const formInputs = [
+    'calc-scan-distance',
+    'calc-distance-unit',
+    'calc-content-type',
+    'calc-qr-version',
+    'calc-ec-level',
+    'calc-dpi-level',
+  ];
+
+  formInputs.forEach((id) => {
+    const el = document.getElementById(id);
+    el?.addEventListener('input', runCalculation);
+    el?.addEventListener('change', runCalculation);
+  });
+
+  // Preset distance buttons
+  document.querySelectorAll('.preset-dist-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const val = btn.getAttribute('data-val');
+      const unit = btn.getAttribute('data-unit');
+      const distInput = document.getElementById('calc-scan-distance') as HTMLInputElement | null;
+      const unitSelect = document.getElementById('calc-distance-unit') as HTMLSelectElement | null;
+      if (distInput && val) distInput.value = val;
+      if (unitSelect && unit) unitSelect.value = unit;
+      runCalculation();
+    });
+  });
+</script>
