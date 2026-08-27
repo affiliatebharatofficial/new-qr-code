@@ -10,7 +10,10 @@ interface Props {
 const { title, activeNav = 'overview' } = Astro.props;
 const user = await getCurrentUser(Astro.request, Astro.locals);
 
-if (!user || user.role !== 'admin') {
+if (!user) {
+  return Astro.redirect('/login?redirect=/admin');
+}
+if (user.role !== 'admin') {
   return Astro.redirect('/dashboard');
 }
 

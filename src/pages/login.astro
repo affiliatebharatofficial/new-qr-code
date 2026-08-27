@@ -99,6 +99,10 @@ if (user) {
 
       if (redirectTarget === 'save') {
         window.location.href = '/#generator-app';
+      } else if (redirectTarget) {
+        window.location.href = redirectTarget;
+      } else if (data.user?.role === 'admin') {
+        window.location.href = '/admin';
       } else {
         window.location.href = '/dashboard';
       }

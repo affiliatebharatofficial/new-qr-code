@@ -1,6 +1,15 @@
 ---
 import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getCurrentUser } from '../../../lib/auth/jwt';
 import { getDb } from '../../../lib/db/client';
+
+const user = await getCurrentUser(Astro.request, Astro.locals);
+if (!user) {
+  return Astro.redirect('/login?redirect=/admin/qr-codes');
+}
+if (user.role !== 'admin') {
+  return Astro.redirect('/dashboard');
+}
 
 const url = new URL(Astro.request.url);
 const search = url.searchParams.get('q') || '';
