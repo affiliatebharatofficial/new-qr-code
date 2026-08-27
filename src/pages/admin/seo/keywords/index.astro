@@ -1,0 +1,136 @@
+---
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import { getCurrentUser } from '../../../../lib/auth/jwt';
+import keywordsData from '../../../../lib/seo/keywords.json';
+
+const user = await getCurrentUser(Astro.request, Astro.locals);
+if (!user) {
+  return Astro.redirect('/login?redirect=/admin/seo/keywords');
+}
+if (user.role !== 'admin') {
+  return Astro.redirect('/dashboard');
+}
+
+const url = new URL(Astro.request.url);
+const search = url.searchParams.get('q')?.toLowerCase() || '';
+
+let keywords = [...keywordsData];
+
+// Sort by impressions descending
+keywords.sort((a, b) => b.impressions - a.impressions);
+
+if (search) {
+  keywords = keywords.filter((k) => k.keyword.toLowerCase().includes(search));
+}
+
+const totalKeywordsCount = keywords.length;
+const totalImpressions = keywords.reduce((acc, k) => acc + k.impressions, 0);
+---
+
+<AdminLayout title="Keyword Strategy Explorer" activeNav="seo">
+  <div class="space-y-8">
+    
+    <!-- Top Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2">
+          <a href="/admin/seo" class="text-xs text-indigo-400 hover:underline">&larr; Back to SEO Center</a>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-1">Keyword Strategy Explorer</h1>
+        <p class="text-xs sm:text-sm text-slate-400">Search volume, trending patterns, and intent mapping parsed from Google Search Console dataset.</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="px-3.5 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-indigo-400 font-bold">
+          Dataset: KeywordStats_8_27_2026.csv ({keywordsData.length} records)
+        </span>
+      </div>
+    </div>
+
+    <!-- Keyword Metrics -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Targeted Keywords</span>
+        <div class="text-2xl sm:text-3xl font-black text-white">{totalKeywordsCount}</div>
+      </div>
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Total Monthly Search Impressions</span>
+        <div class="text-2xl sm:text-3xl font-black text-emerald-400">{totalImpressions.toLocaleString()}</div>
+      </div>
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Multilingual Intents</span>
+        <div class="text-lg font-bold text-amber-400 pt-1">English, German, French, Spanish, Thai</div>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex items-center justify-between">
+      <form method="GET" class="w-full sm:w-96 relative">
+        <input
+          type="text"
+          name="q"
+          value={search}
+          placeholder="Filter keywords (e.g. wifi, payment, monkey, scanner)..."
+          class="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white placeholder-slate-500 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500"
+        />
+        <span class="absolute left-3 top-2.5 text-slate-500 text-xs">🔍</span>
+      </form>
+      {search && (
+        <a href="/admin/seo/keywords" class="text-xs text-slate-400 hover:text-white underline">
+          Clear Search
+        </a>
+      )}
+    </div>
+
+    <!-- Keywords Table -->
+    <div class="bg-slate-950 rounded-3xl border border-slate-800 overflow-hidden shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-900/60 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+            <tr>
+              <th class="py-3.5 px-6">Target Search Keyword</th>
+              <th class="py-3.5 px-6">Monthly Impressions</th>
+              <th class="py-3.5 px-6">Trend Sparkline</th>
+              <th class="py-3.5 px-6">Optimal Target Route</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/80">
+            {keywords.length === 0 ? (
+              <tr>
+                <td colspan="4" class="py-12 text-center text-slate-500">
+                  No keywords matching your search criteria.
+                </td>
+              </tr>
+            ) : (
+              keywords.map((k) => (
+                <tr class="hover:bg-slate-900/40 transition-colors">
+                  <td class="py-4 px-6 font-bold text-white">
+                    {k.keyword}
+                  </td>
+                  <td class="py-4 px-6 font-mono text-emerald-400 font-bold text-sm">
+                    {k.impressions.toLocaleString()}
+                  </td>
+                  <td class="py-4 px-6 font-mono text-slate-400 text-[11px]">
+                    <span class="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-300">
+                      {k.trends}
+                    </span>
+                  </td>
+                  <td class="py-4 px-6">
+                    <span class="font-mono text-indigo-400 text-[11px]">
+                      {k.keyword.includes('wifi') ? '/wifi-qr-code-generator' :
+                       k.keyword.includes('cash app') ? '/cash-app-qr-code-generator' :
+                       k.keyword.includes('vcard') ? '/vcard-qr-code-generator' :
+                       k.keyword.includes('generer') || k.keyword.includes('gratis') || k.keyword.includes('lesen') ? '/[locale]' :
+                       '/'}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</AdminLayout>

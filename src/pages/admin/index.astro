@@ -12,166 +12,375 @@ if (user.role !== 'admin') {
 }
 
 const db = getDb(Astro.locals);
+const now = Date.now();
+const oneDayAgo = now - 24 * 60 * 60 * 1000;
+const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
+const oneMonthAgo = now - 30 * 24 * 60 * 60 * 1000;
 
-// Efficient aggregate counts
-const [usersRes, qrsRes, dynQrsRes, scansRes, landingRes, storageRes, subsRes, reportsRes] = await Promise.all([
+// Execute real aggregated metrics queries
+const [
+  usersTotalRes,
+  usersTodayRes,
+  usersWeekRes,
+  usersMonthRes,
+  usersActiveRes,
+  usersSuspendedRes,
+  qrsTotalRes,
+  qrsTodayRes,
+  qrsWeekRes,
+  qrsMonthRes,
+  qrsStaticRes,
+  qrsDynamicRes,
+  qrsPaymentRes,
+  qrsActiveRes,
+  qrsDisabledRes,
+  scansTotalRes,
+  scansTodayRes,
+  scansWeekRes,
+  scansMonthRes,
+  topQrsRes,
+  topTypesRes,
+  topCountriesRes,
+  topDevicesRes,
+  subsRes,
+  planBreakdownRes,
+  recentUsersRes,
+  recentAuditsRes,
+  storageRes,
+  reportsRes,
+] = await Promise.all([
   db.prepare('SELECT COUNT(*) as total FROM users').all(),
+  db.prepare('SELECT COUNT(*) as total FROM users WHERE created_at >= ?').bind(oneDayAgo).all(),
+  db.prepare('SELECT COUNT(*) as total FROM users WHERE created_at >= ?').bind(oneWeekAgo).all(),
+  db.prepare('SELECT COUNT(*) as total FROM users WHERE created_at >= ?').bind(oneMonthAgo).all(),
+  db.prepare("SELECT COUNT(*) as total FROM users WHERE status = 'active'").all(),
+  db.prepare("SELECT COUNT(*) as total FROM users WHERE status = 'suspended'").all(),
+
   db.prepare('SELECT COUNT(*) as total FROM qr_codes').all(),
+  db.prepare('SELECT COUNT(*) as total FROM qr_codes WHERE created_at >= ?').bind(oneDayAgo).all(),
+  db.prepare('SELECT COUNT(*) as total FROM qr_codes WHERE created_at >= ?').bind(oneWeekAgo).all(),
+  db.prepare('SELECT COUNT(*) as total FROM qr_codes WHERE created_at >= ?').bind(oneMonthAgo).all(),
+  db.prepare('SELECT COUNT(*) as total FROM qr_codes WHERE is_dynamic = 0').all(),
   db.prepare('SELECT COUNT(*) as total FROM qr_codes WHERE is_dynamic = 1').all(),
+  db.prepare("SELECT COUNT(*) as total FROM qr_codes WHERE type IN ('upi', 'paypal', 'venmo', 'cashapp', 'zelle')").all(),
+  db.prepare("SELECT COUNT(*) as total FROM qr_codes WHERE status = 'active'").all(),
+  db.prepare("SELECT COUNT(*) as total FROM qr_codes WHERE status != 'active'").all(),
+
   db.prepare('SELECT SUM(scans_count) as total FROM qr_codes').all(),
-  db.prepare("SELECT COUNT(*) as total FROM landing_pages WHERE status = 'published'").all(),
-  db.prepare('SELECT SUM(file_size) as total FROM qr_assets').all(),
+  db.prepare('SELECT COUNT(*) as total FROM qr_scans WHERE scanned_at >= ?').bind(oneDayAgo).all(),
+  db.prepare('SELECT COUNT(*) as total FROM qr_scans WHERE scanned_at >= ?').bind(oneWeekAgo).all(),
+  db.prepare('SELECT COUNT(*) as total FROM qr_scans WHERE scanned_at >= ?').bind(oneMonthAgo).all(),
+
+  db.prepare('SELECT id, name, type, scans_count FROM qr_codes ORDER BY scans_count DESC LIMIT 5').all(),
+  db.prepare('SELECT type, COUNT(*) as count FROM qr_codes GROUP BY type ORDER BY count DESC LIMIT 6').all(),
+  db.prepare("SELECT country, COUNT(*) as count FROM qr_scans WHERE country != 'Unknown' GROUP BY country ORDER BY count DESC LIMIT 5").all(),
+  db.prepare("SELECT device_type, COUNT(*) as count FROM qr_scans GROUP BY device_type ORDER BY count DESC LIMIT 4").all(),
+
   db.prepare("SELECT COUNT(*) as total FROM subscriptions WHERE status IN ('active', 'trialing')").all(),
+  db.prepare('SELECT plan, COUNT(*) as count FROM users GROUP BY plan').all(),
+
+  db.prepare('SELECT id, email, name, plan, status, created_at FROM users ORDER BY created_at DESC LIMIT 5').all(),
+  db.prepare('SELECT * FROM admin_audit_logs ORDER BY created_at DESC LIMIT 5').all(),
+  db.prepare('SELECT SUM(file_size) as total_bytes, COUNT(*) as total_files FROM qr_assets').all(),
   db.prepare("SELECT COUNT(*) as total FROM abuse_reports WHERE status = 'pending'").all(),
 ]);
 
-const totalUsers = (usersRes.results?.[0] as any)?.total || 0;
-const totalQrs = (qrsRes.results?.[0] as any)?.total || 0;
-const dynamicQrs = (dynQrsRes.results?.[0] as any)?.total || 0;
-const totalScans = (scansRes.results?.[0] as any)?.total || 0;
-const publishedLanding = (landingRes.results?.[0] as any)?.total || 0;
-const storageBytes = (storageRes.results?.[0] as any)?.total || 0;
-const activeSubs = (subsRes.results?.[0] as any)?.total || 0;
-const pendingReports = (reportsRes.results?.[0] as any)?.total || 0;
+const usersTotal = (usersTotalRes.results?.[0] as any)?.total || 0;
+const usersToday = (usersTodayRes.results?.[0] as any)?.total || 0;
+const usersWeek = (usersWeekRes.results?.[0] as any)?.total || 0;
+const usersMonth = (usersMonthRes.results?.[0] as any)?.total || 0;
+const usersActive = (usersActiveRes.results?.[0] as any)?.total || 0;
+const usersSuspended = (usersSuspendedRes.results?.[0] as any)?.total || 0;
 
-const storageMb = (storageBytes / (1024 * 1024)).toFixed(1);
+const qrsTotal = (qrsTotalRes.results?.[0] as any)?.total || 0;
+const qrsToday = (qrsTodayRes.results?.[0] as any)?.total || 0;
+const qrsWeek = (qrsWeekRes.results?.[0] as any)?.total || 0;
+const qrsMonth = (qrsMonthRes.results?.[0] as any)?.total || 0;
+const qrsStatic = (qrsStaticRes.results?.[0] as any)?.total || 0;
+const qrsDynamic = (qrsDynamicRes.results?.[0] as any)?.total || 0;
+const qrsPayment = (qrsPaymentRes.results?.[0] as any)?.total || 0;
+const qrsActive = (qrsActiveRes.results?.[0] as any)?.total || 0;
+const qrsDisabled = (qrsDisabledRes.results?.[0] as any)?.total || 0;
 
-// Recent Users & QR codes
-const [recentUsersRes, recentQrsRes, recentAuditRes] = await Promise.all([
-  db.prepare('SELECT id, email, plan, status, created_at FROM users ORDER BY created_at DESC LIMIT 5').all(),
-  db.prepare('SELECT id, name, type, is_dynamic, scans_count, status, created_at FROM qr_codes ORDER BY created_at DESC LIMIT 5').all(),
-  db.prepare('SELECT * FROM admin_audit_logs ORDER BY created_at DESC LIMIT 5').all(),
-]);
+const scansTotal = (scansTotalRes.results?.[0] as any)?.total || 0;
+const scansToday = (scansTodayRes.results?.[0] as any)?.total || 0;
+const scansWeek = (scansWeekRes.results?.[0] as any)?.total || 0;
+const scansMonth = (scansMonthRes.results?.[0] as any)?.total || 0;
 
+const topQrs = topQrsRes.results || [];
+const topTypes = topTypesRes.results || [];
+const topCountries = topCountriesRes.results || [];
+const topDevices = topDevicesRes.results || [];
 const recentUsers = recentUsersRes.results || [];
-const recentQrs = recentQrsRes.results || [];
-const recentAudits = recentAuditRes.results || [];
+const recentAudits = recentAuditsRes.results || [];
+
+const activeSubs = (subsRes.results?.[0] as any)?.total || 0;
+const pendingAbuse = (reportsRes.results?.[0] as any)?.total || 0;
+
+const planCounts: Record<string, number> = {};
+(planBreakdownRes.results || []).forEach((r: any) => {
+  planCounts[r.plan] = r.count;
+});
+
+const estimatedMrr = ((planCounts['pro'] || 0) * 9) + ((planCounts['business'] || 0) * 29) + ((planCounts['enterprise'] || 0) * 79);
+const totalStorageMb = (((storageRes.results?.[0] as any)?.total_bytes || 0) / (1024 * 1024)).toFixed(1);
+const totalFilesCount = (storageRes.results?.[0] as any)?.total_files || 0;
 ---
 
-<AdminLayout title="Platform Overview" activeNav="overview">
+<AdminLayout title="Platform Command Center" activeNav="overview">
   <div class="space-y-8">
+    
     <!-- Top Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Platform Overview</h1>
-        <p class="text-xs sm:text-sm text-slate-400 mt-1">Real-time operational metrics across database, storage, and moderation queues.</p>
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+            ● Live Cloudflare Production
+          </span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-1">Admin Command Center</h1>
+        <p class="text-xs sm:text-sm text-slate-400">Holistic business overview across users, campaigns, telemetry, and revenue.</p>
       </div>
-      {pendingReports > 0 && (
-        <a href="/admin/abuse-reports" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-bold animate-pulse">
-          🚨 {pendingReports} Pending Abuse Reports &rarr;
+
+      <div class="flex flex-wrap items-center gap-2">
+        {pendingAbuse > 0 && (
+          <a href="/admin/abuse-reports" class="px-3 py-1.5 rounded-xl bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-bold animate-pulse flex items-center gap-1.5">
+            <span>🚨</span> {pendingAbuse} Pending Abuse
+          </a>
+        )}
+        <a href="/admin/crm" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition-colors">
+          💼 Open CRM
         </a>
-      )}
+        <a href="/admin/users" class="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm transition-colors">
+          👥 Manage Users
+        </a>
+      </div>
     </div>
 
-    <!-- Metrics Grid -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-        <span class="text-xs font-semibold text-slate-400 uppercase">Total Users</span>
-        <div class="text-2xl font-black text-white">{totalUsers}</div>
-      </div>
-      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-        <span class="text-xs font-semibold text-slate-400 uppercase">Total QR Codes</span>
-        <div class="text-2xl font-black text-indigo-400">{totalQrs} <span class="text-xs text-slate-500 font-normal">({dynamicQrs} Dyn)</span></div>
-      </div>
-      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-        <span class="text-xs font-semibold text-slate-400 uppercase">Total Scans</span>
-        <div class="text-2xl font-black text-emerald-400">{totalScans}</div>
-      </div>
-      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-        <span class="text-xs font-semibold text-slate-400 uppercase">Landing Pages</span>
-        <div class="text-2xl font-black text-purple-400">{publishedLanding}</div>
-      </div>
-      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-        <span class="text-xs font-semibold text-slate-400 uppercase">Active Paid Plans</span>
-        <div class="text-2xl font-black text-amber-400">{activeSubs}</div>
-      </div>
-      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-        <span class="text-xs font-semibold text-slate-400 uppercase">Storage Used</span>
-        <div class="text-2xl font-black text-white">{storageMb} MB</div>
-      </div>
-      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-        <span class="text-xs font-semibold text-slate-400 uppercase">Pending Abuse</span>
-        <div class="text-2xl font-black text-red-400">{pendingReports}</div>
-      </div>
-      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-        <span class="text-xs font-semibold text-slate-400 uppercase">System Status</span>
-        <div class="text-sm font-bold text-emerald-400 flex items-center gap-1.5 pt-2">
-          <span class="w-2 h-2 rounded-full bg-emerald-500"></span> 100% Operational
+    <!-- 4 High-Level Key Performance Pillars -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- Users Pillar -->
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-3 shadow-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Users Directory</span>
+          <span class="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 text-xs">👥</span>
+        </div>
+        <div class="space-y-1">
+          <div class="text-2xl sm:text-3xl font-black text-white">{usersTotal}</div>
+          <p class="text-[11px] text-emerald-400 font-medium">+{usersWeek} registered this week</p>
+        </div>
+        <div class="pt-2 border-t border-slate-900 grid grid-cols-2 gap-2 text-[11px] text-slate-400 font-mono">
+          <div>Today: <span class="text-white font-bold">{usersToday}</span></div>
+          <div>30d: <span class="text-white font-bold">{usersMonth}</span></div>
+          <div>Active: <span class="text-emerald-400 font-bold">{usersActive}</span></div>
+          <div>Suspended: <span class="text-red-400 font-bold">{usersSuspended}</span></div>
         </div>
       </div>
+
+      <!-- QR Codes Pillar -->
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-3 shadow-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">QR Codes</span>
+          <span class="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 text-xs">🏁</span>
+        </div>
+        <div class="space-y-1">
+          <div class="text-2xl sm:text-3xl font-black text-indigo-400">{qrsTotal}</div>
+          <p class="text-[11px] text-indigo-300 font-medium">{qrsDynamic} Dynamic / {qrsStatic} Static</p>
+        </div>
+        <div class="pt-2 border-t border-slate-900 grid grid-cols-2 gap-2 text-[11px] text-slate-400 font-mono">
+          <div>Today: <span class="text-white font-bold">{qrsToday}</span></div>
+          <div>7 Days: <span class="text-white font-bold">{qrsWeek}</span></div>
+          <div>Payments: <span class="text-amber-400 font-bold">{qrsPayment}</span></div>
+          <div>Active: <span class="text-emerald-400 font-bold">{qrsActive}</span></div>
+        </div>
+      </div>
+
+      <!-- Scans Telemetry Pillar -->
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-3 shadow-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Scans</span>
+          <span class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs">📡</span>
+        </div>
+        <div class="space-y-1">
+          <div class="text-2xl sm:text-3xl font-black text-emerald-400">{scansTotal}</div>
+          <p class="text-[11px] text-emerald-300 font-medium">+{scansWeek} scans logged this week</p>
+        </div>
+        <div class="pt-2 border-t border-slate-900 grid grid-cols-2 gap-2 text-[11px] text-slate-400 font-mono">
+          <div>Today: <span class="text-white font-bold">{scansToday}</span></div>
+          <div>30 Days: <span class="text-white font-bold">{scansMonth}</span></div>
+          <div>Storage: <span class="text-white font-bold">{totalStorageMb} MB</span></div>
+          <div>Files: <span class="text-white font-bold">{totalFilesCount}</span></div>
+        </div>
+      </div>
+
+      <!-- Revenue Pillar -->
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-3 shadow-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Subscription MRR</span>
+          <span class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 text-xs">💰</span>
+        </div>
+        <div class="space-y-1">
+          <div class="text-2xl sm:text-3xl font-black text-amber-400">${estimatedMrr} <span class="text-xs text-slate-500 font-normal">/ mo</span></div>
+          <p class="text-[11px] text-amber-300 font-medium">{activeSubs} Active Subscriptions</p>
+        </div>
+        <div class="pt-2 border-t border-slate-900 grid grid-cols-2 gap-2 text-[11px] text-slate-400 font-mono">
+          <div>Pro Tier: <span class="text-indigo-400 font-bold">{planCounts['pro'] || 0}</span></div>
+          <div>Business: <span class="text-purple-400 font-bold">{planCounts['business'] || 0}</span></div>
+          <div>Free Tier: <span class="text-white font-bold">{planCounts['free'] || 0}</span></div>
+          <div>Gateway: <span class="text-slate-300">Lemon Squeezy</span></div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- Recent Tables Split Grid -->
+    <!-- Middle Split: Top Types, Countries & Devices Distribution -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Top QR Types Breakdown -->
+      <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+            <span>🏷️</span> Popular QR Types
+          </h2>
+          <a href="/admin/qr-codes" class="text-[11px] text-indigo-400 hover:underline">View All &rarr;</a>
+        </div>
+        {topTypes.length === 0 ? (
+          <div class="py-8 text-center text-xs text-slate-500">No QR codes created yet.</div>
+        ) : (
+          <div class="space-y-2.5">
+            {topTypes.map((t: any) => (
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold text-slate-300 uppercase tracking-wider text-[11px]">{t.type}</span>
+                <span class="font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded-md border border-slate-800">
+                  {t.count} QRs
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <!-- Top Countries Telemetry -->
+      <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+            <span>🌍</span> Top Scan Locations
+          </h2>
+          <a href="/admin/scans" class="text-[11px] text-indigo-400 hover:underline">Scan Map &rarr;</a>
+        </div>
+        {topCountries.length === 0 ? (
+          <div class="py-8 text-center text-xs text-slate-500">No geographic scan telemetry recorded yet.</div>
+        ) : (
+          <div class="space-y-2.5">
+            {topCountries.map((c: any) => (
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-semibold text-slate-300">{c.country}</span>
+                <span class="font-mono text-emerald-400 font-bold bg-slate-900 px-2 py-0.5 rounded-md border border-slate-800">
+                  {c.count} scans
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <!-- Device Category Telemetry -->
+      <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+            <span>📱</span> Device Distribution
+          </h2>
+          <a href="/admin/scans" class="text-[11px] text-indigo-400 hover:underline">Details &rarr;</a>
+        </div>
+        {topDevices.length === 0 ? (
+          <div class="py-8 text-center text-xs text-slate-500">No device telemetry logged yet.</div>
+        ) : (
+          <div class="space-y-2.5">
+            {topDevices.map((d: any) => (
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-semibold text-slate-300">{d.device_type}</span>
+                <span class="font-mono text-indigo-300 bg-slate-900 px-2 py-0.5 rounded-md border border-slate-800">
+                  {d.count} scans
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+    </div>
+
+    <!-- Bottom Split: Recent Signups & Audit Activity Trail -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- Recent Users -->
+      
+      <!-- Recent Registered Users -->
       <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-4">
         <div class="flex items-center justify-between">
-          <h2 class="text-sm font-bold text-white uppercase tracking-wider">Recent Users</h2>
-          <a href="/admin/users" class="text-xs text-indigo-400 hover:underline">View All &rarr;</a>
+          <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+            <span>👥</span> Recent User Signups
+          </h2>
+          <a href="/admin/users" class="text-[11px] text-indigo-400 hover:underline">Manage All ({usersTotal}) &rarr;</a>
         </div>
-        <div class="divide-y divide-slate-800 text-xs">
-          {recentUsers.map((u: any) => (
-            <div class="py-3 flex items-center justify-between gap-2">
-              <div>
-                <a href={`/admin/users/${u.id}`} class="font-bold text-white hover:text-indigo-400 transition-colors">
-                  {u.email}
-                </a>
-                <div class="text-[10px] text-slate-500 font-mono">{u.id}</div>
+        <div class="divide-y divide-slate-800/80">
+          {recentUsers.length === 0 ? (
+            <div class="py-6 text-center text-xs text-slate-500">No registered users yet.</div>
+          ) : (
+            recentUsers.map((u: any) => (
+              <div class="py-3 flex items-center justify-between text-xs">
+                <div>
+                  <a href={`/admin/users/${u.id}`} class="font-bold text-white hover:text-indigo-400 block">
+                    {u.name || 'User'}
+                  </a>
+                  <span class="text-[11px] font-mono text-slate-500">{u.email}</span>
+                </div>
+                <div class="text-right">
+                  <span class={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                    u.plan === 'business' ? 'bg-purple-900/50 text-purple-300' :
+                    u.plan === 'pro' ? 'bg-indigo-900/50 text-indigo-300' :
+                    'bg-slate-800 text-slate-400'
+                  }`}>
+                    {u.plan}
+                  </span>
+                  <span class="block text-[10px] text-slate-500 font-mono mt-0.5">
+                    {new Date(u.created_at).toLocaleDateString()}
+                  </span>
+                </div>
               </div>
-              <span class={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                u.plan === 'pro' || u.plan === 'business' ? 'bg-indigo-900/60 text-indigo-300' : 'bg-slate-800 text-slate-400'
-              }`}>
-                {u.plan}
-              </span>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
-      <!-- Recent QR Codes -->
+      <!-- Recent Admin Audit Activity -->
       <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-4">
         <div class="flex items-center justify-between">
-          <h2 class="text-sm font-bold text-white uppercase tracking-wider">Recent QR Codes</h2>
-          <a href="/admin/qr-codes" class="text-xs text-indigo-400 hover:underline">View All &rarr;</a>
+          <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+            <span>📜</span> Recent Administrative Audit Logs
+          </h2>
+          <a href="/admin/logs" class="text-[11px] text-indigo-400 hover:underline">All Logs &rarr;</a>
         </div>
-        <div class="divide-y divide-slate-800 text-xs">
-          {recentQrs.map((q: any) => (
-            <div class="py-3 flex items-center justify-between gap-2">
-              <div>
-                <div class="font-bold text-white">{q.name}</div>
-                <div class="text-[10px] text-slate-500 font-mono">{q.type} • {q.is_dynamic ? 'Dynamic' : 'Static'}</div>
+        <div class="divide-y divide-slate-800/80">
+          {recentAudits.length === 0 ? (
+            <div class="py-6 text-center text-xs text-slate-500">No audit events recorded yet.</div>
+          ) : (
+            recentAudits.map((a: any) => (
+              <div class="py-3 flex items-center justify-between text-xs">
+                <div>
+                  <span class="font-mono text-indigo-400 font-bold text-[11px]">{a.action}</span>
+                  <span class="block text-[11px] text-slate-400">Target: {a.target_type} ({a.target_id || 'system'})</span>
+                </div>
+                <div class="text-right font-mono text-[10px] text-slate-500">
+                  {new Date(a.created_at).toLocaleTimeString()}
+                  <span class="block">{new Date(a.created_at).toLocaleDateString()}</span>
+                </div>
               </div>
-              <div class="text-right">
-                <span class="font-bold text-slate-300">{q.scans_count || 0} scans</span>
-                <div class="text-[10px] text-emerald-400">{q.status}</div>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
+
     </div>
 
-    <!-- Recent Audit Logs -->
-    <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-4">
-      <div class="flex items-center justify-between">
-        <h2 class="text-sm font-bold text-white uppercase tracking-wider">Recent Moderation &amp; Admin Actions</h2>
-        <a href="/admin/audit-logs" class="text-xs text-indigo-400 hover:underline">Full Audit Trail &rarr;</a>
-      </div>
-      {recentAudits.length === 0 ? (
-        <p class="text-xs text-slate-500">No moderation actions recorded yet.</p>
-      ) : (
-        <div class="divide-y divide-slate-800 text-xs">
-          {recentAudits.map((a: any) => (
-            <div class="py-3 flex items-center justify-between gap-4 font-mono">
-              <div class="flex items-center gap-3">
-                <span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 font-bold uppercase">{a.action}</span>
-                <span class="text-slate-400">{a.resource_type}: {a.resource_id}</span>
-              </div>
-              <span class="text-[11px] text-slate-500">{new Date(a.created_at).toLocaleTimeString()}</span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
   </div>
 </AdminLayout>

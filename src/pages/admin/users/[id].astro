@@ -1,6 +1,15 @@
 ---
 import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getCurrentUser } from '../../../lib/auth/jwt';
 import { getDb } from '../../../lib/db/client';
+
+const user = await getCurrentUser(Astro.request, Astro.locals);
+if (!user) {
+  return Astro.redirect('/login?redirect=/admin/users');
+}
+if (user.role !== 'admin') {
+  return Astro.redirect('/dashboard');
+}
 
 const { id } = Astro.params;
 const db = getDb(Astro.locals);
@@ -12,87 +21,103 @@ if (!targetUser) {
   return Astro.redirect('/admin/users');
 }
 
-const [qrsRes, landingRes, assetsRes, auditsRes] = await Promise.all([
+const [qrsRes, landingRes, assetsRes, auditsRes, subscriptionRes] = await Promise.all([
   db.prepare('SELECT * FROM qr_codes WHERE user_id = ? ORDER BY created_at DESC').bind(id).all(),
   db.prepare('SELECT * FROM landing_pages WHERE user_id = ? ORDER BY created_at DESC').bind(id).all(),
-  db.prepare('SELECT * FROM qr_assets WHERE user_id = ?').bind(id).all(),
-  db.prepare("SELECT * FROM admin_audit_logs WHERE resource_id = ? ORDER BY created_at DESC").bind(id).all(),
+  db.prepare('SELECT * FROM qr_assets WHERE user_id = ? ORDER BY created_at DESC').bind(id).all(),
+  db.prepare("SELECT * FROM admin_audit_logs WHERE target_id = ? ORDER BY created_at DESC").bind(id).all(),
+  db.prepare('SELECT * FROM subscriptions WHERE user_id = ?').bind(id).all(),
 ]);
 
 const userQrs = qrsRes.results || [];
 const userLandingPages = landingRes.results || [];
 const userAssets = assetsRes.results || [];
 const userAudits = auditsRes.results || [];
+const subscription = subscriptionRes.results?.[0] as any;
 
 const totalStorageBytes = userAssets.reduce((acc: number, item: any) => acc + (item.file_size || 0), 0);
 const storageMb = (totalStorageBytes / (1024 * 1024)).toFixed(2);
+const totalScans = userQrs.reduce((acc: number, q: any) => acc + (q.scans_count || 0), 0);
 ---
 
 <AdminLayout title={`User: ${targetUser.email}`} activeNav="users">
   <div class="space-y-8 max-w-5xl">
+    
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <a href="/admin/users" class="text-xs font-semibold text-indigo-400 hover:underline">&larr; Back to Users</a>
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">{targetUser.email}</h1>
-        <p class="text-xs font-mono text-slate-500 mt-0.5">User ID: {targetUser.id} • Role: {targetUser.role}</p>
+        <a href="/admin/users" class="text-xs font-semibold text-indigo-400 hover:underline">&larr; Back to Users Directory</a>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">{targetUser.name || 'User'}</h1>
+        <p class="text-xs font-mono text-slate-400 mt-0.5">{targetUser.email} • ID: {targetUser.id} • Role: {targetUser.role.toUpperCase()}</p>
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          id="btn-open-user-plan-modal"
+          class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-sm transition-colors cursor-pointer"
+        >
+          ⚡ Change Plan ({targetUser.plan.toUpperCase()})
+        </button>
+
         <button
           type="button"
           id="toggle-user-status-btn"
           data-id={targetUser.id}
           data-status={targetUser.status}
-          class={`px-4 py-2.5 rounded-xl font-bold text-xs cursor-pointer shadow-sm transition-all ${
+          class={`px-4 py-2 rounded-xl font-bold text-xs cursor-pointer shadow-sm transition-all ${
             targetUser.status === 'active'
               ? 'bg-red-600/20 text-red-400 border border-red-500/30 hover:bg-red-600 hover:text-white'
               : 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600 hover:text-white'
           }`}
         >
-          {targetUser.status === 'active' ? 'Disable Account 🛑' : 'Re-Enable Account 🟢'}
+          {targetUser.status === 'active' ? 'Suspend Account' : 'Reactivate Account'}
         </button>
       </div>
     </div>
 
-    <!-- Account Details Cards -->
+    <!-- Account Overview 4 Cards -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-      <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
         <span class="text-[11px] font-semibold text-slate-400 uppercase">Subscription Plan</span>
-        <div class="text-lg font-bold text-white uppercase">{targetUser.plan}</div>
+        <div class="text-xl font-bold text-white uppercase">{targetUser.plan}</div>
       </div>
-      <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
         <span class="text-[11px] font-semibold text-slate-400 uppercase">Account Status</span>
-        <div class={`text-lg font-bold uppercase ${targetUser.status === 'active' ? 'text-emerald-400' : 'text-red-400'}`}>
+        <div class={`text-xl font-bold uppercase ${targetUser.status === 'active' ? 'text-emerald-400' : 'text-red-400'}`}>
           {targetUser.status}
         </div>
       </div>
-      <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-        <span class="text-[11px] font-semibold text-slate-400 uppercase">QR Codes</span>
-        <div class="text-lg font-bold text-indigo-400">{userQrs.length}</div>
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+        <span class="text-[11px] font-semibold text-slate-400 uppercase">Total QR Codes</span>
+        <div class="text-xl font-bold text-indigo-400">{userQrs.length} <span class="text-xs text-slate-500 font-normal">({totalScans} scans)</span></div>
       </div>
-      <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-        <span class="text-[11px] font-semibold text-slate-400 uppercase">Storage Used</span>
-        <div class="text-lg font-bold text-slate-200">{storageMb} MB</div>
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+        <span class="text-[11px] font-semibold text-slate-400 uppercase">R2 Storage Used</span>
+        <div class="text-xl font-bold text-slate-200">{storageMb} MB</div>
       </div>
     </div>
 
-    <!-- User's QR Codes -->
+    <!-- User's QR Codes List -->
     <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-4">
-      <h2 class="text-sm font-bold text-white uppercase tracking-wider">User QR Codes ({userQrs.length})</h2>
+      <h2 class="text-sm font-bold text-white uppercase tracking-wider flex items-center justify-between">
+        <span>🏁 User QR Codes ({userQrs.length})</span>
+      </h2>
       {userQrs.length === 0 ? (
-        <p class="text-xs text-slate-500">No QR codes created yet.</p>
+        <p class="text-xs text-slate-500 py-4 text-center">No QR codes created by this user.</p>
       ) : (
         <div class="divide-y divide-slate-800 text-xs">
           {userQrs.map((q: any) => (
-            <div class="py-3 flex items-center justify-between gap-4">
+            <div class="py-3.5 flex items-center justify-between gap-4">
               <div>
-                <span class="font-bold text-white">{q.name}</span>
-                <div class="text-[10px] text-slate-500 font-mono">{q.type} • {q.is_dynamic ? 'Dynamic' : 'Static'}</div>
+                <span class="font-bold text-white block">{q.name}</span>
+                <div class="text-[11px] text-slate-400 font-mono">
+                  {q.type} • {q.is_dynamic ? `Dynamic (/r/${q.short_code})` : 'Static'}
+                </div>
               </div>
               <div class="text-right">
-                <span class="font-bold text-slate-300">{q.scans_count || 0} scans</span>
+                <span class="font-bold text-emerald-400 font-mono">{q.scans_count || 0} scans</span>
                 <span class={`ml-2 px-2 py-0.5 rounded text-[10px] uppercase font-bold ${q.status === 'active' ? 'bg-emerald-900/40 text-emerald-400' : 'bg-red-900/40 text-red-400'}`}>
                   {q.status}
                 </span>
@@ -105,18 +130,20 @@ const storageMb = (totalStorageBytes / (1024 * 1024)).toFixed(2);
 
     <!-- User's Hosted Landing Pages -->
     <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-4">
-      <h2 class="text-sm font-bold text-white uppercase tracking-wider">Hosted Landing Pages ({userLandingPages.length})</h2>
+      <h2 class="text-sm font-bold text-white uppercase tracking-wider flex items-center justify-between">
+        <span>📱 Hosted Mobile Landing Pages ({userLandingPages.length})</span>
+      </h2>
       {userLandingPages.length === 0 ? (
-        <p class="text-xs text-slate-500">No landing pages created.</p>
+        <p class="text-xs text-slate-500 py-4 text-center">No landing pages published by this user.</p>
       ) : (
         <div class="divide-y divide-slate-800 text-xs">
           {userLandingPages.map((lp: any) => (
-            <div class="py-3 flex items-center justify-between gap-4">
+            <div class="py-3.5 flex items-center justify-between gap-4">
               <div>
                 <a href={`/p/${lp.slug}`} target="_blank" class="font-bold text-white hover:text-indigo-400">
                   {lp.title} ↗
                 </a>
-                <div class="text-[10px] text-slate-500 font-mono">{lp.type} • /p/{lp.slug}</div>
+                <div class="text-[11px] text-slate-400 font-mono">{lp.type} • /p/{lp.slug}</div>
               </div>
               <span class={`px-2 py-0.5 rounded text-[10px] uppercase font-bold ${lp.status === 'published' ? 'bg-emerald-900/40 text-emerald-400' : 'bg-slate-800 text-slate-400'}`}>
                 {lp.status}
@@ -126,10 +153,82 @@ const storageMb = (totalStorageBytes / (1024 * 1024)).toFixed(2);
         </div>
       )}
     </div>
+
+    <!-- User Audit Trail -->
+    <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-4">
+      <h2 class="text-sm font-bold text-white uppercase tracking-wider">
+        <span>📜 Account Administrative Timeline</span>
+      </h2>
+      {userAudits.length === 0 ? (
+        <p class="text-xs text-slate-500 py-4 text-center">No administrative interventions recorded for this user.</p>
+      ) : (
+        <div class="divide-y divide-slate-800 text-xs font-mono">
+          {userAudits.map((a: any) => (
+            <div class="py-3 flex items-center justify-between">
+              <div>
+                <span class="text-indigo-400 font-bold">{a.action}</span>
+                <span class="block text-slate-400 text-[11px]">{a.details || 'No additional note'}</span>
+              </div>
+              <span class="text-slate-500 text-[11px]">{new Date(a.created_at).toLocaleString()}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+
   </div>
+
+  <!-- Modal: Change Plan -->
+  <div id="user-plan-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 sm:p-8 space-y-6 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h3 class="text-lg font-bold text-white">Change User Plan</h3>
+          <p class="text-xs text-slate-400">{targetUser.email}</p>
+        </div>
+        <button type="button" id="btn-close-plan-modal" class="text-slate-400 hover:text-white text-lg cursor-pointer">&times;</button>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Select New Plan Tier</label>
+          <select id="select-user-plan" class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium">
+            <option value="free" selected={targetUser.plan === 'free'}>Free Tier ($0/mo)</option>
+            <option value="pro" selected={targetUser.plan === 'pro'}>Pro Tier ($9/mo)</option>
+            <option value="business" selected={targetUser.plan === 'business'}>Business Tier ($29/mo)</option>
+            <option value="enterprise" selected={targetUser.plan === 'enterprise'}>Enterprise Tier ($79/mo)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Reason / Note</label>
+          <input type="text" id="input-plan-reason" placeholder="e.g. VIP Customer Upgrade" class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium" />
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-800">
+          <button
+            type="button"
+            id="btn-cancel-plan-modal"
+            class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            id="btn-submit-user-plan"
+            class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm cursor-pointer"
+          >
+            Save Plan
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </AdminLayout>
 
 <script>
+  // Toggle Status
   document.getElementById('toggle-user-status-btn')?.addEventListener('click', async () => {
     const btn = document.getElementById('toggle-user-status-btn');
     const id = btn?.getAttribute('data-id');
@@ -148,6 +247,52 @@ const storageMb = (totalStorageBytes / (1024 * 1024)).toFixed(2);
       else alert('Failed to update user status.');
     } catch {
       alert('Error updating user status.');
+    }
+  });
+
+  // Modal: Change Plan
+  const planModal = document.getElementById('user-plan-modal');
+  const btnOpenPlanModal = document.getElementById('btn-open-user-plan-modal');
+  const btnClosePlanModal = document.getElementById('btn-close-plan-modal');
+  const btnCancelPlanModal = document.getElementById('btn-cancel-plan-modal');
+  const btnSubmitPlan = document.getElementById('btn-submit-user-plan') as HTMLButtonElement;
+
+  btnOpenPlanModal?.addEventListener('click', () => {
+    planModal?.classList.remove('hidden');
+    planModal?.classList.add('flex');
+  });
+
+  const closePlanModal = () => {
+    planModal?.classList.add('hidden');
+    planModal?.classList.remove('flex');
+  };
+
+  btnClosePlanModal?.addEventListener('click', closePlanModal);
+  btnCancelPlanModal?.addEventListener('click', closePlanModal);
+
+  btnSubmitPlan?.addEventListener('click', async () => {
+    const plan = (document.getElementById('select-user-plan') as HTMLSelectElement)?.value;
+    const reason = (document.getElementById('input-plan-reason') as HTMLInputElement)?.value;
+    const btn = document.getElementById('toggle-user-status-btn');
+    const id = btn?.getAttribute('data-id');
+
+    if (!id || !plan) return;
+
+    btnSubmitPlan.disabled = true;
+    btnSubmitPlan.innerText = 'Updating...';
+
+    try {
+      const res = await fetch(`/api/admin/users/${id}/plan`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan, reason }),
+      });
+      if (!res.ok) throw new Error('Failed to update plan.');
+      window.location.reload();
+    } catch (err: any) {
+      alert(err.message || 'Error updating plan.');
+      btnSubmitPlan.disabled = false;
+      btnSubmitPlan.innerText = 'Save Plan';
     }
   });
 </script>

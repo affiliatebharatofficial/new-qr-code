@@ -4,7 +4,7 @@ import '../styles/global.css';
 
 interface Props {
   title: string;
-  activeNav?: 'overview' | 'users' | 'qr_codes' | 'landing_pages' | 'abuse_reports' | 'storage' | 'subscriptions' | 'audit_logs' | 'system_health';
+  activeNav?: string;
 }
 
 const { title, activeNav = 'overview' } = Astro.props;
@@ -17,16 +17,50 @@ if (user.role !== 'admin') {
   return Astro.redirect('/dashboard');
 }
 
-const navItems = [
-  { id: 'overview', name: 'Overview', href: '/admin', icon: '📊' },
-  { id: 'users', name: 'Users', href: '/admin/users', icon: '👥' },
-  { id: 'qr_codes', name: 'QR Codes', href: '/admin/qr-codes', icon: '🏁' },
-  { id: 'landing_pages', name: 'Landing Pages', href: '/admin/landing-pages', icon: '📱' },
-  { id: 'abuse_reports', name: 'Abuse Reports', href: '/admin/abuse-reports', icon: '🚨' },
-  { id: 'storage', name: 'Storage', href: '/admin/storage', icon: '💾' },
-  { id: 'subscriptions', name: 'Subscriptions', href: '/admin/subscriptions', icon: '💳' },
-  { id: 'audit_logs', name: 'Audit Logs', href: '/admin/audit-logs', icon: '📜' },
-  { id: 'system_health', name: 'System Health', href: '/admin/system-health', icon: '💚' },
+const navGroups = [
+  {
+    title: 'Core Business',
+    items: [
+      { id: 'overview', name: 'Overview', href: '/admin', icon: '📊' },
+      { id: 'analytics', name: 'Analytics & Growth', href: '/admin/analytics', icon: '📈' },
+      { id: 'users', name: 'User Management', href: '/admin/users', icon: '👥' },
+      { id: 'crm', name: 'Internal CRM', href: '/admin/crm', icon: '💼' },
+    ],
+  },
+  {
+    title: 'QR Operations',
+    items: [
+      { id: 'qr_codes', name: 'All QR Codes', href: '/admin/qr-codes', icon: '🏁' },
+      { id: 'dynamic_qr', name: 'Dynamic Routing', href: '/admin/dynamic-qr', icon: '🔗' },
+      { id: 'scans', name: 'Scan Analytics', href: '/admin/scans', icon: '📡' },
+      { id: 'landing_pages', name: 'Landing Pages', href: '/admin/landing-pages', icon: '📱' },
+    ],
+  },
+  {
+    title: 'Monetization & Billing',
+    items: [
+      { id: 'revenue', name: 'Revenue & Ledger', href: '/admin/revenue', icon: '💰' },
+      { id: 'subscriptions', name: 'Plans & Subscriptions', href: '/admin/subscriptions', icon: '💳' },
+      { id: 'webhooks', name: 'Webhook Logs', href: '/admin/billing/webhooks', icon: '⚡' },
+    ],
+  },
+  {
+    title: 'Content & SEO',
+    items: [
+      { id: 'seo', name: 'SEO Control Center', href: '/admin/seo', icon: '🎯' },
+      { id: 'content', name: 'CMS & Multilingual', href: '/admin/content', icon: '🌐' },
+    ],
+  },
+  {
+    title: 'Infrastructure & Safety',
+    items: [
+      { id: 'storage', name: 'R2 Storage', href: '/admin/storage', icon: '💾' },
+      { id: 'abuse_reports', name: 'Abuse Reports', href: '/admin/abuse-reports', icon: '🚨' },
+      { id: 'system_health', name: 'System Health', href: '/admin/system', icon: '💚' },
+      { id: 'logs', name: 'Audit & Error Logs', href: '/admin/logs', icon: '📜' },
+      { id: 'settings', name: 'Settings', href: '/admin/settings', icon: '⚙️' },
+    ],
+  },
 ];
 ---
 
@@ -36,7 +70,7 @@ const navItems = [
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>{title} | Platform Admin</title>
+  <title>{title} | Business Control Center</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <script is:inline>
     const theme = (() => {
@@ -50,49 +84,59 @@ const navItems = [
     else document.documentElement.classList.remove('dark');
   </script>
 </head>
-<body class="min-h-full bg-slate-900 text-slate-100 flex flex-col md:flex-row antialiased selection:bg-indigo-500 selection:text-white">
+<body class="min-h-full bg-slate-900 text-slate-100 flex flex-col md:flex-row antialiased selection:bg-indigo-500 selection:text-white font-sans">
+  
   <!-- Desktop Sidebar -->
-  <aside class="w-64 bg-slate-950 border-r border-slate-800 p-6 flex flex-col justify-between hidden md:flex min-h-screen">
+  <aside class="w-64 bg-slate-950 border-r border-slate-800 p-5 flex flex-col justify-between hidden md:flex min-h-screen sticky top-0 h-screen overflow-y-auto">
     <div class="space-y-6">
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center font-black text-white text-xs">
+      <div class="flex items-center gap-3 px-1">
+        <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center font-black text-white text-xs shadow-md shadow-indigo-600/30">
           ADM
         </div>
         <div>
-          <span class="font-extrabold text-sm text-white tracking-tight">Admin Console</span>
-          <span class="block text-[10px] text-emerald-400 font-mono">● Cloudflare Production</span>
+          <span class="font-extrabold text-sm text-white tracking-tight block">Admin Console</span>
+          <span class="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Production D1/R2
+          </span>
         </div>
       </div>
 
-      <nav class="space-y-1" aria-label="Admin Navigation">
-        {navItems.map((item) => (
-          <a
-            href={item.href}
-            class={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-              activeNav === item.id
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
-            }`}
-          >
-            <span>{item.icon}</span>
-            <span>{item.name}</span>
-          </a>
+      <nav class="space-y-5" aria-label="Admin Navigation">
+        {navGroups.map((group) => (
+          <div class="space-y-1">
+            <div class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              {group.title}
+            </div>
+            {group.items.map((item) => (
+              <a
+                href={item.href}
+                class={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                  activeNav === item.id
+                    ? 'bg-indigo-600 text-white shadow-sm font-bold'
+                    : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                }`}
+              >
+                <span>{item.icon}</span>
+                <span>{item.name}</span>
+              </a>
+            ))}
+          </div>
         ))}
       </nav>
     </div>
 
-    <!-- Back to user dashboard & logout -->
-    <div class="pt-6 border-t border-slate-800 space-y-2 text-xs">
-      <a href="/dashboard" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white">
-        <span>&larr;</span> User Dashboard
+    <!-- User & Sign Out Footer -->
+    <div class="pt-4 border-t border-slate-800 space-y-2 text-xs">
+      <a href="/dashboard" class="flex items-center gap-2 px-3 py-1.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition-colors">
+        <span>&larr;</span> User Workspace
       </a>
-      <div class="px-3.5 py-1 text-[11px] text-slate-400 truncate">
+      <div class="px-3 py-1 text-[11px] text-slate-400 truncate">
         {user.name || user.email}
       </div>
       <button
         type="button"
         id="admin-logout-btn"
-        class="w-full flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 font-bold transition-colors cursor-pointer text-xs"
+        class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 font-bold transition-colors cursor-pointer text-xs"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -103,12 +147,16 @@ const navItems = [
   </aside>
 
   <!-- Mobile Top Bar -->
-  <div class="md:hidden bg-slate-950 border-b border-slate-800 p-4 flex items-center justify-between">
+  <div class="md:hidden bg-slate-950 border-b border-slate-800 p-4 flex items-center justify-between sticky top-0 z-40">
     <div class="flex items-center gap-2">
-      <span class="font-bold text-xs text-white">Platform Admin</span>
+      <div class="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white text-xs">
+        ADM
+      </div>
+      <span class="font-bold text-xs text-white">Business Center</span>
     </div>
     <div class="flex items-center gap-2 text-xs">
-      <a href="/dashboard" class="p-2 rounded-lg bg-slate-900 text-slate-300">Dashboard</a>
+      <a href="/admin" class="p-2 rounded-lg bg-slate-900 text-slate-300">Overview</a>
+      <a href="/admin/users" class="p-2 rounded-lg bg-slate-900 text-slate-300">Users</a>
       <button
         type="button"
         id="admin-mobile-logout-btn"
@@ -120,7 +168,7 @@ const navItems = [
   </div>
 
   <!-- Main Content Area -->
-  <main class="flex-1 p-6 md:p-10 max-w-7xl w-full mx-auto space-y-8 overflow-y-auto">
+  <main class="flex-1 p-5 sm:p-8 lg:p-10 max-w-7xl w-full mx-auto space-y-8 overflow-y-auto">
     <slot />
   </main>
 

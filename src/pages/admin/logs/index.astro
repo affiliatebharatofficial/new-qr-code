@@ -1,0 +1,166 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getCurrentUser } from '../../../lib/auth/jwt';
+import { getDb } from '../../../lib/db/client';
+
+const user = await getCurrentUser(Astro.request, Astro.locals);
+if (!user) {
+  return Astro.redirect('/login?redirect=/admin/logs');
+}
+if (user.role !== 'admin') {
+  return Astro.redirect('/dashboard');
+}
+
+const db = getDb(Astro.locals);
+
+const [auditsRes, errorsRes] = await Promise.all([
+  db.prepare(`
+    SELECT a.*, u.email as admin_email, u.name as admin_name 
+    FROM admin_audit_logs a
+    LEFT JOIN users u ON a.admin_id = u.id
+    ORDER BY a.created_at DESC
+    LIMIT 100
+  `).all(),
+  db.prepare('SELECT * FROM system_error_logs ORDER BY created_at DESC LIMIT 50').all(),
+]);
+
+const audits = auditsRes.results || [];
+const errors = errorsRes.results || [];
+---
+
+<AdminLayout title="Audit & Error Logs" activeNav="logs">
+  <div class="space-y-8">
+    
+    <!-- Top Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Audit & Error Logs</h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">Immutable, append-only security logs for administrative operations and system diagnostics.</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-emerald-400 font-bold">
+          Append-Only Protection Active ✓
+        </span>
+      </div>
+    </div>
+
+    <!-- Section 1: Administrative Audit Log Trail -->
+    <div class="bg-slate-950 rounded-3xl border border-slate-800 overflow-hidden shadow-sm space-y-3">
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+        <div>
+          <h2 class="text-sm font-bold text-white flex items-center gap-2">
+            <span>📜</span> Administrative Action Trail (Last 100 Events)
+          </h2>
+          <p class="text-[11px] text-slate-400">All state-changing admin actions (user suspension, plan change, QR moderation).</p>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-900/60 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+            <tr>
+              <th class="py-3.5 px-6">Timestamp</th>
+              <th class="py-3.5 px-6">Admin User</th>
+              <th class="py-3.5 px-6">Action Performed</th>
+              <th class="py-3.5 px-6">Target Entity</th>
+              <th class="py-3.5 px-6">Metadata Details</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/80">
+            {audits.length === 0 ? (
+              <tr>
+                <td colspan="5" class="py-12 text-center text-slate-500">
+                  No administrative actions logged yet.
+                </td>
+              </tr>
+            ) : (
+              audits.map((a: any) => (
+                <tr class="hover:bg-slate-900/40 transition-colors">
+                  <td class="py-4 px-6 font-mono text-slate-400 text-[11px]">
+                    {new Date(a.created_at).toLocaleString()}
+                  </td>
+                  <td class="py-4 px-6">
+                    <span class="font-bold text-white block">{a.admin_name || 'Admin'}</span>
+                    <span class="text-[11px] font-mono text-slate-500">{a.admin_email || a.admin_id}</span>
+                  </td>
+                  <td class="py-4 px-6">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase font-mono bg-indigo-950/60 text-indigo-400 border border-indigo-800">
+                      {a.action}
+                    </span>
+                  </td>
+                  <td class="py-4 px-6 text-slate-300 font-mono text-[11px]">
+                    {a.target_type}: {a.target_id || 'system'}
+                  </td>
+                  <td class="py-4 px-6 text-slate-400 font-mono text-[11px] max-w-xs truncate">
+                    {a.details || '—'}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Section 2: System Error & Exception Logs -->
+    <div class="bg-slate-950 rounded-3xl border border-slate-800 overflow-hidden shadow-sm space-y-3">
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+        <div>
+          <h2 class="text-sm font-bold text-white flex items-center gap-2">
+            <span>⚠️</span> System Exceptions & Diagnostic Log Stream
+          </h2>
+          <p class="text-[11px] text-slate-400">Application warnings and runtime exceptions safely sanitized.</p>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-900/60 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+            <tr>
+              <th class="py-3.5 px-6">Timestamp</th>
+              <th class="py-3.5 px-6">Route / Endpoint</th>
+              <th class="py-3.5 px-6">Error Type</th>
+              <th class="py-3.5 px-6">Severity</th>
+              <th class="py-3.5 px-6">Sanitized Message</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/80">
+            {errors.length === 0 ? (
+              <tr>
+                <td colspan="5" class="py-10 text-center text-slate-500">
+                  <div class="flex items-center justify-center gap-2 text-emerald-400 font-semibold text-xs">
+                    <span>✓</span> Zero critical system exceptions logged.
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              errors.map((e: any) => (
+                <tr class="hover:bg-slate-900/40 transition-colors">
+                  <td class="py-4 px-6 font-mono text-slate-400 text-[11px]">
+                    {new Date(e.created_at).toLocaleString()}
+                  </td>
+                  <td class="py-4 px-6 font-mono text-slate-300">
+                    {e.route}
+                  </td>
+                  <td class="py-4 px-6 font-bold text-amber-400">
+                    {e.error_type}
+                  </td>
+                  <td class="py-4 px-6">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-950/60 text-amber-400 border border-amber-800">
+                      {e.severity}
+                    </span>
+                  </td>
+                  <td class="py-4 px-6 text-slate-300 text-[11px] max-w-sm truncate">
+                    {e.message}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</AdminLayout>

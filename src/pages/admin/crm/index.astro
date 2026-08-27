@@ -1,0 +1,470 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getCurrentUser } from '../../../lib/auth/jwt';
+import { getDb } from '../../../lib/db/client';
+
+const user = await getCurrentUser(Astro.request, Astro.locals);
+if (!user) {
+  return Astro.redirect('/login?redirect=/admin/crm');
+}
+if (user.role !== 'admin') {
+  return Astro.redirect('/dashboard');
+}
+
+const url = new URL(Astro.request.url);
+const statusFilter = url.searchParams.get('status') || 'all';
+
+const db = getDb(Astro.locals);
+
+let query = `
+  SELECT c.*, COUNT(n.id) as notes_count 
+  FROM crm_contacts c
+  LEFT JOIN crm_notes n ON c.id = n.contact_id
+`;
+const params: any[] = [];
+
+if (statusFilter !== 'all') {
+  query += ' WHERE c.status = ?';
+  params.push(statusFilter);
+}
+
+query += ' GROUP BY c.id ORDER BY c.created_at DESC LIMIT 100';
+
+const [contactsRes, statusCountsRes, usersRes] = await Promise.all([
+  db.prepare(query).bind(...params).all(),
+  db.prepare('SELECT status, COUNT(*) as count FROM crm_contacts GROUP BY status').all(),
+  db.prepare('SELECT id, email, name, plan FROM users ORDER BY created_at DESC LIMIT 50').all(),
+]);
+
+const contacts = contactsRes.results || [];
+const registeredUsers = usersRes.results || [];
+
+const counts: Record<string, number> = {};
+(statusCountsRes.results || []).forEach((row: any) => {
+  counts[row.status] = row.count;
+});
+
+const totalContacts = Object.values(counts).reduce((a, b) => a + b, 0);
+---
+
+<AdminLayout title="Internal CRM Pipeline" activeNav="crm">
+  <div class="space-y-8">
+    
+    <!-- Top Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Internal CRM Pipeline</h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">Manage inbound business inquiries, enterprise prospects, and high-value customer accounts.</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          id="btn-open-create-contact"
+          class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer"
+        >
+          <span>+</span> New Lead / Prospect
+        </button>
+      </div>
+    </div>
+
+    <!-- Pipeline Status Filters -->
+    <div class="flex flex-wrap items-center gap-2 border-b border-slate-800 pb-4 text-xs font-semibold">
+      <a
+        href="/admin/crm?status=all"
+        class={`px-3 py-1.5 rounded-xl transition-colors ${
+          statusFilter === 'all' ? 'bg-indigo-600 text-white font-bold' : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+        }`}
+      >
+        All Contacts ({totalContacts})
+      </a>
+      <a
+        href="/admin/crm?status=lead"
+        class={`px-3 py-1.5 rounded-xl transition-colors ${
+          statusFilter === 'lead' ? 'bg-blue-600 text-white font-bold' : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+        }`}
+      >
+        Leads ({counts['lead'] || 0})
+      </a>
+      <a
+        href="/admin/crm?status=trial"
+        class={`px-3 py-1.5 rounded-xl transition-colors ${
+          statusFilter === 'trial' ? 'bg-amber-600 text-white font-bold' : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+        }`}
+      >
+        Trials ({counts['trial'] || 0})
+      </a>
+      <a
+        href="/admin/crm?status=active"
+        class={`px-3 py-1.5 rounded-xl transition-colors ${
+          statusFilter === 'active' ? 'bg-emerald-600 text-white font-bold' : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+        }`}
+      >
+        Active Customers ({counts['active'] || 0})
+      </a>
+      <a
+        href="/admin/crm?status=at_risk"
+        class={`px-3 py-1.5 rounded-xl transition-colors ${
+          statusFilter === 'at_risk' ? 'bg-red-600 text-white font-bold' : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+        }`}
+      >
+        At Risk ({counts['at_risk'] || 0})
+      </a>
+      <a
+        href="/admin/crm?status=churned"
+        class={`px-3 py-1.5 rounded-xl transition-colors ${
+          statusFilter === 'churned' ? 'bg-slate-700 text-white font-bold' : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+        }`}
+      >
+        Churned ({counts['churned'] || 0})
+      </a>
+    </div>
+
+    <!-- CRM Contacts Table -->
+    <div class="bg-slate-950 rounded-3xl border border-slate-800 overflow-hidden shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-900/60 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+            <tr>
+              <th class="py-3.5 px-6">Name & Company</th>
+              <th class="py-3.5 px-6">Email Address</th>
+              <th class="py-3.5 px-6">Pipeline Status</th>
+              <th class="py-3.5 px-6">Plan Tier</th>
+              <th class="py-3.5 px-6">Source</th>
+              <th class="py-3.5 px-6">Notes</th>
+              <th class="py-3.5 px-6">Created</th>
+              <th class="py-3.5 px-6 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/80">
+            {contacts.length === 0 ? (
+              <tr>
+                <td colspan="8" class="py-12 text-center text-slate-500">
+                  <div class="space-y-2">
+                    <div class="text-2xl">💼</div>
+                    <p class="font-semibold text-slate-400">No CRM contacts found in this pipeline filter.</p>
+                    <p class="text-xs text-slate-600">Click "+ New Lead / Prospect" above to add enterprise leads or high-value accounts.</p>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              contacts.map((c: any) => (
+                <tr class="hover:bg-slate-900/40 transition-colors">
+                  <td class="py-4 px-6">
+                    <span class="font-bold text-white block">{c.name}</span>
+                    <span class="text-[11px] text-slate-400">{c.company || 'Individual'}</span>
+                  </td>
+                  <td class="py-4 px-6 font-mono text-slate-300">
+                    <a href={`mailto:${c.email}`} class="hover:text-indigo-400 hover:underline">
+                      {c.email}
+                    </a>
+                  </td>
+                  <td class="py-4 px-6">
+                    <span class={`px-2.5 py-1 rounded text-[10px] font-bold uppercase ${
+                      c.status === 'active' || c.status === 'customer' ? 'bg-emerald-900/50 text-emerald-300' :
+                      c.status === 'lead' ? 'bg-blue-900/50 text-blue-300' :
+                      c.status === 'trial' ? 'bg-amber-900/50 text-amber-300' :
+                      c.status === 'at_risk' ? 'bg-red-900/50 text-red-300' :
+                      'bg-slate-800 text-slate-400'
+                    }`}>
+                      {c.status}
+                    </span>
+                  </td>
+                  <td class="py-4 px-6">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-800 text-slate-300">
+                      {c.plan}
+                    </span>
+                  </td>
+                  <td class="py-4 px-6 text-slate-400 capitalize text-[11px]">
+                    {c.source.replace('_', ' ')}
+                  </td>
+                  <td class="py-4 px-6 font-mono text-[11px] text-slate-400">
+                    {c.notes_count} notes
+                  </td>
+                  <td class="py-4 px-6 text-slate-500 font-mono text-[11px]">
+                    {new Date(c.created_at).toLocaleDateString()}
+                  </td>
+                  <td class="py-4 px-6 text-right">
+                    <button
+                      type="button"
+                      class="btn-open-note-modal px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-indigo-400 text-xs font-semibold cursor-pointer transition-colors"
+                      data-contact-id={c.id}
+                      data-contact-name={c.name}
+                    >
+                      + Add Note
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal 1: Create CRM Contact -->
+  <div id="create-contact-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h3 class="text-lg font-bold text-white">Create CRM Lead / Contact</h3>
+          <p class="text-xs text-slate-400">Add an enterprise inquiry, agency partner, or key prospect.</p>
+        </div>
+        <button type="button" id="btn-close-contact-modal" class="text-slate-400 hover:text-white text-lg cursor-pointer">&times;</button>
+      </div>
+
+      <form id="create-contact-form" class="space-y-4" onsubmit="return false;">
+        <div id="contact-form-feedback" class="hidden p-3 rounded-lg text-xs"></div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Contact Name *</label>
+            <input type="text" id="contact-name-input" required placeholder="John Doe" class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Email Address *</label>
+            <input type="email" id="contact-email-input" required placeholder="john@enterprise.com" class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Company / Organization</label>
+            <input type="text" id="contact-company-input" placeholder="Acme Inc." class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Pipeline Status</label>
+            <select id="contact-status-select" class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium">
+              <option value="lead">Lead</option>
+              <option value="trial">Trial</option>
+              <option value="active">Active Customer</option>
+              <option value="at_risk">At Risk</option>
+              <option value="churned">Churned</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Plan Interest</label>
+            <select id="contact-plan-select" class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium">
+              <option value="free">Free</option>
+              <option value="pro">Pro ($9/mo)</option>
+              <option value="business">Business ($29/mo)</option>
+              <option value="enterprise">Enterprise ($79/mo)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Segment Tag</label>
+            <select id="contact-tag-select" class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium">
+              <option value="High Value">High Value</option>
+              <option value="Enterprise Lead">Enterprise Lead</option>
+              <option value="Agency">Agency</option>
+              <option value="Restaurant">Restaurant</option>
+              <option value="Retail">Retail</option>
+              <option value="Marketing">Marketing</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-800">
+          <button
+            type="button"
+            id="btn-cancel-contact-modal"
+            class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            id="btn-submit-contact"
+            class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm cursor-pointer"
+          >
+            Save Contact
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: Add Internal Note -->
+  <div id="add-note-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 sm:p-8 space-y-6 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h3 class="text-lg font-bold text-white" id="note-modal-title">Add Internal Admin Note</h3>
+          <p class="text-xs text-slate-400">Notes are strictly internal and never visible to customers.</p>
+        </div>
+        <button type="button" id="btn-close-note-modal" class="text-slate-400 hover:text-white text-lg cursor-pointer">&times;</button>
+      </div>
+
+      <form id="add-note-form" class="space-y-4" onsubmit="return false;">
+        <input type="hidden" id="note-contact-id" />
+        <div id="note-form-feedback" class="hidden p-3 rounded-lg text-xs"></div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Note Content *</label>
+          <textarea id="note-text-input" rows="4" placeholder="Enter call notes, requirements, discount terms, or next steps..." class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-800">
+          <button
+            type="button"
+            id="btn-cancel-note-modal"
+            class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            id="btn-submit-note"
+            class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm cursor-pointer"
+          >
+            Save Note
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</AdminLayout>
+
+<script>
+  // Modal 1: Create Contact
+  const contactModal = document.getElementById('create-contact-modal');
+  const btnOpenContact = document.getElementById('btn-open-create-contact');
+  const btnCloseContact = document.getElementById('btn-close-contact-modal');
+  const btnCancelContact = document.getElementById('btn-cancel-contact-modal');
+  const btnSubmitContact = document.getElementById('btn-submit-contact') as HTMLButtonElement;
+  const contactFeedback = document.getElementById('contact-form-feedback');
+
+  const openContactModal = () => {
+    contactFeedback?.classList.add('hidden');
+    contactModal?.classList.remove('hidden');
+    contactModal?.classList.add('flex');
+  };
+  const closeContactModal = () => {
+    contactModal?.classList.add('hidden');
+    contactModal?.classList.remove('flex');
+  };
+
+  btnOpenContact?.addEventListener('click', openContactModal);
+  btnCloseContact?.addEventListener('click', closeContactModal);
+  btnCancelContact?.addEventListener('click', closeContactModal);
+
+  btnSubmitContact?.addEventListener('click', async () => {
+    const name = (document.getElementById('contact-name-input') as HTMLInputElement)?.value;
+    const email = (document.getElementById('contact-email-input') as HTMLInputElement)?.value;
+    const company = (document.getElementById('contact-company-input') as HTMLInputElement)?.value;
+    const status = (document.getElementById('contact-status-select') as HTMLSelectElement)?.value;
+    const plan = (document.getElementById('contact-plan-select') as HTMLSelectElement)?.value;
+    const tag = (document.getElementById('contact-tag-select') as HTMLSelectElement)?.value;
+
+    if (!name || !email) {
+      alert('Please provide contact name and email.');
+      return;
+    }
+
+    btnSubmitContact.disabled = true;
+    btnSubmitContact.innerText = 'Saving...';
+
+    try {
+      const res = await fetch('/api/admin/crm/contacts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, company, status, plan, tag }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || 'Failed to create contact.');
+
+      if (contactFeedback) {
+        contactFeedback.className = 'p-3 rounded-lg text-xs bg-emerald-950/40 border border-emerald-800 text-emerald-300 font-medium block';
+        contactFeedback.innerText = '✓ Lead created successfully!';
+      }
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 800);
+    } catch (err: any) {
+      if (contactFeedback) {
+        contactFeedback.className = 'p-3 rounded-lg text-xs bg-red-950/40 border border-red-800 text-red-300 font-medium block';
+        contactFeedback.innerText = `✗ ${err.message || 'Error saving contact.'}`;
+      }
+      btnSubmitContact.disabled = false;
+      btnSubmitContact.innerText = 'Save Contact';
+    }
+  });
+
+  // Modal 2: Add Internal Note
+  const noteModal = document.getElementById('add-note-modal');
+  const noteContactIdInput = document.getElementById('note-contact-id') as HTMLInputElement;
+  const noteTextInput = document.getElementById('note-text-input') as HTMLTextAreaElement;
+  const btnCloseNote = document.getElementById('btn-close-note-modal');
+  const btnCancelNote = document.getElementById('btn-cancel-note-modal');
+  const btnSubmitNote = document.getElementById('btn-submit-note') as HTMLButtonElement;
+  const noteFeedback = document.getElementById('note-form-feedback');
+
+  document.querySelectorAll('.btn-open-note-modal').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const contactId = btn.getAttribute('data-contact-id') || '';
+      const contactName = btn.getAttribute('data-contact-name') || '';
+
+      if (noteContactIdInput) noteContactIdInput.value = contactId;
+      const titleEl = document.getElementById('note-modal-title');
+      if (titleEl) titleEl.innerText = `Add Note for ${contactName}`;
+
+      noteFeedback?.classList.add('hidden');
+      if (noteTextInput) noteTextInput.value = '';
+      noteModal?.classList.remove('hidden');
+      noteModal?.classList.add('flex');
+    });
+  });
+
+  const closeNoteModal = () => {
+    noteModal?.classList.add('hidden');
+    noteModal?.classList.remove('flex');
+  };
+  btnCloseNote?.addEventListener('click', closeNoteModal);
+  btnCancelNote?.addEventListener('click', closeNoteModal);
+
+  btnSubmitNote?.addEventListener('click', async () => {
+    const contactId = noteContactIdInput?.value;
+    const note = noteTextInput?.value;
+
+    if (!contactId || !note) {
+      alert('Please enter note text.');
+      return;
+    }
+
+    btnSubmitNote.disabled = true;
+    btnSubmitNote.innerText = 'Saving...';
+
+    try {
+      const res = await fetch('/api/admin/crm/notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contactId, note }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || 'Failed to save note.');
+
+      if (noteFeedback) {
+        noteFeedback.className = 'p-3 rounded-lg text-xs bg-emerald-950/40 border border-emerald-800 text-emerald-300 font-medium block';
+        noteFeedback.innerText = '✓ Internal note recorded successfully!';
+      }
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 800);
+    } catch (err: any) {
+      if (noteFeedback) {
+        noteFeedback.className = 'p-3 rounded-lg text-xs bg-red-950/40 border border-red-800 text-red-300 font-medium block';
+        noteFeedback.innerText = `✗ ${err.message || 'Error recording note.'}`;
+      }
+      btnSubmitNote.disabled = false;
+      btnSubmitNote.innerText = 'Save Note';
+    }
+  });
+</script>

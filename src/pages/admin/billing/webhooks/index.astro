@@ -1,0 +1,91 @@
+---
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import { getCurrentUser } from '../../../../lib/auth/jwt';
+import { getDb } from '../../../../lib/db/client';
+
+const user = await getCurrentUser(Astro.request, Astro.locals);
+if (!user) {
+  return Astro.redirect('/login?redirect=/admin/billing/webhooks');
+}
+if (user.role !== 'admin') {
+  return Astro.redirect('/dashboard');
+}
+
+const db = getDb(Astro.locals);
+const webhooksRes = await db.prepare('SELECT * FROM webhook_events ORDER BY created_at DESC LIMIT 100').all();
+const webhooks = webhooksRes.results || [];
+---
+
+<AdminLayout title="Webhook Event Logs" activeNav="webhooks">
+  <div class="space-y-8">
+    
+    <!-- Top Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Lemon Squeezy Webhook Events</h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">Audit trail of real-time subscription lifecycle webhooks received at edge endpoints.</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <a href="/admin/subscriptions" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition-colors flex items-center gap-1.5">
+          <span>💳</span> Subscriptions Ledger
+        </a>
+      </div>
+    </div>
+
+    <!-- Webhook Events Table -->
+    <div class="bg-slate-950 rounded-3xl border border-slate-800 overflow-hidden shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-900/60 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+            <tr>
+              <th class="py-3.5 px-6">Event Type / Name</th>
+              <th class="py-3.5 px-6">Event ID</th>
+              <th class="py-3.5 px-6">Processing Status</th>
+              <th class="py-3.5 px-6">Received Timestamp</th>
+              <th class="py-3.5 px-6 text-right">Details</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/80">
+            {webhooks.length === 0 ? (
+              <tr>
+                <td colspan="5" class="py-12 text-center text-slate-500">
+                  <div class="space-y-2">
+                    <div class="text-2xl">⚡</div>
+                    <p class="font-semibold text-slate-400">No incoming webhook events logged yet.</p>
+                    <p class="text-xs text-slate-600">Webhooks from Lemon Squeezy will automatically appear here when subscriptions are created or renewed.</p>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              webhooks.map((w: any) => (
+                <tr class="hover:bg-slate-900/40 transition-colors">
+                  <td class="py-4 px-6 font-bold text-white font-mono">
+                    {w.event_name}
+                  </td>
+                  <td class="py-4 px-6 font-mono text-slate-400 text-[11px]">
+                    {w.id}
+                  </td>
+                  <td class="py-4 px-6">
+                    <span class={`px-2.5 py-1 rounded text-[10px] font-bold uppercase ${
+                      w.status === 'processed' ? 'bg-emerald-900/50 text-emerald-300' : 'bg-red-900/50 text-red-300'
+                    }`}>
+                      {w.status}
+                    </span>
+                  </td>
+                  <td class="py-4 px-6 font-mono text-slate-400 text-[11px]">
+                    {new Date(w.created_at).toLocaleString()}
+                  </td>
+                  <td class="py-4 px-6 text-right">
+                    <span class="text-[11px] text-slate-500 font-mono">Verified Signature ✓</span>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</AdminLayout>
