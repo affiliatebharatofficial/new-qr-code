@@ -17,7 +17,7 @@ if (!isValidLocale(lang) || lang === DEFAULT_LOCALE) {
   return Astro.redirect('/');
 }
 
-const currentSlug = slug || '';
+const currentSlug = (slug || '').replace(/^\/+|\/+$/g, '');
 const currentLocale = lang as Locale;
 
 const isSizeCalculator = currentSlug === 'qr-code-size-calculator';
