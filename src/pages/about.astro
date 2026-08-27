@@ -1,0 +1,164 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const breadcrumbs = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://freeqrcode-generator.com/' },
+    { '@type': 'ListItem', position: 2, name: 'About Us', item: 'https://freeqrcode-generator.com/about' },
+  ],
+};
+
+const aboutJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  name: 'About Free QR Code Generator',
+  description: 'About Free QR Code Generator, our mission, zero-storage client-side privacy architecture, and operations powered by FK DIGITAL MEDIA.',
+  publisher: {
+    '@type': 'Organization',
+    name: 'FK DIGITAL MEDIA',
+    url: 'https://freeqrcode-generator.com',
+    contactPoint: {
+      '@type': 'ContactPoint',
+      email: 'support@freeqrcode-generator.com',
+      contactType: 'Customer Support',
+    },
+  },
+};
+---
+
+<BaseLayout
+  title="About Us — Free QR Code Generator | Powered by FK DIGITAL MEDIA"
+  description="Learn about Free QR Code Generator, our zero-storage client-side privacy architecture, commercial vector SVG exports, and mission powered by FK DIGITAL MEDIA."
+  jsonLd={[breadcrumbs, aboutJsonLd]}
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-12">
+    
+    <!-- Hero Header -->
+    <div class="text-center space-y-4 max-w-2xl mx-auto">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+        <span>🚀</span> About Our Mission
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+        Empowering Seamless Connections with Instant, Private QR Codes
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <strong>Free QR Code Generator</strong> is a modern, high-performance digital connectivity platform engineered to provide individuals, restaurants, and global brands with enterprise-grade QR code generation without subscription paywalls or privacy trade-offs.
+      </p>
+    </div>
+
+    <!-- Powered by FK DIGITAL MEDIA Highlight Card -->
+    <div class="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-950 border border-indigo-500/30 text-white shadow-xl space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <span class="text-[10px] uppercase font-bold tracking-widest text-indigo-400">Organization &amp; Publishing</span>
+          <h2 class="text-xl sm:text-2xl font-black tracking-tight">Powered by FK DIGITAL MEDIA</h2>
+        </div>
+        <a
+          href="mailto:support@freeqrcode-generator.com"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-md transition-all shrink-0"
+        >
+          <span>✉️</span> support@freeqrcode-generator.com
+        </a>
+      </div>
+      <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+        Operated and maintained by <strong>FK DIGITAL MEDIA</strong>, our platform delivers sub-millisecond barcode rendering, edge-routed dynamic campaigns, and comprehensive digital business solutions built on cutting-edge serverless infrastructure.
+      </p>
+    </div>
+
+    <!-- Core Technology Pillars -->
+    <div class="space-y-6">
+      <div class="text-center space-y-1">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Why Free QR Code Generator?</h2>
+        <p class="text-xs text-slate-500">The four foundational pillars of our platform architecture.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Pillar 1 -->
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-2.5">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-black text-lg">
+            🔒
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white">1. Zero-Storage Client-Side Privacy</h3>
+          <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            Unlike legacy generator tools that log your URLs and text onto remote servers, our static generator runs 100% locally in your browser using HTML5 Canvas and Web Cryptography. Your confidential Wi-Fi passwords, vCards, and notes never touch external disks.
+          </p>
+        </div>
+
+        <!-- Pillar 2 -->
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-2.5">
+          <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-black text-lg">
+            📐
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white">2. High-Resolution Vector &amp; SVG Exports</h3>
+          <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            Every QR code generated on our platform can be instantly exported in crystal-clear Scalable Vector Graphics (SVG) or up to 4000x4000 300 DPI PNG, guaranteeing flawless optical scannability across billboards, packaging, and acrylic tabletop stands.
+          </p>
+        </div>
+
+        <!-- Pillar 3 -->
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-2.5">
+          <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center font-black text-lg">
+            ⚡
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white">3. Cloudflare Edge-Routed Dynamic QRs</h3>
+          <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            Need to change your target destination after printing flyers? Our dynamic QR system lets you update destination URLs in milliseconds with real-time scan analytics, country breakdown, and device telemetry powered by Cloudflare Workers.
+          </p>
+        </div>
+
+        <!-- Pillar 4 -->
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-2.5">
+          <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center font-black text-lg">
+            🌐
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white">4. 7 Global Languages &amp; Universal Access</h3>
+          <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            Our platform provides native multilingual support across English, Spanish, German, French, Portuguese, Italian, and Hindi, making digital QR utilities truly universal and accessible across international markets.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Official Contacts & Desk -->
+    <div class="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+      <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">Official Communications &amp; Support</h2>
+      <p class="text-xs text-slate-500">Connect directly with our dedicated teams:</p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/60 space-y-1">
+          <span class="font-bold text-slate-900 dark:text-white block">Customer Support</span>
+          <a href="mailto:support@freeqrcode-generator.com" class="text-indigo-600 dark:text-indigo-400 font-mono hover:underline break-all">
+            support@freeqrcode-generator.com
+          </a>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/60 space-y-1">
+          <span class="font-bold text-slate-900 dark:text-white block">Legal &amp; Compliance</span>
+          <a href="mailto:legal@freeqrcode-generator.com" class="text-purple-600 dark:text-purple-400 font-mono hover:underline break-all">
+            legal@freeqrcode-generator.com
+          </a>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/60 space-y-1">
+          <span class="font-bold text-slate-900 dark:text-white block">Security &amp; Abuse</span>
+          <a href="mailto:abuse@freeqrcode-generator.com" class="text-red-600 dark:text-red-400 font-mono hover:underline break-all">
+            abuse@freeqrcode-generator.com
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Call to action -->
+    <div class="text-center pt-4 space-y-3">
+      <a
+        href="/"
+        class="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl font-bold text-xs sm:text-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/25 transition-all"
+      >
+        <span>+</span> Create Your First QR Code Now &rarr;
+      </a>
+    </div>
+
+  </div>
+</BaseLayout>

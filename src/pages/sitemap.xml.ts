@@ -40,7 +40,8 @@ export const GET: APIRoute = async () => {
     { path: 'guides/how-to-create-a-wifi-qr-code', priority: '0.7', changefreq: 'monthly' },
     { path: 'guides/how-to-create-a-vcard-qr-code', priority: '0.7', changefreq: 'monthly' },
     { path: 'guides/how-to-use-qr-codes-for-restaurants', priority: '0.7', changefreq: 'monthly' },
-    // Legal & Support
+    // Legal & Support & Company
+    { path: 'about', priority: '0.7', changefreq: 'monthly' },
     { path: 'privacy', priority: '0.5', changefreq: 'monthly' },
     { path: 'terms', priority: '0.5', changefreq: 'monthly' },
     { path: 'disclaimer', priority: '0.5', changefreq: 'monthly' },

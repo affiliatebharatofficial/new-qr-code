@@ -55,12 +55,13 @@ License: Free for personal and commercial usage with lifetime validity
 - [Italian (Italiano)](https://freeqrcode-generator.com/it): Generatore QR Code Gratis
 - [Hindi (हिन्दी)](https://freeqrcode-generator.com/hi): मुफ़्त क्यूआर कोड जेनरेटर
 
-## Legal & Compliance
+## Legal, Company & Support
 
+- [About Us](https://freeqrcode-generator.com/about): Mission, zero-storage client-side privacy architecture, and operations powered by FK DIGITAL MEDIA.
 - [Privacy Policy](https://freeqrcode-generator.com/privacy): Client-side zero-storage architecture, GDPR/CCPA compliance, and privacy guarantee.
 - [Terms of Service](https://freeqrcode-generator.com/terms): Master Service Agreement, IP ownership, and Acceptable Use Policy.
 - [Legal Disclaimer](https://freeqrcode-generator.com/disclaimer): Pre-print scannability proofing clause and nominative payment trademark notices.
-- [Contact & Support](https://freeqrcode-generator.com/contact): Engineering support, legal compliance, and abuse desk.
+- [Contact & Support](https://freeqrcode-generator.com/contact): Engineering support, legal compliance, and abuse desk (Email: support@freeqrcode-generator.com).
 `;
 
 export const GET: APIRoute = async () => {
