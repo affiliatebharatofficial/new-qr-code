@@ -172,10 +172,10 @@ const initialResult = calculatePrintReadiness({
         <!-- Prominent Pixel Grid Output -->
         <div class="space-y-1">
           <div id="print-pixel-output" class="text-3xl sm:text-4xl font-black tracking-tight text-white">
-            {initialResult.rasterPixels.widthPx} × {initialResult.rasterPixels.heightPx} px
+            {initialResult.rasterOutput.widthPx} × {initialResult.rasterOutput.heightPx} px
           </div>
           <div id="print-size-output" class="text-xs sm:text-sm text-slate-300 font-mono">
-            {initialResult.convertedDimensions.widthCm} × {initialResult.convertedDimensions.heightCm} cm ({initialResult.convertedDimensions.widthInches} × {initialResult.convertedDimensions.heightInches} in)
+            {initialResult.physicalDimensions.widthCm} × {initialResult.physicalDimensions.heightCm} cm ({initialResult.physicalDimensions.widthInches} × {initialResult.physicalDimensions.heightInches} in)
           </div>
         </div>
 
@@ -183,11 +183,11 @@ const initialResult = calculatePrintReadiness({
         <div class="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2 text-xs">
           <div class="flex justify-between items-center text-slate-300">
             <span>{t.recommendedDpi}:</span>
-            <span id="print-spec-dpi" class="font-bold text-white font-mono">{initialResult.dpi} DPI</span>
+            <span id="print-spec-dpi" class="font-bold text-white font-mono">{initialResult.rasterOutput.dpi} DPI</span>
           </div>
           <div class="flex justify-between items-center text-slate-300">
             <span>{t.maxScanDistance}:</span>
-            <span id="print-spec-distance" class="font-bold text-indigo-300 font-mono">{initialResult.estimatedMaxScanDistanceM} m</span>
+            <span id="print-spec-distance" class="font-bold text-indigo-300 font-mono">{initialResult.opticalDistance.recommendedMaxDistanceMeters} m</span>
           </div>
           <div class="flex justify-between items-center text-slate-400 text-[11px] pt-1 border-t border-white/5">
             <span>{t.vectorRecommendation}:</span>
@@ -271,22 +271,22 @@ const initialResult = calculatePrintReadiness({
       });
 
       if (pixelOutput) {
-        pixelOutput.textContent = `${result.rasterPixels.widthPx} × ${result.rasterPixels.heightPx} px`;
+        pixelOutput.textContent = `${result.rasterOutput.widthPx} × ${result.rasterOutput.heightPx} px`;
       }
       if (sizeOutput) {
-        sizeOutput.textContent = `${result.convertedDimensions.widthCm} × ${result.convertedDimensions.heightCm} cm (${result.convertedDimensions.widthInches} × ${result.convertedDimensions.heightInches} in)`;
+        sizeOutput.textContent = `${result.physicalDimensions.widthCm} × ${result.physicalDimensions.heightCm} cm (${result.physicalDimensions.widthInches} × ${result.physicalDimensions.heightInches} in)`;
       }
       if (specDpi) {
-        specDpi.textContent = `${result.dpi} DPI`;
+        specDpi.textContent = `${result.rasterOutput.dpi} DPI`;
       }
       if (specDistance) {
-        specDistance.textContent = `${result.estimatedMaxScanDistanceM} m`;
+        specDistance.textContent = `${result.opticalDistance.recommendedMaxDistanceMeters} m`;
       }
       if (readinessBadge) {
-        if (result.dpi >= 300) {
+        if (result.rasterOutput.dpi >= 300) {
           readinessBadge.textContent = 'Print Ready (300+ DPI)';
           readinessBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
-        } else if (result.dpi >= 150) {
+        } else if (result.rasterOutput.dpi >= 150) {
           readinessBadge.textContent = 'Acceptable (150 DPI)';
           readinessBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30';
         } else {
