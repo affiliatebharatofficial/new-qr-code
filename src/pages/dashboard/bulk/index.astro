@@ -80,7 +80,12 @@ const savedTemplates = (templatesRes.results || []).map((t: any) => {
       </div>
     ) : (
       <!-- Bulk Generator Wizard Container -->
-      <div id="bulk-wizard-app" class="space-y-8" data-batch-limit={bulkLimit}>
+      <div
+        id="bulk-wizard-app"
+        class="space-y-8"
+        data-batch-limit={bulkLimit}
+        data-templates={JSON.stringify(savedTemplates)}
+      >
         <!-- Step 1: Upload / Input -->
         <div class="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
@@ -92,11 +97,11 @@ const savedTemplates = (templatesRes.results || []).map((t: any) => {
             <!-- Download Templates Dropdown -->
             <div class="flex items-center gap-2 text-xs">
               <span class="text-slate-400 font-semibold">Sample CSVs:</span>
-              <button type="button" class="sample-csv-btn text-indigo-600 hover:underline font-bold" data-sample="static_url">Static URL</button>
+              <button type="button" class="sample-csv-btn text-indigo-600 hover:underline font-bold cursor-pointer" data-sample="static_url">Static URL</button>
               <span>•</span>
-              <button type="button" class="sample-csv-btn text-indigo-600 hover:underline font-bold" data-sample="dynamic_url">Dynamic URL</button>
+              <button type="button" class="sample-csv-btn text-indigo-600 hover:underline font-bold cursor-pointer" data-sample="dynamic_url">Dynamic URL</button>
               <span>•</span>
-              <button type="button" class="sample-csv-btn text-indigo-600 hover:underline font-bold" data-sample="wifi">Wi-Fi</button>
+              <button type="button" class="sample-csv-btn text-indigo-600 hover:underline font-bold cursor-pointer" data-sample="wifi">Wi-Fi</button>
             </div>
           </div>
 
@@ -122,7 +127,7 @@ const savedTemplates = (templatesRes.results || []).map((t: any) => {
           <div class="space-y-2">
             <div class="flex justify-between items-center text-xs">
               <label for="csv-raw-textarea" class="font-semibold text-slate-600 dark:text-slate-400">Or Paste CSV Text</label>
-              <button type="button" id="clear-csv-btn" class="text-slate-400 hover:text-slate-600">Clear</button>
+              <button type="button" id="clear-csv-btn" class="text-slate-400 hover:text-slate-600 cursor-pointer">Clear</button>
             </div>
             <textarea
               id="csv-raw-textarea"
@@ -278,34 +283,68 @@ const savedTemplates = (templatesRes.results || []).map((t: any) => {
 </DashboardLayout>
 
 <!-- Client Script for CSV Parsing, Rendering, and JSZip Packaging -->
-<script define:vars={{ savedTemplates }}>
-  let validRows = [];
-  let invalidRows = [];
-  let generatedZipPng = null;
-  let generatedZipSvg = null;
+<script>
+  import JSZip from 'jszip';
+  import QRCodeStyling from 'qr-code-styling';
+
+  const appEl = document.getElementById('bulk-wizard-app');
+  let savedTemplates = [];
+  try {
+    savedTemplates = JSON.parse(appEl?.getAttribute('data-templates') || '[]');
+  } catch {
+    savedTemplates = [];
+  }
+
+  let validRows: any[] = [];
+  let invalidRows: any[] = [];
+  let generatedZipPng: Blob | null = null;
+  let generatedZipSvg: Blob | null = null;
 
   const dropzone = document.getElementById('csv-dropzone');
-  const fileInput = document.getElementById('csv-file-input');
-  const textarea = document.getElementById('csv-raw-textarea');
+  const fileInput = document.getElementById('csv-file-input') as HTMLInputElement | null;
+  const textarea = document.getElementById('csv-raw-textarea') as HTMLTextAreaElement | null;
   const clearBtn = document.getElementById('clear-csv-btn');
 
-  // Simple CSV Splitter
-  function parseCSV(text) {
+  function splitLine(line: string): string[] {
+    const result: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') {
+        if (inQuotes && line[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (c === ',' && !inQuotes) {
+        result.push(current.trim());
+        current = '';
+      } else {
+        current += c;
+      }
+    }
+    result.push(current.trim());
+    return result;
+  }
+
+  function parseCSV(text: string) {
     const lines = text.split(/\r?\n/).map((l) => l.trim()).filter((l) => l.length > 0);
     if (lines.length < 2) return { valid: [], invalid: [] };
 
-    const headers = lines[0].split(',').map((h) => h.trim().toLowerCase().replace(/[^a-z0-9]/g, ''));
-    const nameIdx = headers.findIndex((h) => h === 'name' || h === 'title');
+    const headers = splitLine(lines[0]).map((h) => h.toLowerCase().replace(/[^a-z0-9]/g, ''));
+    const nameIdx = headers.findIndex((h) => h === 'name' || h === 'title' || h === 'label');
     const typeIdx = headers.findIndex((h) => h === 'type' || h === 'qrtype');
-    const dataIdx = headers.findIndex((h) => h === 'data' || h === 'url' || h === 'destination' || h === 'payload');
+    const dataIdx = headers.findIndex((h) => h === 'data' || h === 'url' || h === 'destination' || h === 'payload' || h === 'target');
 
     if (dataIdx === -1) return { valid: [], invalid: [] };
 
-    const v = [];
-    const inv = [];
+    const v: any[] = [];
+    const inv: any[] = [];
 
     for (let i = 1; i < lines.length; i++) {
-      const parts = lines[i].split(',').map((p) => p.trim().replace(/^"|"$/g, ''));
+      const parts = splitLine(lines[i]);
       const rowNum = i + 1;
       const name = nameIdx !== -1 && parts[nameIdx] ? parts[nameIdx] : `QR_${rowNum - 1}`;
       const type = typeIdx !== -1 && parts[typeIdx] ? parts[typeIdx].toLowerCase() : 'url';
@@ -320,7 +359,7 @@ const savedTemplates = (templatesRes.results || []).map((t: any) => {
     return { valid: v, invalid: inv };
   }
 
-  function handleCsvContent(content) {
+  function handleCsvContent(content: string) {
     const result = parseCSV(content);
     validRows = result.valid;
     invalidRows = result.invalid;
@@ -357,7 +396,7 @@ const savedTemplates = (templatesRes.results || []).map((t: any) => {
     const tbody = document.getElementById('preview-tbody');
     if (tbody) {
       tbody.innerHTML = '';
-      const allRows = [...validRows, ...invalidRows].slice(0, 50); // Preview up to 50
+      const allRows = [...validRows, ...invalidRows].slice(0, 50);
       for (const r of allRows) {
         const tr = document.createElement('tr');
         tr.className = r.error ? 'bg-red-50/40 dark:bg-red-950/20 text-red-700 dark:text-red-400' : 'hover:bg-slate-50/50';
@@ -379,12 +418,12 @@ const savedTemplates = (templatesRes.results || []).map((t: any) => {
 
   // File Upload Handlers
   dropzone?.addEventListener('click', () => fileInput?.click());
-  fileInput?.addEventListener('change', (e) => {
+  fileInput?.addEventListener('change', (e: any) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (evt) => {
-      const text = evt.target?.result || '';
+      const text = (evt.target?.result as string) || '';
       if (textarea) textarea.value = text;
       handleCsvContent(text);
     };
@@ -422,10 +461,10 @@ const savedTemplates = (templatesRes.results || []).map((t: any) => {
       return;
     }
 
-    const isDynamic = (document.querySelector('input[name="bulk_mode"]:checked'))?.value === 'dynamic';
-    const templateChoice = (document.getElementById('template-select'))?.value || 'classic';
+    const isDynamic = ((document.querySelector('input[name="bulk_mode"]:checked') as HTMLInputElement))?.value === 'dynamic';
+    const templateChoice = ((document.getElementById('template-select') as HTMLSelectElement))?.value || 'classic';
 
-    let chosenStyle = {
+    let chosenStyle: any = {
       colors: { foreground: '#000000', background: '#ffffff' },
       dotType: 'square',
       eyeFrameType: 'square',
@@ -438,7 +477,7 @@ const savedTemplates = (templatesRes.results || []).map((t: any) => {
       chosenStyle = { colors: { foreground: '#059669', background: '#ffffff' }, dotType: 'dots', eyeFrameType: 'circle', eyeDotType: 'circle' };
     } else if (templateChoice.startsWith('custom_')) {
       const tplId = templateChoice.replace('custom_', '');
-      const found = (savedTemplates || []).find((t) => t.id === tplId);
+      const found = (savedTemplates || []).find((t: any) => t.id === tplId);
       if (found && found.styleConfig) chosenStyle = found.styleConfig;
     }
 
@@ -452,7 +491,7 @@ const savedTemplates = (templatesRes.results || []).map((t: any) => {
     const countLabel = document.getElementById('progress-count');
 
     // 1. Submit Job to Server
-    let jobData;
+    let jobData: any;
     try {
       const res = await fetch('/api/bulk', {
         method: 'POST',
@@ -466,7 +505,7 @@ const savedTemplates = (templatesRes.results || []).map((t: any) => {
 
       jobData = await res.json();
       if (!res.ok) throw new Error(jobData.error?.message || 'Bulk creation failed.');
-    } catch (err) {
+    } catch (err: any) {
       alert(err?.message || 'Failed to start bulk job.');
       progressSec?.classList.add('hidden');
       document.getElementById('config-section')?.classList.remove('hidden');
@@ -474,21 +513,18 @@ const savedTemplates = (templatesRes.results || []).map((t: any) => {
     }
 
     // 2. Client-side QR Rendering & ZIP Generation
-    const JSZipModule = await import('jszip');
-    const JSZip = JSZipModule.default;
-    const qrModule = await import('qr-code-styling');
-    const QRCodeStyling = qrModule.default;
-
     const zipPng = new JSZip();
     const zipSvg = new JSZip();
 
     const dotsColor = chosenStyle.colors?.foreground || '#000000';
     const bgColor = chosenStyle.colors?.isTransparent ? 'transparent' : (chosenStyle.colors?.background || '#ffffff');
 
-    for (let i = 0; i < validRows.length; i++) {
-      const row = validRows[i];
-      const cleanName = row.name.replace(/[^a-zA-Z0-9_-]/g, '_') || `qr_${i + 1}`;
-      const payload = row.payload;
+    const returnedQrs = jobData.data?.qrs || validRows;
+
+    for (let i = 0; i < returnedQrs.length; i++) {
+      const row = returnedQrs[i];
+      const cleanName = (row.name || `qr_${i + 1}`).replace(/[^a-zA-Z0-9_-]/g, '_') || `qr_${i + 1}`;
+      const payload = row.payload || validRows[i]?.payload || 'https://freeqrcode-generator.com';
 
       const qr = new QRCodeStyling({
         width: 512,
@@ -502,18 +538,22 @@ const savedTemplates = (templatesRes.results || []).map((t: any) => {
         cornersDotOptions: { type: chosenStyle.eyeDotType || 'square', color: dotsColor },
       });
 
-      // Get PNG blob
-      const rawBlob = await qr.getRawData('png');
-      if (rawBlob) zipPng.file(`${cleanName}.png`, rawBlob);
+      try {
+        // Get PNG blob
+        const rawBlob = await qr.getRawData('png');
+        if (rawBlob) zipPng.file(`${cleanName}.png`, rawBlob);
 
-      // Get SVG blob
-      const rawSvgBlob = await qr.getRawData('svg');
-      if (rawSvgBlob) zipSvg.file(`${cleanName}.svg`, rawSvgBlob);
+        // Get SVG blob
+        const rawSvgBlob = await qr.getRawData('svg');
+        if (rawSvgBlob) zipSvg.file(`${cleanName}.svg`, rawSvgBlob);
+      } catch (renderErr) {
+        console.warn('QR render error for item:', cleanName, renderErr);
+      }
 
-      const progress = Math.round(((i + 1) / validRows.length) * 100);
+      const progress = Math.round(((i + 1) / returnedQrs.length) * 100);
       if (barFill) barFill.style.width = `${progress}%`;
       if (pctLabel) pctLabel.innerText = `${progress}%`;
-      if (countLabel) countLabel.innerText = `${i + 1} / ${validRows.length}`;
+      if (countLabel) countLabel.innerText = `${i + 1} / ${returnedQrs.length}`;
     }
 
     generatedZipPng = await zipPng.generateAsync({ type: 'blob' });
@@ -522,7 +562,7 @@ const savedTemplates = (templatesRes.results || []).map((t: any) => {
     const title = document.getElementById('progress-title');
     const subtitle = document.getElementById('progress-subtitle');
     if (title) title.innerText = '✓ Bulk Generation Complete!';
-    if (subtitle) subtitle.innerText = `Successfully created ${validRows.length} QR codes. Your ZIP downloads are ready.`;
+    if (subtitle) subtitle.innerText = `Successfully created ${returnedQrs.length} QR codes. Your ZIP downloads are ready.`;
 
     document.getElementById('completion-actions')?.classList.remove('hidden');
   });

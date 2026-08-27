@@ -63,22 +63,17 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const now = Date.now();
   const name = (jobName || `Bulk Batch - ${new Date().toLocaleDateString()}`).trim();
 
-  // Create job record
+  // Create job record in bulk_jobs
   await db.prepare(`
     INSERT INTO bulk_jobs (
-      id, user_id, name, type, status, total_items, processed_items, successful_items, failed_items, style_config, created_at, started_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      id, user_id, total_count, processed_count, status, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?)
   `).bind(
     jobId,
     user.id,
-    name,
-    isDynamic ? 'dynamic' : 'static',
-    'processing',
     itemsToProcess.length,
     0,
-    0,
-    0,
-    JSON.stringify(styleConfig),
+    'processing',
     now,
     now
   ).run();
@@ -87,6 +82,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   let failCount = 0;
   const host = request.headers.get('host') || 'freeqrcode-generator.com';
   const proto = request.headers.get('x-forwarded-proto') || 'https';
+  const createdQrs: { id: string; name: string; payload: string; shortCode: string | null }[] = [];
 
   // Process rows
   for (let idx = 0; idx < itemsToProcess.length; idx++) {
@@ -128,40 +124,44 @@ export const POST: APIRoute = async ({ request, locals }) => {
         now
       ).run();
 
-      // Record job item
+      // Record job item in bulk_job_items
       await db.prepare(`
         INSERT INTO bulk_job_items (
-          id, job_id, row_number, name, type, payload, destination, short_code, qr_id, status, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          id, job_id, row_index, name, payload, qr_id, status, error, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).bind(
         `bji_${crypto.randomUUID()}`,
         jobId,
         rowNum,
         itemName,
-        itemType,
         finalPayload,
-        isDynamic ? finalDest : null,
-        shortCode,
         qrId,
         'success',
+        null,
         now
       ).run();
+
+      createdQrs.push({
+        id: qrId,
+        name: itemName,
+        payload: finalPayload,
+        shortCode,
+      });
 
       successCount++;
     } catch (err: any) {
       failCount++;
       await db.prepare(`
         INSERT INTO bulk_job_items (
-          id, job_id, row_number, name, type, payload, destination, status, error, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          id, job_id, row_index, name, payload, qr_id, status, error, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).bind(
         `bji_${crypto.randomUUID()}`,
         jobId,
         rowNum,
         itemName,
-        itemType,
         itemTarget,
-        item.destination || null,
+        null,
         'failed',
         err?.message || 'Database error during QR generation',
         now
@@ -174,21 +174,17 @@ export const POST: APIRoute = async ({ request, locals }) => {
   await db.prepare(`
     UPDATE bulk_jobs SET
       status = 'completed',
-      processed_items = ?,
-      successful_items = ?,
-      failed_items = ?,
-      completed_at = ?
+      processed_count = ?,
+      updated_at = ?
     WHERE id = ?
   `).bind(
-    itemsToProcess.length,
     successCount,
-    failCount,
     completedAt,
     jobId
   ).run();
 
   return jsonSuccess({
-    message: 'Bulk generation completed.',
+    message: 'Bulk generation completed successfully.',
     job: {
       id: jobId,
       name,
@@ -198,5 +194,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
       status: 'completed',
       completedAt,
     },
+    qrs: createdQrs,
   }, 201);
 };
