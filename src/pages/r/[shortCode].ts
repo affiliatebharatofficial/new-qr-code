@@ -74,7 +74,7 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
       return renderStatusPage('QR Code Expired', 'This QR code campaign has expired.', 410);
     }
 
-    let destination = qr.destination || 'https://qrcode.page';
+    let destination = qr.destination || 'https://freeqrcode-generator.com';
     if (!/^https?:\/\//i.test(destination.trim())) {
       destination = `https://${destination.trim()}`;
     }

@@ -47,7 +47,7 @@ describe('Phase 4: Dynamic QR Codes, Redirects & Scan Analytics', () => {
       const qrId = 'qr_dyn_1';
       const shortCode = 'xY78Kq';
       const destination = 'https://example.com/target-page';
-      const redirectUrl = `https://qrcode.page/r/${shortCode}`;
+      const redirectUrl = `https://freeqrcode-generator.com/r/${shortCode}`;
       const now = Date.now();
 
       await db.prepare(`
@@ -81,7 +81,7 @@ describe('Phase 4: Dynamic QR Codes, Redirects & Scan Analytics', () => {
       await db.prepare(`
         INSERT INTO qr_codes (id, user_id, short_code, name, type, destination, payload, is_dynamic, status, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).bind(qrId, userA.id, shortCode, 'Fall Promo', 'url', 'https://example.com/initial', `https://qrcode.page/r/${shortCode}`, 1, 'active', now, now).run();
+      `).bind(qrId, userA.id, shortCode, 'Fall Promo', 'url', 'https://example.com/initial', `https://freeqrcode-generator.com/r/${shortCode}`, 1, 'active', now, now).run();
 
       // Update destination
       await db.prepare(`
@@ -127,7 +127,7 @@ describe('Phase 4: Dynamic QR Codes, Redirects & Scan Analytics', () => {
     });
 
     it('should extract scan context with Cloudflare geolocation fallback', async () => {
-      const mockReq = new Request('https://qrcode.page/r/abc123', {
+      const mockReq = new Request('https://freeqrcode-generator.com/r/abc123', {
         headers: {
           'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0 Safari/537.36',
           'cf-ipcountry': 'US',
@@ -156,7 +156,7 @@ describe('Phase 4: Dynamic QR Codes, Redirects & Scan Analytics', () => {
       await db.prepare(`
         INSERT INTO qr_codes (id, user_id, short_code, name, type, destination, payload, is_dynamic, status, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).bind(qrId, userA.id, shortCode, 'Analytics Test', 'url', 'https://example.com', `https://qrcode.page/r/${shortCode}`, 1, 'active', now, now).run();
+      `).bind(qrId, userA.id, shortCode, 'Analytics Test', 'url', 'https://example.com', `https://freeqrcode-generator.com/r/${shortCode}`, 1, 'active', now, now).run();
 
       // Log 3 scans
       await db.prepare(`
@@ -189,7 +189,7 @@ describe('Phase 4: Dynamic QR Codes, Redirects & Scan Analytics', () => {
       await db.prepare(`
         INSERT INTO qr_codes (id, user_id, short_code, name, type, destination, payload, is_dynamic, status, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).bind(qrId, userA.id, shortCode, 'Private Alpha Campaign', 'url', 'https://example.com', `https://qrcode.page/r/${shortCode}`, 1, 'active', now, now).run();
+      `).bind(qrId, userA.id, shortCode, 'Private Alpha Campaign', 'url', 'https://example.com', `https://freeqrcode-generator.com/r/${shortCode}`, 1, 'active', now, now).run();
 
       // Querying as User B
       const userBAttempt = await db.prepare('SELECT id, user_id FROM qr_codes WHERE id = ? AND user_id = ?').bind(qrId, userB.id).all();
@@ -207,7 +207,7 @@ describe('Phase 4: Dynamic QR Codes, Redirects & Scan Analytics', () => {
       await db.prepare(`
         INSERT INTO qr_codes (id, user_id, short_code, name, type, destination, payload, is_dynamic, status, expires_at, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).bind(qrId, userA.id, shortCode, 'Expired Campaign', 'url', 'https://example.com', `https://qrcode.page/r/${shortCode}`, 1, 'paused', pastTime, now, now).run();
+      `).bind(qrId, userA.id, shortCode, 'Expired Campaign', 'url', 'https://example.com', `https://freeqrcode-generator.com/r/${shortCode}`, 1, 'paused', pastTime, now, now).run();
 
       const qr = (await db.prepare('SELECT * FROM qr_codes WHERE short_code = ?').bind(shortCode).all()).results?.[0] as any;
       expect(qr.status).toBe('paused');

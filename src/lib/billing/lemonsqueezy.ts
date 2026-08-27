@@ -137,7 +137,7 @@ export async function createCheckoutUrl(options: {
                 },
               },
               product_options: {
-                redirect_url: redirectUrl || 'https://qrcode.page/dashboard/billing?success=1',
+                redirect_url: redirectUrl || 'https://freeqrcode-generator.com/dashboard/billing?success=1',
               },
             },
             relationships: {

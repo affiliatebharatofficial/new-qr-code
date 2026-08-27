@@ -18,14 +18,14 @@ describe('Phase 9: SEO, Organic Growth & Content Architecture', () => {
       const xml = await response.text();
 
       // Should include primary public pages
-      expect(xml).toContain('<loc>https://qrcode.page/</loc>');
-      expect(xml).toContain('<loc>https://qrcode.page/pricing</loc>');
-      expect(xml).toContain('<loc>https://qrcode.page/wifi-qr-code-generator</loc>');
-      expect(xml).toContain('<loc>https://qrcode.page/vcard-qr-code-generator</loc>');
-      expect(xml).toContain('<loc>https://qrcode.page/digital-business-card</loc>');
-      expect(xml).toContain('<loc>https://qrcode.page/restaurant-menu-qr-code</loc>');
-      expect(xml).toContain('<loc>https://qrcode.page/guides</loc>');
-      expect(xml).toContain('<loc>https://qrcode.page/guides/what-is-a-qr-code</loc>');
+      expect(xml).toContain('<loc>https://freeqrcode-generator.com/</loc>');
+      expect(xml).toContain('<loc>https://freeqrcode-generator.com/pricing</loc>');
+      expect(xml).toContain('<loc>https://freeqrcode-generator.com/wifi-qr-code-generator</loc>');
+      expect(xml).toContain('<loc>https://freeqrcode-generator.com/vcard-qr-code-generator</loc>');
+      expect(xml).toContain('<loc>https://freeqrcode-generator.com/digital-business-card</loc>');
+      expect(xml).toContain('<loc>https://freeqrcode-generator.com/restaurant-menu-qr-code</loc>');
+      expect(xml).toContain('<loc>https://freeqrcode-generator.com/guides</loc>');
+      expect(xml).toContain('<loc>https://freeqrcode-generator.com/guides/what-is-a-qr-code</loc>');
 
       // Must NOT include private or dynamic routes
       expect(xml).not.toContain('/dashboard');
@@ -40,10 +40,10 @@ describe('Phase 9: SEO, Organic Growth & Content Architecture', () => {
 
   describe('2. Canonical URLs & Meta Validation', () => {
     it('should format clean canonical URLs without query strings', () => {
-      const siteUrl = 'https://qrcode.page';
+      const siteUrl = 'https://freeqrcode-generator.com';
       const path = '/wifi-qr-code-generator';
       const cleanCanonical = `${siteUrl}${path}/`;
-      expect(cleanCanonical).toBe('https://qrcode.page/wifi-qr-code-generator/');
+      expect(cleanCanonical).toBe('https://freeqrcode-generator.com/wifi-qr-code-generator/');
       expect(cleanCanonical).not.toContain('?type=wifi');
     });
   });
@@ -54,9 +54,9 @@ describe('Phase 9: SEO, Organic Growth & Content Architecture', () => {
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://qrcode.page/' },
-          { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://qrcode.page/guides' },
-          { '@type': 'ListItem', position: 3, name: 'Static vs Dynamic', item: 'https://qrcode.page/guides/static-vs-dynamic-qr' },
+          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://freeqrcode-generator.com/' },
+          { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://freeqrcode-generator.com/guides' },
+          { '@type': 'ListItem', position: 3, name: 'Static vs Dynamic', item: 'https://freeqrcode-generator.com/guides/static-vs-dynamic-qr' },
         ],
       };
 

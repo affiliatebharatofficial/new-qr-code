@@ -8,7 +8,7 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /r/
 
-Sitemap: https://qrcode.page/sitemap.xml
+Sitemap: https://freeqrcode-generator.com/sitemap.xml
 `;
 
   return new Response(robots, {

@@ -34,8 +34,10 @@ const siteUrl = 'https://freeqrcode-generator.com';
 const pageTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
 
 // Self-referencing clean canonical URL
-const rawPath = currentPath.replace(/\/+$/, '') || '';
-const cleanCanonical = canonical || `${siteUrl}${rawPath ? `${rawPath}/` : '/'}`;
+const cleanPathname = currentPath === '/' ? '/' : currentPath.replace(/\/+$/, '');
+const cleanCanonical = canonical
+  ? (canonical.startsWith('http') ? canonical.replace(/\/+$/, '') : `${siteUrl}${canonical.replace(/\/+$/, '')}`)
+  : `${siteUrl}${cleanPathname}`;
 const absoluteOgImage = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage.startsWith('/') ? '' : '/'}${ogImage}`;
 
 // Dynamic hreflang alternates for all supported locales + x-default

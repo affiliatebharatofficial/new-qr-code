@@ -80,7 +80,7 @@ describe('Phase 5: Monetization, Plans, Usage Limits & Lemon Squeezy', () => {
         await db.prepare(`
           INSERT INTO qr_codes (id, user_id, short_code, name, type, payload, is_dynamic, status, created_at, updated_at)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `).bind(`qr_free_dyn_${i}`, userFree.id, `code_${i}`, `Dynamic QR ${i}`, 'url', `https://qrcode.page/r/code_${i}`, 1, 'active', now, now).run();
+        `).bind(`qr_free_dyn_${i}`, userFree.id, `code_${i}`, `Dynamic QR ${i}`, 'url', `https://freeqrcode-generator.com/r/code_${i}`, 1, 'active', now, now).run();
       }
 
       const check = await canCreateDynamicQr(userFree.id);
@@ -96,7 +96,7 @@ describe('Phase 5: Monetization, Plans, Usage Limits & Lemon Squeezy', () => {
         await db.prepare(`
           INSERT INTO qr_codes (id, user_id, short_code, name, type, payload, is_dynamic, status, created_at, updated_at)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `).bind(`qr_pro_dyn_${i}`, userPro.id, `pro_code_${i}`, `Pro QR ${i}`, 'url', `https://qrcode.page/r/pro_code_${i}`, 1, 'active', now, now).run();
+        `).bind(`qr_pro_dyn_${i}`, userPro.id, `pro_code_${i}`, `Pro QR ${i}`, 'url', `https://freeqrcode-generator.com/r/pro_code_${i}`, 1, 'active', now, now).run();
       }
 
       const check = await canCreateDynamicQr(userPro.id);

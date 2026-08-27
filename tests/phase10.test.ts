@@ -45,7 +45,7 @@ describe('Phase 10: Admin Panel, Abuse Protection & Platform Operations', () => 
 
   describe('1. Admin Authorization & Security Boundaries', () => {
     it('should reject unauthenticated or non-admin requests', async () => {
-      const dummyReq = new Request('https://qrcode.page/admin');
+      const dummyReq = new Request('https://freeqrcode-generator.com/admin');
       const result = await requireAdmin(dummyReq);
       expect(result).toBeNull();
     });

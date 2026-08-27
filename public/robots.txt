@@ -14,4 +14,4 @@ Disallow: /r/
 Disallow: /p/
 
 # Sitemap reference
-Sitemap: https://qrcode.page/sitemap.xml
+Sitemap: https://freeqrcode-generator.com/sitemap.xml

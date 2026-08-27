@@ -92,7 +92,7 @@ describe('Phase 11: Multilingual QR Generator & International SEO', () => {
       expect(langs).toContain('x-default');
 
       const xDefault = tags.find((t) => t.lang === 'x-default');
-      expect(xDefault?.href).toBe('https://qrcode.page/wifi-qr-code-generator');
+      expect(xDefault?.href).toBe('https://freeqrcode-generator.com/wifi-qr-code-generator');
     });
 
     it('should generate smart language switcher links preserving page equivalence', () => {

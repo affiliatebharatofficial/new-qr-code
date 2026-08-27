@@ -32,10 +32,10 @@ describe('FINAL PRODUCTION AUDIT & LAUNCH READINESS', () => {
       expect(hreflangs.length).toBe(SUPPORTED_LOCALES.length + 1); // 7 languages + x-default
 
       const xDefault = hreflangs.find((h) => h.lang === 'x-default');
-      expect(xDefault?.href).toBe('https://qrcode.page/wifi-qr-code-generator');
+      expect(xDefault?.href).toBe('https://freeqrcode-generator.com/wifi-qr-code-generator');
 
       const esTag = hreflangs.find((h) => h.lang === 'es');
-      expect(esTag?.href).toBe('https://qrcode.page/es/wifi-qr-code-generator');
+      expect(esTag?.href).toBe('https://freeqrcode-generator.com/es/wifi-qr-code-generator');
     });
   });
 

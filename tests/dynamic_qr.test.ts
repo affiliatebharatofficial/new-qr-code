@@ -20,7 +20,7 @@ describe('Dynamic QR Code Operations & D1 Integration', () => {
       'Test Campaign',
       'url',
       'https://example.com/initial',
-      `https://qrcode.page/r/${shortCode}`,
+      `https://freeqrcode-generator.com/r/${shortCode}`,
       '{}',
       1,
       'active',

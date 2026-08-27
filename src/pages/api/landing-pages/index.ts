@@ -62,7 +62,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const slug = `p_${generateShortCode()}`;
   const now = Date.now();
 
-  const host = request.headers.get('host') || 'qrcode.page';
+  const host = request.headers.get('host') || 'freeqrcode-generator.com';
   const proto = request.headers.get('x-forwarded-proto') || 'https';
   const publicPageUrl = `${proto}://${host}/p/${slug}`;
 

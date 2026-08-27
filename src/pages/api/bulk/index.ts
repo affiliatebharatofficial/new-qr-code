@@ -85,7 +85,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   let successCount = 0;
   let failCount = 0;
-  const host = request.headers.get('host') || 'qrcode.page';
+  const host = request.headers.get('host') || 'freeqrcode-generator.com';
   const proto = request.headers.get('x-forwarded-proto') || 'https';
 
   // Process rows

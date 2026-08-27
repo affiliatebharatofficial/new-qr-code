@@ -1,6 +1,6 @@
 import { SUPPORTED_LOCALES, DEFAULT_LOCALE, LOCALE_METADATA, extractLocaleFromPath, type Locale } from './config';
 
-export const SITE_BASE_URL = 'https://qrcode.page';
+export const SITE_BASE_URL = 'https://freeqrcode-generator.com';
 
 /**
  * Returns the localized URL path for a given path and target locale.

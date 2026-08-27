@@ -84,7 +84,7 @@ describe('Phase 6: Bulk QR Generation, Templates & Import/Export', () => {
           name: 'My Website',
           type: 'url',
           is_dynamic: 1,
-          payload: 'https://qrcode.page/r/abc123',
+          payload: 'https://freeqrcode-generator.com/r/abc123',
           destination: 'https://example.com',
           short_code: 'abc123',
           scans_count: 42,
@@ -95,7 +95,7 @@ describe('Phase 6: Bulk QR Generation, Templates & Import/Export', () => {
 
       const csv = generateExportCsv(qrs);
       expect(csv).toContain('name,type,is_dynamic,payload,destination,short_code,scans_count,status,created_at');
-      expect(csv).toContain('My Website,url,1,https://qrcode.page/r/abc123,https://example.com,abc123,42,active');
+      expect(csv).toContain('My Website,url,1,https://freeqrcode-generator.com/r/abc123,https://example.com,abc123,42,active');
     });
   });
 

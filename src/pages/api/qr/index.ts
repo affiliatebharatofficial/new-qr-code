@@ -131,7 +131,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       return jsonError('COLLISION_ERROR', 'Failed to generate unique short code. Please try again.', 500);
     }
 
-    const host = request.headers.get('host') || 'qrcode.page';
+    const host = request.headers.get('host') || 'freeqrcode-generator.com';
     const proto = request.headers.get('x-forwarded-proto') || 'https';
     finalPayload = `${proto}://${host}/r/${finalShortCode}`;
   }
