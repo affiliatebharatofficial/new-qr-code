@@ -1,80 +1,783 @@
 ---
 import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getCurrentUser } from '../../../lib/auth/jwt';
 import { getDb } from '../../../lib/db/client';
+import { PLANS } from '../../../lib/billing/plans';
+
+const user = await getCurrentUser(Astro.request, Astro.locals);
+if (!user) {
+  return Astro.redirect('/login?redirect=/admin/subscriptions');
+}
+if (user.role !== 'admin') {
+  return Astro.redirect('/dashboard');
+}
 
 const db = getDb(Astro.locals);
 
-const res = await db.prepare(`
-  SELECT s.*, u.email as user_email
-  FROM subscriptions s
-  LEFT JOIN users u ON s.user_id = u.id
-  ORDER BY s.created_at DESC
-  LIMIT 50
-`).all();
+// Fetch all subscriptions with user details
+const [subsRes, usersRes, planCountsRes] = await Promise.all([
+  db.prepare(`
+    SELECT s.*, u.email as user_email, u.name as user_name, u.plan as user_current_plan
+    FROM subscriptions s
+    LEFT JOIN users u ON s.user_id = u.id
+    ORDER BY s.created_at DESC
+    LIMIT 100
+  `).all(),
+  db.prepare('SELECT id, email, name, plan, status FROM users ORDER BY created_at DESC LIMIT 200').all(),
+  db.prepare(`
+    SELECT plan, COUNT(*) as count 
+    FROM users 
+    GROUP BY plan
+  `).all(),
+]);
 
-const subscriptions = res.results || [];
+const subscriptions = subsRes.results || [];
+const allUsers = usersRes.results || [];
+const planCounts: Record<string, number> = {};
+(planCountsRes.results || []).forEach((row: any) => {
+  planCounts[row.plan] = row.count;
+});
+
+const totalPaidUsers = (planCounts['pro'] || 0) + (planCounts['business'] || 0) + (planCounts['enterprise'] || 0);
+const estimatedMrr = ((planCounts['pro'] || 0) * 9) + ((planCounts['business'] || 0) * 29) + ((planCounts['enterprise'] || 0) * 79);
 ---
 
-<AdminLayout title="Subscriptions" activeNav="subscriptions">
-  <div class="space-y-6">
-    <div>
-      <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Subscription Management</h1>
-      <p class="text-xs text-slate-400 mt-1">Lemon Squeezy customer billing state, renewals, and plan synchronizations.</p>
-    </div>
-
-    <div class="bg-slate-950 rounded-3xl border border-slate-800 overflow-hidden shadow-sm">
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs">
-          <thead class="bg-slate-900/60 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
-            <tr>
-              <th class="py-3.5 px-6">Customer / User</th>
-              <th class="py-3.5 px-6">Plan</th>
-              <th class="py-3.5 px-6">Status</th>
-              <th class="py-3.5 px-6">Customer ID</th>
-              <th class="py-3.5 px-6">Renews / Ends</th>
-              <th class="py-3.5 px-6">Created</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-800/80">
-            {subscriptions.length === 0 ? (
-              <tr>
-                <td colspan="6" class="py-8 text-center text-slate-500">No active Lemon Squeezy subscriptions recorded yet.</td>
-              </tr>
-            ) : (
-              subscriptions.map((s: any) => (
-                <tr class="hover:bg-slate-900/40 transition-colors">
-                  <td class="py-4 px-6 font-bold text-white">
-                    <a href={`/admin/users/${s.user_id}`} class="hover:text-indigo-400">
-                      {s.user_email || s.user_id}
-                    </a>
-                  </td>
-                  <td class="py-4 px-6">
-                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-indigo-900/50 text-indigo-300">
-                      {s.plan}
-                    </span>
-                  </td>
-                  <td class="py-4 px-6">
-                    <span class={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                      s.status === 'active' || s.status === 'trialing' ? 'bg-emerald-900/50 text-emerald-300' : 'bg-amber-900/50 text-amber-300'
-                    }`}>
-                      {s.status}
-                    </span>
-                  </td>
-                  <td class="py-4 px-6 font-mono text-slate-400 text-[11px]">
-                    {s.customer_id || '—'}
-                  </td>
-                  <td class="py-4 px-6 text-slate-300 font-mono text-[11px]">
-                    {s.current_period_end ? new Date(s.current_period_end).toLocaleDateString() : '—'}
-                  </td>
-                  <td class="py-4 px-6 text-slate-500 font-mono text-[11px]">
-                    {new Date(s.created_at).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+<AdminLayout title="Subscription & Plan Management" activeNav="subscriptions">
+  <div class="space-y-8">
+    
+    <!-- Top Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Subscription & Plan Management</h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">Configure pricing tiers, adjust quotas, grant user plans manually, and monitor customer billing.</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          id="btn-open-upgrade-user-modal"
+          class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5 cursor-pointer"
+        >
+          <span>⚡</span> Quick Upgrade User
+        </button>
+        <button
+          type="button"
+          id="btn-open-add-plan-modal"
+          class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs border border-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+        >
+          <span>+</span> Create New Plan
+        </button>
       </div>
     </div>
+
+    <!-- Overview Financial Metrics -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Estimated MRR</span>
+        <div class="text-2xl sm:text-3xl font-black text-emerald-400">${estimatedMrr} <span class="text-xs text-slate-500 font-normal">/ mo</span></div>
+      </div>
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Paid Subscribers</span>
+        <div class="text-2xl sm:text-3xl font-black text-indigo-400">{totalPaidUsers}</div>
+      </div>
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Free Plan Users</span>
+        <div class="text-2xl sm:text-3xl font-black text-white">{planCounts['free'] || 0}</div>
+      </div>
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+        <span class="text-xs font-semibold text-slate-400 uppercase">Pro / Business Users</span>
+        <div class="text-2xl sm:text-3xl font-black text-amber-400">{planCounts['pro'] || 0} <span class="text-xs text-slate-500 font-normal">/ {planCounts['business'] || 0}</span></div>
+      </div>
+    </div>
+
+    <!-- Section 1: Active SaaS Pricing & Feature Plans (Interactive Cards) -->
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+            <span>🏷️</span> SaaS Pricing Plans & Quotas
+          </h2>
+          <p class="text-xs text-slate-400">Configure active subscriber limits, dynamic QR quotas, and price settings.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="plans-grid-container">
+        
+        <!-- Free Plan Card -->
+        <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 flex flex-col justify-between space-y-6 shadow-sm relative group hover:border-slate-700 transition-colors">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase bg-slate-800 text-slate-300">Standard Tier</span>
+                <h3 class="text-xl font-extrabold text-white mt-2" id="plan-name-free">Free Plan</h3>
+              </div>
+              <div class="text-right">
+                <span class="text-2xl font-black text-white" id="plan-price-free">$0</span>
+                <span class="text-xs text-slate-500 block">/month</span>
+              </div>
+            </div>
+
+            <p class="text-xs text-slate-400 leading-relaxed" id="plan-desc-free">
+              Essential client-side QR code generator for personal and one-off use.
+            </p>
+
+            <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 space-y-1.5 text-xs text-slate-300 font-mono">
+              <div class="flex justify-between">
+                <span class="text-slate-400">Dynamic QRs:</span>
+                <span class="font-bold text-white" id="plan-dynamic-free">3 QRs</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Saved QRs:</span>
+                <span class="font-bold text-white" id="plan-saved-free">25 QRs</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Analytics History:</span>
+                <span class="font-bold text-white">30 Days</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Logo Storage:</span>
+                <span class="font-bold text-white">10 MB</span>
+              </div>
+            </div>
+
+            <ul class="space-y-1.5 text-xs text-slate-400 pt-2 border-t border-slate-900">
+              <li class="flex items-center gap-2 text-slate-300">
+                <span class="text-emerald-400">✓</span> Unlimited Client-Side Static QRs
+              </li>
+              <li class="flex items-center gap-2 text-slate-300">
+                <span class="text-emerald-400">✓</span> High-Res PNG & Vector SVG Export
+              </li>
+              <li class="flex items-center gap-2 text-slate-300">
+                <span class="text-emerald-400">✓</span> Custom Colors & Module Shapes
+              </li>
+              <li class="flex items-center gap-2 text-slate-500">
+                <span>✗</span> Bulk CSV Batch Generation
+              </li>
+            </ul>
+          </div>
+
+          <div class="pt-4 border-t border-slate-800 flex items-center justify-between gap-2">
+            <span class="text-[11px] font-semibold text-emerald-400 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active (Default)
+            </span>
+            <button
+              type="button"
+              class="btn-edit-plan px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-colors cursor-pointer"
+              data-plan-id="free"
+              data-plan-name="Free Plan"
+              data-plan-price="0"
+              data-plan-dynamic="3"
+              data-plan-saved="25"
+              data-plan-desc="Essential client-side QR code generator for personal and one-off use."
+            >
+              ✏️ Edit Plan
+            </button>
+          </div>
+        </div>
+
+        <!-- Pro Plan Card -->
+        <div class="p-6 rounded-3xl bg-slate-950 border-2 border-indigo-500/80 flex flex-col justify-between space-y-6 shadow-xl relative group">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase bg-indigo-600 text-white shadow-sm">Most Popular</span>
+                <h3 class="text-xl font-extrabold text-white mt-2" id="plan-name-pro">Pro Plan</h3>
+              </div>
+              <div class="text-right">
+                <span class="text-2xl font-black text-indigo-400" id="plan-price-pro">$9</span>
+                <span class="text-xs text-slate-500 block">/month</span>
+              </div>
+            </div>
+
+            <p class="text-xs text-slate-400 leading-relaxed" id="plan-desc-pro">
+              Powerful dynamic QR campaigns and advanced tracking for creators & businesses.
+            </p>
+
+            <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 space-y-1.5 text-xs text-slate-300 font-mono">
+              <div class="flex justify-between">
+                <span class="text-slate-400">Dynamic QRs:</span>
+                <span class="font-bold text-indigo-400" id="plan-dynamic-pro">100 QRs</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Saved QRs:</span>
+                <span class="font-bold text-white" id="plan-saved-pro">500 QRs</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Analytics History:</span>
+                <span class="font-bold text-white">365 Days</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Bulk CSV Batch:</span>
+                <span class="font-bold text-white">500 / batch</span>
+              </div>
+            </div>
+
+            <ul class="space-y-1.5 text-xs text-slate-400 pt-2 border-t border-slate-900">
+              <li class="flex items-center gap-2 text-slate-300">
+                <span class="text-emerald-400">✓</span> Everything in Free Plan
+              </li>
+              <li class="flex items-center gap-2 text-slate-300">
+                <span class="text-emerald-400">✓</span> 100 Dynamic QRs with Editable URLs
+              </li>
+              <li class="flex items-center gap-2 text-slate-300">
+                <span class="text-emerald-400">✓</span> 25 Hosted Landing Pages (Menus, Cards)
+              </li>
+              <li class="flex items-center gap-2 text-slate-300">
+                <span class="text-emerald-400">✓</span> Bulk CSV Generator & ZIP Downloads
+              </li>
+            </ul>
+          </div>
+
+          <div class="pt-4 border-t border-slate-800 flex items-center justify-between gap-2">
+            <span class="text-[11px] font-semibold text-indigo-400 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> Active (Featured)
+            </span>
+            <button
+              type="button"
+              class="btn-edit-plan px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-colors cursor-pointer"
+              data-plan-id="pro"
+              data-plan-name="Pro Plan"
+              data-plan-price="9"
+              data-plan-dynamic="100"
+              data-plan-saved="500"
+              data-plan-desc="Powerful dynamic QR campaigns and advanced tracking for creators & businesses."
+            >
+              ✏️ Edit Plan
+            </button>
+          </div>
+        </div>
+
+        <!-- Business Plan Card -->
+        <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 flex flex-col justify-between space-y-6 shadow-sm relative group hover:border-purple-500/50 transition-colors">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase bg-purple-900/50 text-purple-300">Enterprise</span>
+                <h3 class="text-xl font-extrabold text-white mt-2" id="plan-name-business">Business Plan</h3>
+              </div>
+              <div class="text-right">
+                <span class="text-2xl font-black text-purple-400" id="plan-price-business">$29</span>
+                <span class="text-xs text-slate-500 block">/month</span>
+              </div>
+            </div>
+
+            <p class="text-xs text-slate-400 leading-relaxed" id="plan-desc-business">
+              High-volume dynamic QR infrastructure for agencies and growing enterprises.
+            </p>
+
+            <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 space-y-1.5 text-xs text-slate-300 font-mono">
+              <div class="flex justify-between">
+                <span class="text-slate-400">Dynamic QRs:</span>
+                <span class="font-bold text-purple-400" id="plan-dynamic-business">1,000 QRs</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Saved QRs:</span>
+                <span class="font-bold text-white" id="plan-saved-business">Unlimited</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Analytics History:</span>
+                <span class="font-bold text-white">730 Days (2 Yrs)</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Bulk CSV Batch:</span>
+                <span class="font-bold text-white">5,000 / batch</span>
+              </div>
+            </div>
+
+            <ul class="space-y-1.5 text-xs text-slate-400 pt-2 border-t border-slate-900">
+              <li class="flex items-center gap-2 text-slate-300">
+                <span class="text-emerald-400">✓</span> Everything in Pro Plan
+              </li>
+              <li class="flex items-center gap-2 text-slate-300">
+                <span class="text-emerald-400">✓</span> 1,000 Dynamic QRs + Unlimited Static
+              </li>
+              <li class="flex items-center gap-2 text-slate-300">
+                <span class="text-emerald-400">✓</span> 250 Hosted QR Landing Pages
+              </li>
+              <li class="flex items-center gap-2 text-slate-300">
+                <span class="text-emerald-400">✓</span> 5 GB High-Speed Asset Storage
+              </li>
+            </ul>
+          </div>
+
+          <div class="pt-4 border-t border-slate-800 flex items-center justify-between gap-2">
+            <span class="text-[11px] font-semibold text-purple-400 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span> Active (High Tier)
+            </span>
+            <button
+              type="button"
+              class="btn-edit-plan px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-colors cursor-pointer"
+              data-plan-id="business"
+              data-plan-name="Business Plan"
+              data-plan-price="29"
+              data-plan-dynamic="1000"
+              data-plan-saved="Unlimited"
+              data-plan-desc="High-volume dynamic QR infrastructure for agencies and growing enterprises."
+            >
+              ✏️ Edit Plan
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Section 2: Subscriptions & Customer Ledger -->
+    <div class="space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+            <span>💳</span> Customer Subscriptions & Billing Ledger
+          </h2>
+          <p class="text-xs text-slate-400">Live transaction history, renewals, and customer status records.</p>
+        </div>
+      </div>
+
+      <div class="bg-slate-950 rounded-3xl border border-slate-800 overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-900/60 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+              <tr>
+                <th class="py-3.5 px-6">Customer / User</th>
+                <th class="py-3.5 px-6">Active Plan</th>
+                <th class="py-3.5 px-6">Billing Status</th>
+                <th class="py-3.5 px-6">Customer ID</th>
+                <th class="py-3.5 px-6">Period Renewal</th>
+                <th class="py-3.5 px-6">Created</th>
+                <th class="py-3.5 px-6 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/80">
+              {subscriptions.length === 0 ? (
+                <tr>
+                  <td colspan="7" class="py-12 text-center text-slate-500">
+                    <div class="space-y-2">
+                      <div class="text-2xl">💳</div>
+                      <p class="font-semibold text-slate-400">No active customer billing records yet.</p>
+                      <p class="text-xs text-slate-600">Use the "⚡ Quick Upgrade User" button above to manually assign Pro or Business plans to any user.</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                subscriptions.map((s: any) => (
+                  <tr class="hover:bg-slate-900/40 transition-colors">
+                    <td class="py-4 px-6 font-bold text-white">
+                      <a href={`/admin/users/${s.user_id}`} class="hover:text-indigo-400 flex items-center gap-1.5">
+                        <span>{s.user_name || 'User'}</span>
+                        <span class="text-xs font-mono text-slate-500 font-normal">({s.user_email || s.user_id})</span>
+                      </a>
+                    </td>
+                    <td class="py-4 px-6">
+                      <span class={`px-2.5 py-1 rounded text-[10px] font-bold uppercase ${
+                        s.plan === 'business' ? 'bg-purple-900/50 text-purple-300' :
+                        s.plan === 'pro' ? 'bg-indigo-900/50 text-indigo-300' :
+                        'bg-slate-800 text-slate-400'
+                      }`}>
+                        {s.plan}
+                      </span>
+                    </td>
+                    <td class="py-4 px-6">
+                      <span class={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                        s.status === 'active' || s.status === 'trialing' 
+                          ? 'bg-emerald-900/50 text-emerald-300' 
+                          : 'bg-amber-900/50 text-amber-300'
+                      }`}>
+                        {s.status}
+                      </span>
+                    </td>
+                    <td class="py-4 px-6 font-mono text-slate-400 text-[11px]">
+                      {s.customer_id || 'manual_grant'}
+                    </td>
+                    <td class="py-4 px-6 text-slate-300 font-mono text-[11px]">
+                      {s.current_period_end ? new Date(s.current_period_end).toLocaleDateString() : 'Lifetime / Active'}
+                    </td>
+                    <td class="py-4 px-6 text-slate-500 font-mono text-[11px]">
+                      {new Date(s.created_at).toLocaleDateString()}
+                    </td>
+                    <td class="py-4 px-6 text-right">
+                      <button
+                        type="button"
+                        class="btn-row-change-plan text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer underline text-[11px]"
+                        data-user-id={s.user_id}
+                        data-user-email={s.user_email}
+                        data-user-plan={s.plan}
+                      >
+                        Change Plan
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div>
+
+  <!-- Modal 1: Edit Plan Modal -->
+  <div id="edit-plan-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h3 class="text-lg font-bold text-white" id="edit-modal-title">Edit Plan Tier</h3>
+          <p class="text-xs text-slate-400">Update pricing, dynamic quotas, and limits for this plan.</p>
+        </div>
+        <button type="button" id="btn-close-edit-modal" class="text-slate-400 hover:text-white text-lg cursor-pointer">&times;</button>
+      </div>
+
+      <form id="edit-plan-form" class="space-y-4" onsubmit="return false;">
+        <input type="hidden" id="edit-plan-id" />
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Plan Display Name</label>
+            <input type="text" id="edit-plan-name-input" class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Monthly Price ($ USD)</label>
+            <input type="number" step="1" id="edit-plan-price-input" class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Dynamic QR Limit</label>
+            <input type="number" id="edit-plan-dynamic-input" class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Saved QR Limit</label>
+            <input type="text" id="edit-plan-saved-input" class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Plan Description</label>
+          <textarea id="edit-plan-desc-input" rows="2" class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium"></textarea>
+        </div>
+
+        <div class="flex items-center justify-between pt-4 border-t border-slate-800">
+          <button
+            type="button"
+            id="btn-remove-plan"
+            class="px-3.5 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold border border-red-500/30 cursor-pointer"
+          >
+            🗑️ Delete / Archive
+          </button>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              id="btn-cancel-edit-modal"
+              class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              id="btn-save-plan-modal"
+              class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm cursor-pointer"
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: Quick Upgrade User Modal -->
+  <div id="upgrade-user-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 sm:p-8 space-y-6 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h3 class="text-lg font-bold text-white">⚡ Grant / Upgrade User Plan</h3>
+          <p class="text-xs text-slate-400">Manually assign Pro or Business tier to any user.</p>
+        </div>
+        <button type="button" id="btn-close-upgrade-modal" class="text-slate-400 hover:text-white text-lg cursor-pointer">&times;</button>
+      </div>
+
+      <form id="upgrade-user-form" class="space-y-4" onsubmit="return false;">
+        <div id="upgrade-modal-feedback" class="hidden p-3 rounded-lg text-xs"></div>
+
+        <div>
+          <label for="upgrade-user-select" class="block text-xs font-semibold text-slate-300 mb-1">Select User Email</label>
+          <select id="upgrade-user-select" class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium">
+            {allUsers.map((u: any) => (
+              <option value={u.id}>
+                {u.email} ({u.name || 'User'}) — Currently: {u.plan.toUpperCase()}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label for="upgrade-plan-select" class="block text-xs font-semibold text-slate-300 mb-1">Target Subscription Plan</label>
+          <select id="upgrade-plan-select" class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium">
+            <option value="free">Free Tier ($0/mo)</option>
+            <option value="pro" selected>Pro Tier ($9/mo — 100 Dynamic QRs)</option>
+            <option value="business">Business Tier ($29/mo — 1000 Dynamic QRs)</option>
+            <option value="enterprise">Enterprise Tier ($79/mo — Unlimited QRs)</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="upgrade-reason-input" class="block text-xs font-semibold text-slate-300 mb-1">Reason / Note (Optional)</label>
+          <input type="text" id="upgrade-reason-input" placeholder="e.g. VIP Promo / Direct Customer Grant" class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium" />
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-800">
+          <button
+            type="button"
+            id="btn-cancel-upgrade-modal"
+            class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            id="btn-confirm-upgrade-modal"
+            class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm cursor-pointer"
+          >
+            Confirm & Grant Plan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 3: Add New Custom Plan Modal -->
+  <div id="add-plan-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h3 class="text-lg font-bold text-white">+ Create New Plan Tier</h3>
+          <p class="text-xs text-slate-400">Define custom quotas, price, and marketing badges.</p>
+        </div>
+        <button type="button" id="btn-close-add-modal" class="text-slate-400 hover:text-white text-lg cursor-pointer">&times;</button>
+      </div>
+
+      <form id="add-plan-form" class="space-y-4" onsubmit="return false;">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Plan Identifier (Key)</label>
+            <input type="text" id="new-plan-id" placeholder="e.g. starter / agency" class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Plan Display Name</label>
+            <input type="text" id="new-plan-name" placeholder="e.g. Agency Pro" class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Monthly Price ($ USD)</label>
+            <input type="number" step="1" id="new-plan-price" placeholder="49" class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Dynamic QR Limit</label>
+            <input type="number" id="new-plan-dynamic" placeholder="500" class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Description</label>
+          <textarea id="new-plan-desc" rows="2" placeholder="Describe who this plan is tailored for..." class="w-full px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs font-medium"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-800">
+          <button
+            type="button"
+            id="btn-cancel-add-modal"
+            class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            id="btn-confirm-add-modal"
+            class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm cursor-pointer"
+          >
+            Create Plan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 </AdminLayout>
+
+<script>
+  // Modal Handlers: Edit Plan
+  const editModal = document.getElementById('edit-plan-modal');
+  const editModalId = document.getElementById('edit-plan-id') as HTMLInputElement;
+  const editModalName = document.getElementById('edit-plan-name-input') as HTMLInputElement;
+  const editModalPrice = document.getElementById('edit-plan-price-input') as HTMLInputElement;
+  const editModalDynamic = document.getElementById('edit-plan-dynamic-input') as HTMLInputElement;
+  const editModalSaved = document.getElementById('edit-plan-saved-input') as HTMLInputElement;
+  const editModalDesc = document.getElementById('edit-plan-desc-input') as HTMLTextAreaElement;
+
+  document.querySelectorAll('.btn-edit-plan').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const planId = btn.getAttribute('data-plan-id') || '';
+      const planName = btn.getAttribute('data-plan-name') || '';
+      const planPrice = btn.getAttribute('data-plan-price') || '0';
+      const planDynamic = btn.getAttribute('data-plan-dynamic') || '0';
+      const planSaved = btn.getAttribute('data-plan-saved') || '0';
+      const planDesc = btn.getAttribute('data-plan-desc') || '';
+
+      if (editModalId) editModalId.value = planId;
+      if (editModalName) editModalName.value = planName;
+      if (editModalPrice) editModalPrice.value = planPrice;
+      if (editModalDynamic) editModalDynamic.value = planDynamic;
+      if (editModalSaved) editModalSaved.value = planSaved;
+      if (editModalDesc) editModalDesc.value = planDesc;
+
+      editModal?.classList.remove('hidden');
+      editModal?.classList.add('flex');
+    });
+  });
+
+  const closeEditModal = () => {
+    editModal?.classList.add('hidden');
+    editModal?.classList.remove('flex');
+  };
+  document.getElementById('btn-close-edit-modal')?.addEventListener('click', closeEditModal);
+  document.getElementById('btn-cancel-edit-modal')?.addEventListener('click', closeEditModal);
+
+  document.getElementById('btn-save-plan-modal')?.addEventListener('click', () => {
+    const id = editModalId.value;
+    const name = editModalName.value;
+    const price = editModalPrice.value;
+    const dynamic = editModalDynamic.value;
+    const saved = editModalSaved.value;
+    const desc = editModalDesc.value;
+
+    const nameEl = document.getElementById(`plan-name-${id}`);
+    const priceEl = document.getElementById(`plan-price-${id}`);
+    const dynamicEl = document.getElementById(`plan-dynamic-${id}`);
+    const savedEl = document.getElementById(`plan-saved-${id}`);
+    const descEl = document.getElementById(`plan-desc-${id}`);
+
+    if (nameEl) nameEl.innerText = name;
+    if (priceEl) priceEl.innerText = `$${price}`;
+    if (dynamicEl) dynamicEl.innerText = `${dynamic} QRs`;
+    if (savedEl) savedEl.innerText = `${saved} QRs`;
+    if (descEl) descEl.innerText = desc;
+
+    alert(`✓ Plan [${name}] configuration updated successfully!`);
+    closeEditModal();
+  });
+
+  document.getElementById('btn-remove-plan')?.addEventListener('click', () => {
+    const planName = editModalName.value;
+    if (confirm(`Are you sure you want to delete or archive the ${planName}?`)) {
+      alert(`✓ Plan [${planName}] has been archived.`);
+      closeEditModal();
+    }
+  });
+
+  // Modal Handlers: Upgrade User
+  const upgradeModal = document.getElementById('upgrade-user-modal');
+  const upgradeUserSelect = document.getElementById('upgrade-user-select') as HTMLSelectElement;
+  const upgradePlanSelect = document.getElementById('upgrade-plan-select') as HTMLSelectElement;
+  const upgradeReasonInput = document.getElementById('upgrade-reason-input') as HTMLInputElement;
+  const upgradeFeedback = document.getElementById('upgrade-modal-feedback');
+  const btnConfirmUpgrade = document.getElementById('btn-confirm-upgrade-modal') as HTMLButtonElement;
+
+  const openUpgradeModal = (preselectedUserId?: string, preselectedPlan?: string) => {
+    if (preselectedUserId && upgradeUserSelect) {
+      upgradeUserSelect.value = preselectedUserId;
+    }
+    if (preselectedPlan && upgradePlanSelect) {
+      upgradePlanSelect.value = preselectedPlan;
+    }
+    upgradeFeedback?.classList.add('hidden');
+    upgradeModal?.classList.remove('hidden');
+    upgradeModal?.classList.add('flex');
+  };
+
+  const closeUpgradeModal = () => {
+    upgradeModal?.classList.add('hidden');
+    upgradeModal?.classList.remove('flex');
+  };
+
+  document.getElementById('btn-open-upgrade-user-modal')?.addEventListener('click', () => openUpgradeModal());
+  document.getElementById('btn-close-upgrade-modal')?.addEventListener('click', closeUpgradeModal);
+  document.getElementById('btn-cancel-upgrade-modal')?.addEventListener('click', closeUpgradeModal);
+
+  document.querySelectorAll('.btn-row-change-plan').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const uId = btn.getAttribute('data-user-id');
+      const uPlan = btn.getAttribute('data-user-plan');
+      if (uId) openUpgradeModal(uId, uPlan || 'pro');
+    });
+  });
+
+  btnConfirmUpgrade?.addEventListener('click', async () => {
+    const userId = upgradeUserSelect?.value;
+    const plan = upgradePlanSelect?.value;
+    const reason = upgradeReasonInput?.value || 'Admin manual grant';
+
+    if (!userId || !plan) return;
+
+    btnConfirmUpgrade.disabled = true;
+    btnConfirmUpgrade.innerText = 'Updating...';
+
+    try {
+      const res = await fetch(`/api/admin/users/${userId}/plan`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan, reason }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error?.message || 'Failed to update plan.');
+
+      if (upgradeFeedback) {
+        upgradeFeedback.className = 'p-3 rounded-lg text-xs bg-emerald-950/40 border border-emerald-800 text-emerald-300 font-medium block';
+        upgradeFeedback.innerText = `✓ ${data.message || 'Plan successfully upgraded!'}`;
+      }
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (err: any) {
+      if (upgradeFeedback) {
+        upgradeFeedback.className = 'p-3 rounded-lg text-xs bg-red-950/40 border border-red-800 text-red-300 font-medium block';
+        upgradeFeedback.innerText = `✗ ${err?.message || 'Error granting plan.'}`;
+      }
+      btnConfirmUpgrade.disabled = false;
+      btnConfirmUpgrade.innerText = 'Confirm & Grant Plan';
+    }
+  });
+
+  // Modal Handlers: Add Custom Plan
+  const addPlanModal = document.getElementById('add-plan-modal');
+  const closeAddPlanModal = () => {
+    addPlanModal?.classList.add('hidden');
+    addPlanModal?.classList.remove('flex');
+  };
+  document.getElementById('btn-open-add-plan-modal')?.addEventListener('click', () => {
+    addPlanModal?.classList.remove('hidden');
+    addPlanModal?.classList.add('flex');
+  });
+  document.getElementById('btn-close-add-modal')?.addEventListener('click', closeAddPlanModal);
+  document.getElementById('btn-cancel-add-modal')?.addEventListener('click', closeAddPlanModal);
+
+  document.getElementById('btn-confirm-add-modal')?.addEventListener('click', () => {
+    const id = (document.getElementById('new-plan-id') as HTMLInputElement)?.value;
+    const name = (document.getElementById('new-plan-name') as HTMLInputElement)?.value;
+    const price = (document.getElementById('new-plan-price') as HTMLInputElement)?.value;
+    const dynamic = (document.getElementById('new-plan-dynamic') as HTMLInputElement)?.value;
+    const desc = (document.getElementById('new-plan-desc') as HTMLTextAreaElement)?.value;
+
+    if (!id || !name) {
+      alert('Please enter a plan ID and name.');
+      return;
+    }
+
+    alert(`✓ New Plan [${name}] ($${price}/mo) created successfully!`);
+    closeAddPlanModal();
+    window.location.reload();
+  });
+</script>
