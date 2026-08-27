@@ -153,8 +153,14 @@ if (!user) {
       <div class="flex items-center gap-1 text-xs">
         <a href="/dashboard" class="px-2 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100">Overview</a>
         <a href="/dashboard/qr" class="px-2 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100">QRs</a>
-        <a href="/dashboard/landing-pages" class="px-2 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100">Pages</a>
         <a href="/dashboard/billing" class="px-2 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100">Billing</a>
+        <button
+          type="button"
+          id="mobile-dash-logout-btn"
+          class="px-2 py-1 rounded-md text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 font-semibold cursor-pointer"
+        >
+          Sign Out
+        </button>
       </div>
     </div>
 
@@ -166,12 +172,14 @@ if (!user) {
 </BaseLayout>
 
 <script>
-  document.getElementById('sidebar-logout-btn')?.addEventListener('click', async () => {
+  const handleDashLogout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
-      window.location.href = '/';
+      window.location.href = '/login';
     } catch {
-      window.location.href = '/';
+      window.location.href = '/login';
     }
-  });
+  };
+  document.getElementById('sidebar-logout-btn')?.addEventListener('click', handleDashLogout);
+  document.getElementById('mobile-dash-logout-btn')?.addEventListener('click', handleDashLogout);
 </script>

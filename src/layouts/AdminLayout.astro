@@ -86,9 +86,19 @@ const navItems = [
       <a href="/dashboard" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white">
         <span>&larr;</span> User Dashboard
       </a>
-      <div class="px-3.5 py-2 text-[11px] text-slate-500 truncate">
-        {user.email}
+      <div class="px-3.5 py-1 text-[11px] text-slate-400 truncate">
+        {user.name || user.email}
       </div>
+      <button
+        type="button"
+        id="admin-logout-btn"
+        class="w-full flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 font-bold transition-colors cursor-pointer text-xs"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+        Sign Out
+      </button>
     </div>
   </aside>
 
@@ -98,8 +108,14 @@ const navItems = [
       <span class="font-bold text-xs text-white">Platform Admin</span>
     </div>
     <div class="flex items-center gap-2 text-xs">
-      <a href="/admin" class="p-2 rounded-lg bg-slate-900 text-slate-300">Overview</a>
-      <a href="/dashboard" class="p-2 rounded-lg bg-slate-900 text-slate-300">Dashboard &rarr;</a>
+      <a href="/dashboard" class="p-2 rounded-lg bg-slate-900 text-slate-300">Dashboard</a>
+      <button
+        type="button"
+        id="admin-mobile-logout-btn"
+        class="px-2.5 py-1.5 rounded-lg bg-red-500/20 text-red-400 border border-red-500/30 font-bold cursor-pointer"
+      >
+        Sign Out
+      </button>
     </div>
   </div>
 
@@ -107,5 +123,18 @@ const navItems = [
   <main class="flex-1 p-6 md:p-10 max-w-7xl w-full mx-auto space-y-8 overflow-y-auto">
     <slot />
   </main>
+
+  <script>
+    const handleLogout = async () => {
+      try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        window.location.href = '/login';
+      } catch {
+        window.location.href = '/login';
+      }
+    };
+    document.getElementById('admin-logout-btn')?.addEventListener('click', handleLogout);
+    document.getElementById('admin-mobile-logout-btn')?.addEventListener('click', handleLogout);
+  </script>
 </body>
 </html>
