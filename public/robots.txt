@@ -1,10 +1,17 @@
-# Robots.txt for QR Code Generator
+# Robots.txt for Free QR Code Generator
+# https://freeqrcode-generator.com
+
 User-agent: *
 Allow: /
 Allow: /guides/
 Allow: /pricing
+Allow: /privacy
+Allow: /terms
+Allow: /disclaimer
+Allow: /contact
+Allow: /llms.txt
 
-# Disallow private user portals, auth, dynamic redirects, and API endpoints
+# Disallow private dashboards, authentication, edge redirects, and internal APIs
 Disallow: /dashboard/
 Disallow: /admin/
 Disallow: /api/
@@ -13,5 +20,8 @@ Disallow: /signup
 Disallow: /r/
 Disallow: /p/
 
-# Sitemap reference
+# AI Crawlers & LLM Documentation
+# See: https://freeqrcode-generator.com/llms.txt
+
+# XML Sitemaps
 Sitemap: https://freeqrcode-generator.com/sitemap.xml
