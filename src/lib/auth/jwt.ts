@@ -33,7 +33,9 @@ export async function createSessionToken(user: UserSessionPayload, envSecret?: s
 export async function verifySessionToken(token: string, envSecret?: string): Promise<UserSessionPayload | null> {
   try {
     const secret = getJwtSecret(envSecret);
-    const { payload } = await jose.jwtVerify(token, secret);
+    const { payload } = await jose.jwtVerify(token, secret, {
+      algorithms: ['HS256'],
+    });
     return {
       id: payload.id as string,
       email: payload.email as string,
