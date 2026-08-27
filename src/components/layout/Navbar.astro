@@ -121,6 +121,12 @@ const user = sessionToken ? await verifySessionToken(sessionToken) : null;
       <a href="/pricing" class="text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white transition-colors">
         {ui.nav.pricing}
       </a>
+      {user && (
+        <a href="/dashboard" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-200/60 dark:border-indigo-800/60 hover:bg-indigo-100 transition-colors">
+          <span>📊</span>
+          <span>{ui.nav.dashboard}</span>
+        </a>
+      )}
     </nav>
 
     <!-- Right Controls: Language Selector, Theme Toggle, Auth, Hamburger -->
@@ -180,32 +186,33 @@ const user = sessionToken ? await verifySessionToken(sessionToken) : null;
       </button>
 
       {user ? (
-        <div class="hidden sm:flex items-center gap-2">
+        <div class="flex items-center gap-2">
           {user.role === 'admin' && (
             <a
               href="/admin"
-              class="px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20"
+              class="hidden md:inline-flex px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20"
             >
               {ui.nav.admin}
             </a>
           )}
           <a
             href="/dashboard"
-            class="px-3.5 py-2 text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-colors"
+            class="px-3.5 py-1.5 sm:py-2 text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-colors flex items-center gap-1.5"
           >
-            {ui.nav.dashboard}
+            <span>📊</span>
+            <span>{ui.nav.dashboard}</span>
           </a>
           <button
             type="button"
             id="navbar-logout-btn"
-            class="px-2.5 py-1.5 text-xs font-semibold text-slate-500 hover:text-red-500 dark:text-slate-400 dark:hover:text-red-400 transition-colors cursor-pointer"
+            class="hidden sm:block px-2.5 py-1.5 text-xs font-semibold text-slate-500 hover:text-red-500 dark:text-slate-400 dark:hover:text-red-400 transition-colors cursor-pointer"
             title="Sign Out"
           >
             Sign Out
           </button>
         </div>
       ) : (
-        <div class="hidden sm:flex items-center gap-2">
+        <div class="flex items-center gap-2">
           <a
             href="/login"
             class="px-2.5 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white transition-colors"
@@ -214,7 +221,7 @@ const user = sessionToken ? await verifySessionToken(sessionToken) : null;
           </a>
           <a
             href="/signup"
-            class="px-3.5 py-2 text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all"
+            class="hidden sm:inline-flex px-3.5 py-2 text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all"
           >
             {ui.nav.signup}
           </a>
