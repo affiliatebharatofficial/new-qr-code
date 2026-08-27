@@ -134,8 +134,16 @@ const shortUrl = qr.short_code ? `https://freeqrcode-generator.com/r/${qr.short_
       
       <!-- QR Preview Card (5 cols) -->
       <div class="md:col-span-5 p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4 text-center">
-        <div class="relative aspect-square max-w-[280px] mx-auto rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-100 dark:border-slate-800 flex items-center justify-center p-4">
-          <div id="detail-qr-viewport" class="w-full h-full flex items-center justify-center"></div>
+        <div class="relative aspect-square max-w-[280px] mx-auto rounded-2xl bg-white dark:bg-slate-950/80 border border-slate-100 dark:border-slate-800 flex items-center justify-center p-4">
+          <div
+            id="detail-qr-viewport"
+            class="w-full h-full flex items-center justify-center overflow-hidden"
+            data-payload={qr.payload}
+            data-style={typeof qr.style_config === 'string' ? qr.style_config : JSON.stringify(qr.style_config || {})}
+            data-name={qr.name}
+            data-id={qr.id}
+            data-dynamic={qr.is_dynamic ? 'true' : 'false'}
+          ></div>
         </div>
 
         {shortUrl && (
@@ -248,24 +256,24 @@ const shortUrl = qr.short_code ? `https://freeqrcode-generator.com/r/${qr.short_
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl">
       <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
         <div>
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white">Edit QR Code</h3>
-          <p class="text-xs text-slate-500">Update destination URL and campaign name</p>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">Edit QR Code</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Update details or change target destination URL.</p>
         </div>
-        <button type="button" id="btn-close-edit-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-white text-lg cursor-pointer">&times;</button>
+        <button type="button" id="btn-close-edit-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg cursor-pointer">✕</button>
       </div>
 
-      <div id="edit-modal-error" class="hidden p-3 rounded-xl text-xs bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800"></div>
+      <div id="edit-modal-error" class="hidden p-3 rounded-xl text-xs bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-300 border border-red-200 dark:border-red-800"></div>
 
       <form id="edit-qr-form" class="space-y-4">
         <div>
           <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-            QR Campaign Name <span class="text-red-500">*</span>
+            QR Code Name
           </label>
           <input
             type="text"
             id="edit-name-input"
-            value={qr.name}
             required
+            value={qr.name}
             class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none"
           />
         </div>
@@ -273,28 +281,28 @@ const shortUrl = qr.short_code ? `https://freeqrcode-generator.com/r/${qr.short_
         {qr.is_dynamic ? (
           <div>
             <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Target Destination URL <span class="text-red-500">*</span>
+              Destination URL (Dynamic Target)
             </label>
             <input
               type="url"
               id="edit-destination-input"
-              value={qr.destination || qr.payload}
               required
-              placeholder="https://example.com/new-destination"
-              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              value={qr.destination || ''}
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              placeholder="https://yourwebsite.com/new-page"
             />
-            <p class="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1">
-              ✓ Destination URL will be updated without changing the physical printed QR code!
+            <p class="text-[11px] text-slate-500 mt-1">
+              Redirect destination can be updated at any time without changing the printed QR image.
             </p>
           </div>
         ) : (
           <div>
             <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Encoded Payload <span class="text-red-500">*</span>
+              Static QR Raw Payload
             </label>
             <textarea
               id="edit-payload-input"
-              rows="3"
+              rows={3}
               required
               class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none"
             >{qr.payload}</textarea>
@@ -340,22 +348,32 @@ const shortUrl = qr.short_code ? `https://freeqrcode-generator.com/r/${qr.short_
 </DashboardLayout>
 
 <!-- Client QR Renderer Script -->
-<script define:vars={{ payload: qr.payload, styleConfig, qrName: qr.name, qrId: qr.id, isDynamic: qr.is_dynamic }}>
-  let qrCodeInstance = null;
+<script>
+  import QRCodeStyling from 'qr-code-styling';
 
-  async function initQR() {
-    const module = await import('qr-code-styling');
-    const QRCodeStylingClass = module.default;
+  let qrCodeInstance: any = null;
+
+  function initQR() {
+    const viewport = document.getElementById('detail-qr-viewport');
+    if (!viewport) return;
+
+    const payload = viewport.getAttribute('data-payload') || '';
+    let styleConfig: any = {};
+    try {
+      styleConfig = JSON.parse(viewport.getAttribute('data-style') || '{}');
+    } catch {
+      styleConfig = {};
+    }
 
     const dotsColor = styleConfig.colors?.foreground || '#000000';
     const bgColor = styleConfig.colors?.isTransparent ? 'transparent' : (styleConfig.colors?.background || '#ffffff');
 
-    const qrOptions = {
+    const qrOptions: any = {
       width: 256,
       height: 256,
       type: 'canvas',
-      data: payload,
-      margin: styleConfig.margin || 10,
+      data: payload || 'https://freeqrcode-generator.com',
+      margin: typeof styleConfig.margin === 'number' ? styleConfig.margin : 10,
       qrOptions: {
         errorCorrectionLevel: styleConfig.errorCorrection || 'M',
       },
@@ -386,18 +404,23 @@ const shortUrl = qr.short_code ? `https://freeqrcode-generator.com/r/${qr.short_
       };
     }
 
-    const viewport = document.getElementById('detail-qr-viewport');
-    if (viewport) {
-      qrCodeInstance = new QRCodeStylingClass(qrOptions);
+    try {
+      qrCodeInstance = new QRCodeStyling(qrOptions);
       viewport.innerHTML = '';
       qrCodeInstance.append(viewport);
+    } catch (e) {
+      console.error('Failed to render QR Code:', e);
     }
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    initQR();
+  function setupActions() {
+    const viewport = document.getElementById('detail-qr-viewport');
+    if (!viewport) return;
 
+    const qrName = viewport.getAttribute('data-name') || 'qrcode';
+    const qrId = viewport.getAttribute('data-id') || '';
     const cleanName = qrName.replace(/[^a-zA-Z0-9_-]/g, '_') || 'qrcode';
+    const isDynamic = viewport.getAttribute('data-dynamic') === 'true';
 
     document.getElementById('detail-dl-png')?.addEventListener('click', () => {
       qrCodeInstance?.download({ name: `${cleanName}.png`, extension: 'png' });
@@ -407,16 +430,16 @@ const shortUrl = qr.short_code ? `https://freeqrcode-generator.com/r/${qr.short_
       qrCodeInstance?.download({ name: `${cleanName}.svg`, extension: 'svg' });
     });
 
-    document.getElementById('copy-short-url')?.addEventListener('click', async (e) => {
-      const url = e.currentTarget.getAttribute('data-url');
+    document.getElementById('copy-short-url')?.addEventListener('click', async (e: any) => {
+      const url = e.currentTarget?.getAttribute('data-url');
       if (!url) return;
       await navigator.clipboard.writeText(url);
       e.currentTarget.innerText = 'Copied!';
       setTimeout(() => (e.currentTarget.innerText = 'Copy'), 2000);
     });
 
-    document.getElementById('toggle-status-btn')?.addEventListener('click', async (e) => {
-      const current = e.currentTarget.getAttribute('data-current-status');
+    document.getElementById('toggle-status-btn')?.addEventListener('click', async (e: any) => {
+      const current = e.currentTarget?.getAttribute('data-current-status');
       const endpoint = current === 'active' ? `/api/qr/${qrId}/pause` : `/api/qr/${qrId}/activate`;
       const res = await fetch(endpoint, { method: 'POST' });
       if (res.ok) {
@@ -426,8 +449,8 @@ const shortUrl = qr.short_code ? `https://freeqrcode-generator.com/r/${qr.short_
       }
     });
 
-    document.getElementById('duplicate-btn')?.addEventListener('click', async (e) => {
-      const id = e.currentTarget.getAttribute('data-id');
+    document.getElementById('duplicate-btn')?.addEventListener('click', async (e: any) => {
+      const id = e.currentTarget?.getAttribute('data-id');
       if (!id) return;
       const res = await fetch(`/api/qr/${id}/duplicate`, { method: 'POST' });
       if (res.ok) {
@@ -437,8 +460,8 @@ const shortUrl = qr.short_code ? `https://freeqrcode-generator.com/r/${qr.short_
       }
     });
 
-    document.getElementById('delete-btn')?.addEventListener('click', async (e) => {
-      const id = e.currentTarget.getAttribute('data-id');
+    document.getElementById('delete-btn')?.addEventListener('click', async (e: any) => {
+      const id = e.currentTarget?.getAttribute('data-id');
       if (!id || !confirm(`Are you sure you want to delete "${qrName}"?`)) return;
       const res = await fetch(`/api/qr/${id}`, { method: 'DELETE' });
       if (res.ok) {
@@ -448,14 +471,13 @@ const shortUrl = qr.short_code ? `https://freeqrcode-generator.com/r/${qr.short_
       }
     });
 
-    // Edit Modal Logic
     const editModal = document.getElementById('edit-qr-modal');
     const openEditBtn = document.getElementById('open-edit-modal-btn');
     const closeEditBtn = document.getElementById('btn-close-edit-modal');
     const cancelEditBtn = document.getElementById('btn-cancel-edit-modal');
     const editForm = document.getElementById('edit-qr-form');
     const editError = document.getElementById('edit-modal-error');
-    const saveBtn = document.getElementById('btn-save-qr-edit');
+    const saveBtn = document.getElementById('btn-save-qr-edit') as HTMLButtonElement | null;
 
     const openModal = () => {
       editModal?.classList.remove('hidden');
@@ -515,5 +537,12 @@ const shortUrl = qr.short_code ? `https://freeqrcode-generator.com/r/${qr.short_
         saveBtn.innerText = 'Save Changes';
       }
     });
+  }
+
+  initQR();
+  setupActions();
+  document.addEventListener('astro:page-load', () => {
+    initQR();
+    setupActions();
   });
 </script>
