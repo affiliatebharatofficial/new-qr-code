@@ -1,0 +1,500 @@
+---
+import DashboardLayout from '../../../layouts/DashboardLayout.astro';
+import { getCurrentUser } from '../../../lib/auth/jwt';
+import { getDb } from '../../../lib/db/client';
+
+const user = await getCurrentUser(Astro.request, Astro.locals);
+if (!user) {
+  return Astro.redirect('/login?redirect=/dashboard/analytics');
+}
+
+const url = new URL(Astro.request.url);
+const range = url.searchParams.get('range') || '30d';
+
+const now = Date.now();
+let periodMs = 30 * 24 * 60 * 60 * 1000;
+let periodLabel = 'Last 30 Days';
+let timelineBucketsCount = 14;
+
+if (range === 'today') {
+  periodMs = 24 * 60 * 60 * 1000;
+  periodLabel = 'Today (24h)';
+  timelineBucketsCount = 24;
+} else if (range === '7d') {
+  periodMs = 7 * 24 * 60 * 60 * 1000;
+  periodLabel = 'Last 7 Days';
+  timelineBucketsCount = 7;
+} else if (range === '90d') {
+  periodMs = 90 * 24 * 60 * 60 * 1000;
+  periodLabel = 'Last 90 Days';
+  timelineBucketsCount = 12;
+} else if (range === '12m') {
+  periodMs = 365 * 24 * 60 * 60 * 1000;
+  periodLabel = 'Last 12 Months';
+  timelineBucketsCount = 12;
+}
+
+const currentPeriodStart = now - periodMs;
+const prevPeriodStart = currentPeriodStart - periodMs;
+
+const db = getDb(Astro.locals);
+
+// Fetch user's scans for current and previous period
+const [
+  currentScansRes,
+  prevScansRes,
+  userQrsRes,
+  allScansListRes,
+] = await Promise.all([
+  db.prepare(`
+    SELECT s.*, q.name as qr_name, q.type as qr_type, q.short_code
+    FROM qr_scans s
+    JOIN qr_codes q ON s.qr_id = q.id
+    WHERE q.user_id = ? AND s.scanned_at >= ?
+    ORDER BY s.scanned_at DESC
+  `).bind(user.id, currentPeriodStart).all(),
+  db.prepare(`
+    SELECT COUNT(s.id) as count
+    FROM qr_scans s
+    JOIN qr_codes q ON s.qr_id = q.id
+    WHERE q.user_id = ? AND s.scanned_at >= ? AND s.scanned_at < ?
+  `).bind(user.id, prevPeriodStart, currentPeriodStart).all(),
+  db.prepare('SELECT id, name, type, scans_count, short_code, is_dynamic FROM qr_codes WHERE user_id = ? ORDER BY scans_count DESC').bind(user.id).all(),
+  db.prepare(`
+    SELECT s.*, q.name as qr_name, q.short_code
+    FROM qr_scans s
+    JOIN qr_codes q ON s.qr_id = q.id
+    WHERE q.user_id = ?
+    ORDER BY s.scanned_at DESC
+    LIMIT 100
+  `).bind(user.id).all(),
+]);
+
+const currentScans = currentScansRes.results || [];
+const prevCount = (prevScansRes.results?.[0] as any)?.count || 0;
+const currentCount = currentScans.length;
+const userQrs = userQrsRes.results || [];
+const allRecentScans = allScansListRes.results || [];
+
+// Calculate growth percentage
+let growthStr = '0%';
+if (prevCount === 0) {
+  growthStr = currentCount > 0 ? '+100%' : '0%';
+} else {
+  const pct = Math.round(((currentCount - prevCount) / prevCount) * 100);
+  growthStr = pct >= 0 ? `+${pct}%` : `${pct}%`;
+}
+
+// Compute Distribution Maps
+const deviceMap: Record<string, number> = {};
+const osMap: Record<string, number> = {};
+const browserMap: Record<string, number> = {};
+const countryMap: Record<string, number> = {};
+const referrerMap: Record<string, number> = {};
+const timeOfDayMap: Record<string, number> = {
+  'Night (12am-6am)': 0,
+  'Morning (6am-12pm)': 0,
+  'Afternoon (12pm-6pm)': 0,
+  'Evening (6pm-12am)': 0,
+};
+const dayOfWeekMap: Record<string, number> = {
+  'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0, 'Sat': 0, 'Sun': 0
+};
+const daysArr = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+// Build time-series timeline
+const timelineMap: Record<string, { label: string; count: number }> = {};
+const bucketDays = Math.max(1, Math.round(periodMs / (timelineBucketsCount * 24 * 60 * 60 * 1000)));
+
+for (let i = timelineBucketsCount - 1; i >= 0; i--) {
+  const d = new Date(now - i * bucketDays * 24 * 60 * 60 * 1000);
+  const key = d.toISOString().split('T')[0];
+  const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  timelineMap[key] = { label, count: 0 };
+}
+
+for (const s of currentScans as any[]) {
+  // Device
+  const d = s.device_type || 'Mobile';
+  deviceMap[d] = (deviceMap[d] || 0) + 1;
+
+  // OS
+  const o = s.os || 'Unknown';
+  osMap[o] = (osMap[o] || 0) + 1;
+
+  // Browser
+  const b = s.browser || 'Unknown';
+  browserMap[b] = (browserMap[b] || 0) + 1;
+
+  // Country
+  const c = s.country || 'Unknown';
+  countryMap[c] = (countryMap[c] || 0) + 1;
+
+  // Referrer
+  const r = s.referrer || 'Direct Scan';
+  referrerMap[r] = (referrerMap[r] || 0) + 1;
+
+  // Date
+  const dObj = new Date(s.scanned_at);
+  const dateKey = dObj.toISOString().split('T')[0];
+  if (timelineMap[dateKey]) {
+    timelineMap[dateKey].count++;
+  }
+
+  // Time of Day
+  const hour = dObj.getHours();
+  if (hour < 6) timeOfDayMap['Night (12am-6am)']++;
+  else if (hour < 12) timeOfDayMap['Morning (6am-12pm)']++;
+  else if (hour < 18) timeOfDayMap['Afternoon (12pm-6pm)']++;
+  else timeOfDayMap['Evening (6pm-12am)']++;
+
+  // Day of Week
+  const dayName = daysArr[dObj.getDay()];
+  if (dayOfWeekMap[dayName] !== undefined) {
+    dayOfWeekMap[dayName]++;
+  }
+}
+
+const timeline = Object.values(timelineMap);
+const maxDailyCount = Math.max(...timeline.map((t) => t.count), 1);
+
+const sortedCountries = Object.entries(countryMap).sort((a, b) => b[1] - a[1]).slice(0, 6);
+const sortedDevices = Object.entries(deviceMap).sort((a, b) => b[1] - a[1]);
+const sortedBrowsers = Object.entries(browserMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+const sortedOs = Object.entries(osMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+const sortedReferrers = Object.entries(referrerMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+const isProOrBusiness = user.plan === 'pro' || user.plan === 'business';
+---
+
+<DashboardLayout title="Campaign Analytics Hub" activeNav="analytics">
+  <div class="space-y-8 max-w-6xl mx-auto">
+    
+    <!-- Top Header & Date Filter Bar -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          Campaign Analytics Hub
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">
+          Aggregated scan telemetry across all active dynamic QR campaigns.
+        </p>
+      </div>
+
+      <!-- Date Filter Pills -->
+      <div class="flex flex-wrap items-center gap-1.5 bg-white dark:bg-slate-900 p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs shadow-card">
+        <a
+          href="/dashboard/analytics?range=today"
+          class={`px-3 py-1.5 rounded-lg font-bold transition-colors ${
+            range === 'today' ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600'
+          }`}
+        >
+          Today
+        </a>
+        <a
+          href="/dashboard/analytics?range=7d"
+          class={`px-3 py-1.5 rounded-lg font-bold transition-colors ${
+            range === '7d' ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600'
+          }`}
+        >
+          7 Days
+        </a>
+        <a
+          href="/dashboard/analytics?range=30d"
+          class={`px-3 py-1.5 rounded-lg font-bold transition-colors ${
+            range === '30d' ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600'
+          }`}
+        >
+          30 Days
+        </a>
+        <a
+          href="/dashboard/analytics?range=90d"
+          class={`px-3 py-1.5 rounded-lg font-bold transition-colors ${
+            range === '90d' ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600'
+          }`}
+        >
+          90 Days
+        </a>
+        <a
+          href="/dashboard/analytics?range=12m"
+          class={`px-3 py-1.5 rounded-lg font-bold transition-colors ${
+            range === '12m' ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600'
+          }`}
+        >
+          12 Months
+        </a>
+      </div>
+    </div>
+
+    <!-- Comparative KPI Banner -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-1">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Scan Volume ({periodLabel})</span>
+          <span class={`text-xs font-bold px-2 py-0.5 rounded-md ${
+            growthStr.startsWith('+') ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : 'bg-slate-100 text-slate-500'
+          }`}>
+            {growthStr}
+          </span>
+        </div>
+        <div class="text-3xl font-black text-slate-900 dark:text-white">{currentCount}</div>
+        <p class="text-[11px] text-slate-400 font-mono">vs. {prevCount} in previous period</p>
+      </div>
+
+      <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-1">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Active Dynamic QR Campaigns</span>
+        <div class="text-3xl font-black text-indigo-600 dark:text-indigo-400">
+          {userQrs.filter((q: any) => q.is_dynamic).length}
+        </div>
+        <p class="text-[11px] text-slate-400 font-mono">with real-time redirection</p>
+      </div>
+
+      <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-1">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Top Campaign</span>
+        <div class="text-xl font-bold text-slate-900 dark:text-white truncate pt-1">
+          {userQrs[0]?.name || 'No campaigns yet'}
+        </div>
+        <p class="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono font-bold">
+          {userQrs[0]?.scans_count || 0} lifetime scans
+        </p>
+      </div>
+    </div>
+
+    <!-- Interactive Time-Series Scan Graph -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-card space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span>📈</span> Scan Engagement Over Time ({periodLabel})
+          </h2>
+          <p class="text-xs text-slate-500">Chronological daily scan volume trajectory.</p>
+        </div>
+        
+        <button
+          type="button"
+          id="btn-export-csv"
+          class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+        >
+          <span>📥</span> Export CSV
+        </button>
+      </div>
+
+      {currentCount === 0 ? (
+        <div class="text-center py-16 px-4 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 space-y-2">
+          <div class="text-3xl">📡</div>
+          <p class="text-xs text-slate-500 font-semibold">No scan telemetry recorded for this time window.</p>
+          <p class="text-[11px] text-slate-400">Share your dynamic QR codes on marketing collateral, posters, or packaging to track scans.</p>
+        </div>
+      ) : (
+        <div class="pt-6">
+          <!-- Visual Bar Chart -->
+          <div class="h-44 flex items-end gap-2 sm:gap-4 border-b border-slate-100 dark:border-slate-800 pb-2">
+            {timeline.map((point) => {
+              const heightPercent = Math.max(8, Math.round((point.count / maxDailyCount) * 100));
+              return (
+                <div class="flex-1 flex flex-col items-center gap-1 group relative h-full justify-end">
+                  <!-- Hover tooltip -->
+                  <div class="absolute -top-9 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[10px] py-1 px-2 rounded font-mono pointer-events-none whitespace-nowrap z-20 shadow-lg">
+                    {point.count} scans ({point.label})
+                  </div>
+                  <div
+                    class="w-full rounded-t-md bg-indigo-500 hover:bg-indigo-600 transition-all cursor-pointer"
+                    style={`height: ${heightPercent}%;`}
+                  ></div>
+                  <span class="text-[9px] text-slate-400 font-mono hidden sm:block truncate w-full text-center">
+                    {point.label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+
+    <!-- 4 Distribution Breakdown Modules Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- Device Platform -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-card space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+          <span>📱</span> Device Platform
+        </h3>
+        {sortedDevices.length === 0 ? (
+          <p class="text-xs text-slate-400 py-4 text-center">No device data.</p>
+        ) : (
+          <div class="space-y-2 text-xs">
+            {sortedDevices.map(([dev, count]) => {
+              const pct = Math.round((count / currentCount) * 100);
+              return (
+                <div class="space-y-1">
+                  <div class="flex justify-between text-slate-700 dark:text-slate-300">
+                    <span class="capitalize font-semibold">{dev}</span>
+                    <span class="font-mono text-slate-500">{count} ({pct}%)</span>
+                  </div>
+                  <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-indigo-600 h-full rounded-full" style={`width: ${pct}%;`}></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      <!-- Operating System -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-card space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+          <span>💻</span> Operating System
+        </h3>
+        {sortedOs.length === 0 ? (
+          <p class="text-xs text-slate-400 py-4 text-center">No OS data.</p>
+        ) : (
+          <div class="space-y-2 text-xs">
+            {sortedOs.map(([os, count]) => {
+              const pct = Math.round((count / currentCount) * 100);
+              return (
+                <div class="space-y-1">
+                  <div class="flex justify-between text-slate-700 dark:text-slate-300">
+                    <span class="font-semibold">{os}</span>
+                    <span class="font-mono text-slate-500">{count} ({pct}%)</span>
+                  </div>
+                  <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-purple-600 h-full rounded-full" style={`width: ${pct}%;`}></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      <!-- Browser Distribution -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-card space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+          <span>🌐</span> Browser Client
+        </h3>
+        {sortedBrowsers.length === 0 ? (
+          <p class="text-xs text-slate-400 py-4 text-center">No browser data.</p>
+        ) : (
+          <div class="space-y-2 text-xs">
+            {sortedBrowsers.map(([browser, count]) => {
+              const pct = Math.round((count / currentCount) * 100);
+              return (
+                <div class="space-y-1">
+                  <div class="flex justify-between text-slate-700 dark:text-slate-300">
+                    <span class="font-semibold">{browser}</span>
+                    <span class="font-mono text-slate-500">{count} ({pct}%)</span>
+                  </div>
+                  <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-emerald-500 h-full rounded-full" style={`width: ${pct}%;`}></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      <!-- Top Geographic Countries -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-card space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+          <span>🌍</span> Top Countries
+        </h3>
+        {sortedCountries.length === 0 ? (
+          <p class="text-xs text-slate-400 py-4 text-center">No geo data.</p>
+        ) : (
+          <div class="space-y-2 text-xs">
+            {sortedCountries.map(([country, count]) => {
+              const pct = Math.round((count / currentCount) * 100);
+              return (
+                <div class="space-y-1">
+                  <div class="flex justify-between text-slate-700 dark:text-slate-300">
+                    <span class="font-semibold">{country}</span>
+                    <span class="font-mono text-slate-500">{count} ({pct}%)</span>
+                  </div>
+                  <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-amber-500 h-full rounded-full" style={`width: ${pct}%;`}></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+    </div>
+
+    <!-- Time of Day & Day of Week Engagement Split -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Time of Day -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-card space-y-4">
+        <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span>⏰</span> Engagement by Time of Day
+        </h3>
+        <div class="space-y-2.5 text-xs">
+          {Object.entries(timeOfDayMap).map(([slot, count]) => {
+            const pct = currentCount > 0 ? Math.round((count / currentCount) * 100) : 0;
+            return (
+              <div class="space-y-1">
+                <div class="flex justify-between text-slate-700 dark:text-slate-300">
+                  <span class="font-semibold">{slot}</span>
+                  <span class="font-mono text-slate-500">{count} scans ({pct}%)</span>
+                </div>
+                <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                  <div class="bg-indigo-600 h-full rounded-full" style={`width: ${pct}%;`}></div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <!-- Day of Week -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-card space-y-4">
+        <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span>📅</span> Weekly Scan Distribution
+        </h3>
+        <div class="space-y-2.5 text-xs">
+          {Object.entries(dayOfWeekMap).map(([day, count]) => {
+            const pct = currentCount > 0 ? Math.round((count / currentCount) * 100) : 0;
+            return (
+              <div class="space-y-1">
+                <div class="flex justify-between text-slate-700 dark:text-slate-300">
+                  <span class="font-semibold">{day}</span>
+                  <span class="font-mono text-slate-500">{count} scans ({pct}%)</span>
+                </div>
+                <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                  <div class="bg-emerald-500 h-full rounded-full" style={`width: ${pct}%;`}></div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</DashboardLayout>
+
+<script>
+  document.getElementById('btn-export-csv')?.addEventListener('click', () => {
+    // Generate clean CSV on client
+    const rows = [
+      ['Timestamp', 'Location', 'Device', 'OS', 'Browser', 'Referrer'],
+    ];
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + 
+      rows.map((e) => e.join(',')).join('\n');
+    
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `qr-analytics-export-${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+</script>

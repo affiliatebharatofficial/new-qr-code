@@ -57,6 +57,18 @@ if (!user) {
         </a>
 
         <a
+          href="/dashboard/analytics"
+          class={`flex items-center gap-2.5 px-3 py-2 rounded-lg font-semibold transition-colors ${
+            activeNav === 'analytics'
+              ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+          }`}
+        >
+          <span>📈</span>
+          <span>Analytics</span>
+        </a>
+
+        <a
           href="/dashboard/landing-pages"
           class={`flex items-center gap-2.5 px-3 py-2 rounded-lg font-semibold transition-colors ${
             activeNav === 'landing_pages'
@@ -146,14 +158,15 @@ if (!user) {
     </aside>
 
     <!-- Mobile Navigation Topbar -->
-    <div class="lg:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-2.5 flex items-center justify-between">
-      <a href="/dashboard" class="flex items-center gap-2 font-bold text-xs text-slate-900 dark:text-white">
+    <div class="lg:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-2.5 flex items-center justify-between overflow-x-auto">
+      <a href="/dashboard" class="flex items-center gap-1.5 font-bold text-xs text-slate-900 dark:text-white shrink-0 mr-2">
         <span>Workspace</span>
       </a>
-      <div class="flex items-center gap-1 text-xs">
-        <a href="/dashboard" class="px-2 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100">Overview</a>
-        <a href="/dashboard/qr" class="px-2 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100">QRs</a>
-        <a href="/dashboard/billing" class="px-2 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100">Billing</a>
+      <div class="flex items-center gap-1 text-xs shrink-0">
+        <a href="/dashboard" class="px-2 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">Overview</a>
+        <a href="/dashboard/qr" class="px-2 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">QRs</a>
+        <a href="/dashboard/analytics" class="px-2 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">Analytics</a>
+        <a href="/dashboard/billing" class="px-2 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">Billing</a>
         <button
           type="button"
           id="mobile-dash-logout-btn"

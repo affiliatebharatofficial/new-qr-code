@@ -2,134 +2,357 @@
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
 import { getCurrentUser } from '../../lib/auth/jwt';
 import { getDb } from '../../lib/db/client';
+import { PLANS, type PlanId } from '../../lib/billing/plans';
 
 const user = await getCurrentUser(Astro.request, Astro.locals);
 if (!user) {
-  return Astro.redirect('/login');
+  return Astro.redirect('/login?redirect=/dashboard');
 }
 
 const db = getDb(Astro.locals);
+const now = Date.now();
+const oneDayAgo = now - 24 * 60 * 60 * 1000;
+const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
+const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;
+const prevThirtyDaysAgo = now - 60 * 24 * 60 * 60 * 1000;
 
-const [countRes, dynRes, scansRes, recentRes] = await Promise.all([
+// Fetch user's QR codes and scan telemetry
+const [
+  qrsCountRes,
+  qrsDynamicRes,
+  qrsActiveRes,
+  qrsDisabledRes,
+  userQrsRes,
+  scansRes,
+  assetsRes,
+] = await Promise.all([
   db.prepare('SELECT COUNT(*) as total FROM qr_codes WHERE user_id = ?').bind(user.id).all(),
   db.prepare('SELECT COUNT(*) as total FROM qr_codes WHERE user_id = ? AND is_dynamic = 1').bind(user.id).all(),
-  db.prepare('SELECT COALESCE(SUM(scans_count), 0) as total FROM qr_codes WHERE user_id = ?').bind(user.id).all(),
-  db.prepare('SELECT * FROM qr_codes WHERE user_id = ? ORDER BY created_at DESC LIMIT 5').bind(user.id).all(),
+  db.prepare("SELECT COUNT(*) as total FROM qr_codes WHERE user_id = ? AND status = 'active'").bind(user.id).all(),
+  db.prepare("SELECT COUNT(*) as total FROM qr_codes WHERE user_id = ? AND status != 'active'").bind(user.id).all(),
+  db.prepare('SELECT * FROM qr_codes WHERE user_id = ? ORDER BY scans_count DESC LIMIT 10').bind(user.id).all(),
+  db.prepare(`
+    SELECT s.*, q.name as qr_name, q.type as qr_type, q.short_code
+    FROM qr_scans s
+    JOIN qr_codes q ON s.qr_id = q.id
+    WHERE q.user_id = ?
+    ORDER BY s.scanned_at DESC
+    LIMIT 100
+  `).bind(user.id).all(),
+  db.prepare('SELECT COALESCE(SUM(file_size), 0) as total_bytes FROM qr_assets WHERE user_id = ?').bind(user.id).all(),
 ]);
 
-const totalQrs = (countRes.results?.[0] as any)?.total || 0;
-const dynamicQrs = (dynRes.results?.[0] as any)?.total || 0;
-const totalScans = (scansRes.results?.[0] as any)?.total || 0;
-const recentQrs = recentRes.results || [];
+const totalQrs = (qrsCountRes.results?.[0] as any)?.total || 0;
+const dynamicQrs = (qrsDynamicRes.results?.[0] as any)?.total || 0;
+const staticQrs = Math.max(0, totalQrs - dynamicQrs);
+const activeQrs = (qrsActiveRes.results?.[0] as any)?.total || 0;
+const disabledQrs = (qrsDisabledRes.results?.[0] as any)?.total || 0;
+
+const topQrs = userQrsRes.results || [];
+const allUserScans = scansRes.results || [];
+const totalStorageBytes = (assetsRes.results?.[0] as any)?.total_bytes || 0;
+const storageMb = (totalStorageBytes / (1024 * 1024)).toFixed(1);
+
+// Scan time windows
+let scansToday = 0;
+let scansThisWeek = 0;
+let scansThisMonth = 0;
+let scansPrevMonth = 0;
+
+const qrTypeStats: Record<string, number> = {};
+
+for (const s of allUserScans as any[]) {
+  if (s.scanned_at >= oneDayAgo) scansToday++;
+  if (s.scanned_at >= sevenDaysAgo) scansThisWeek++;
+  if (s.scanned_at >= thirtyDaysAgo) {
+    scansThisMonth++;
+  } else if (s.scanned_at >= prevThirtyDaysAgo) {
+    scansPrevMonth++;
+  }
+
+  const type = s.qr_type || 'url';
+  qrTypeStats[type] = (qrTypeStats[type] || 0) + 1;
+}
+
+const totalLifetimeScans = topQrs.reduce((acc: number, q: any) => acc + (q.scans_count || 0), 0);
+
+// Compute 30d scan growth
+let scanGrowthStr = '0%';
+if (scansPrevMonth === 0) {
+  scanGrowthStr = scansThisMonth > 0 ? '+100%' : '0%';
+} else {
+  const pct = Math.round(((scansThisMonth - scansPrevMonth) / scansPrevMonth) * 100);
+  scanGrowthStr = pct >= 0 ? `+${pct}%` : `${pct}%`;
+}
+
+// Plan limits
+const userPlanConfig = PLANS[(user.plan as PlanId) || 'free'] || PLANS.free;
+const savedQrLimitStr = userPlanConfig.savedQrLimit === null ? 'Unlimited' : userPlanConfig.savedQrLimit.toString();
+const dynamicQrLimitStr = userPlanConfig.dynamicQrLimit === null ? 'Unlimited' : userPlanConfig.dynamicQrLimit.toString();
+const storageLimitMb = Math.round(userPlanConfig.logoStorageLimitBytes / (1024 * 1024));
+
+const recentScans = allUserScans.slice(0, 5);
 ---
 
-<DashboardLayout title="Workspace Overview" activeNav="overview">
-  <div class="space-y-6">
-    <!-- Header -->
+<DashboardLayout title="Customer Portal & Overview" activeNav="overview">
+  <div class="space-y-8">
+    
+    <!-- Top Welcome Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-          Welcome, {user.name || 'User'}
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 font-mono">
+            {userPlanConfig.name} Plan • {userPlanConfig.badge}
+          </span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-1">
+          Welcome back, {user.name || 'User'}
         </h1>
-        <p class="text-xs text-slate-500 mt-0.5">
-          Workspace overview for your active QR configurations and telemetry.
+        <p class="text-xs sm:text-sm text-slate-500">
+          Campaign telemetry, scannability meters, and active QR configurations.
         </p>
       </div>
 
-      <a
-        href="/"
-        class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-subtle cursor-pointer"
-      >
-        <span>+ Generate QR Code</span>
-      </a>
-    </div>
-
-    <!-- Overview Stats Cards -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-1">
-        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Total QR Codes</div>
-        <div class="text-2xl font-black text-slate-900 dark:text-white">{totalQrs}</div>
-      </div>
-
-      <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-1">
-        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Dynamic Links</div>
-        <div class="text-2xl font-black text-indigo-600 dark:text-indigo-400">{dynamicQrs}</div>
-      </div>
-
-      <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-1">
-        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Total Scans</div>
-        <div class="text-2xl font-black text-emerald-600 dark:text-emerald-400">{totalScans}</div>
-      </div>
-
-      <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-1">
-        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Plan Tier</div>
-        <div class="text-2xl font-black text-slate-900 dark:text-white uppercase">{user.plan}</div>
+      <div class="flex flex-wrap items-center gap-2">
+        <a
+          href="/dashboard/analytics"
+          class="px-3.5 py-2 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+        >
+          <span>📈</span> Full Analytics
+        </a>
+        <a
+          href="/"
+          class="px-4 py-2 rounded-lg text-xs font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-subtle flex items-center gap-1.5 cursor-pointer"
+        >
+          <span>+</span> Create New QR
+        </a>
       </div>
     </div>
 
-    <!-- Recently Created QR Codes -->
-    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-card overflow-hidden">
-      <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">Recent QR Codes</h2>
-        <a href="/dashboard/qr" class="text-xs font-bold text-slate-600 dark:text-slate-400 hover:underline">
-          View All &rarr;
+    <!-- 4 Primary Metric Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- Total QRs -->
+      <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-1">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">My QR Codes</span>
+        <div class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+          {totalQrs} <span class="text-xs text-slate-400 font-normal">/ {savedQrLimitStr}</span>
+        </div>
+        <p class="text-[11px] text-slate-500 font-medium">
+          {dynamicQrs} Dynamic • {staticQrs} Static
+        </p>
+      </div>
+
+      <!-- Lifetime Scans -->
+      <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-1">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Total Scans</span>
+        <div class="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">
+          {totalLifetimeScans}
+        </div>
+        <p class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
+          {scanGrowthStr} vs last month
+        </p>
+      </div>
+
+      <!-- Scans Today & This Week -->
+      <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-1">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Scans This Week</span>
+        <div class="text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400">
+          {scansThisWeek}
+        </div>
+        <p class="text-[11px] text-slate-500 font-medium">
+          {scansToday} scans recorded today
+        </p>
+      </div>
+
+      <!-- Dynamic Quota Meter -->
+      <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-1">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Dynamic Links</span>
+        <div class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+          {dynamicQrs} <span class="text-xs text-slate-400 font-normal">/ {dynamicQrLimitStr}</span>
+        </div>
+        <div class="pt-1">
+          <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+            <div 
+              class="bg-indigo-600 h-full rounded-full" 
+              style={`width: ${userPlanConfig.dynamicQrLimit ? Math.min(100, Math.round((dynamicQrs / userPlanConfig.dynamicQrLimit) * 100)) : 10}%`}
+            ></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Middle Split: Top Performing QR Codes & Plan Entitlement Status -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Top Performing QR Codes (2 Cols) -->
+      <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-card space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <span>🏆</span> Top Performing QR Campaigns
+            </h2>
+            <p class="text-xs text-slate-500">Ranked by lifetime optical scan engagement.</p>
+          </div>
+          <a href="/dashboard/qr" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+            View All &rarr;
+          </a>
+        </div>
+
+        {topQrs.length === 0 ? (
+          <div class="text-center py-10 px-4 space-y-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+            <div class="text-3xl">🏁</div>
+            <p class="text-xs text-slate-500 font-semibold">No QR codes created in your account yet.</p>
+            <a
+              href="/"
+              class="inline-block px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-colors"
+            >
+              Generate Your First QR Code
+            </a>
+          </div>
+        ) : (
+          <div class="divide-y divide-slate-100 dark:divide-slate-800">
+            {topQrs.slice(0, 5).map((q: any, idx) => (
+              <div class="py-3.5 flex items-center justify-between gap-4 text-xs">
+                <div class="flex items-center gap-3 min-w-0">
+                  <span class="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 font-mono text-[11px] font-bold text-slate-500 flex items-center justify-center shrink-0">
+                    #{idx + 1}
+                  </span>
+                  <div class="min-w-0">
+                    <a href={`/dashboard/qr/${q.id}`} class="font-bold text-slate-900 dark:text-white hover:text-indigo-600 block truncate">
+                      {q.name}
+                    </a>
+                    <span class="text-[11px] text-slate-400 font-mono">
+                      {q.type.toUpperCase()} • {q.is_dynamic ? `Dynamic (/r/${q.short_code})` : 'Static'}
+                    </span>
+                  </div>
+                </div>
+                
+                <div class="flex items-center gap-3 shrink-0">
+                  <span class="font-mono font-black text-emerald-600 dark:text-emerald-400">
+                    {q.scans_count || 0} scans
+                  </span>
+                  {q.is_dynamic ? (
+                    <a
+                      href={`/dashboard/qr/${q.id}/analytics`}
+                      class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition-colors"
+                    >
+                      Analytics ↗
+                    </a>
+                  ) : (
+                    <span class="text-[10px] text-slate-400 font-mono">Static</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <!-- Account Quota & Plan Status Card (1 Col) -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-card space-y-5">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Account Quotas</span>
+          <h2 class="text-base font-bold text-slate-900 dark:text-white mt-0.5">
+            {userPlanConfig.name} Tier
+          </h2>
+          <p class="text-xs text-slate-500">{userPlanConfig.description}</p>
+        </div>
+
+        <div class="space-y-3 text-xs font-mono">
+          <div>
+            <div class="flex justify-between text-slate-700 dark:text-slate-300 mb-1">
+              <span>Saved QR Codes:</span>
+              <span class="font-bold">{totalQrs} / {savedQrLimitStr}</span>
+            </div>
+            <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+              <div class="bg-indigo-600 h-full rounded-full" style={`width: ${userPlanConfig.savedQrLimit ? Math.min(100, (totalQrs / userPlanConfig.savedQrLimit) * 100) : 15}%`}></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between text-slate-700 dark:text-slate-300 mb-1">
+              <span>Dynamic QR Links:</span>
+              <span class="font-bold">{dynamicQrs} / {dynamicQrLimitStr}</span>
+            </div>
+            <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+              <div class="bg-indigo-600 h-full rounded-full" style={`width: ${userPlanConfig.dynamicQrLimit ? Math.min(100, (dynamicQrs / userPlanConfig.dynamicQrLimit) * 100) : 15}%`}></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between text-slate-700 dark:text-slate-300 mb-1">
+              <span>Logo Asset Storage:</span>
+              <span class="font-bold">{storageMb} MB / {storageLimitMb} MB</span>
+            </div>
+            <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+              <div class="bg-emerald-500 h-full rounded-full" style={`width: ${Math.min(100, (parseFloat(storageMb) / storageLimitMb) * 100)}%`}></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 dark:border-slate-800">
+          <a
+            href="/dashboard/billing"
+            class="w-full py-2 px-3 rounded-lg text-xs font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition-colors flex items-center justify-center gap-1.5"
+          >
+            <span>💳</span> Upgrade or Manage Plan
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Recent Scan Stream Feed -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-card space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span>📡</span> Live Campaign Scan Activity
+          </h2>
+          <p class="text-xs text-slate-500">Recent real-time scans logged across your dynamic QR codes.</p>
+        </div>
+        <a href="/dashboard/analytics" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+          Analytics Dashboard &rarr;
         </a>
       </div>
 
-      {recentQrs.length === 0 ? (
-        <div class="text-center py-10 px-4 space-y-2">
-          <p class="text-xs text-slate-500">No QR codes created yet.</p>
-          <a
-            href="/"
-            class="inline-block px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900"
-          >
-            Create Your First QR
-          </a>
+      {recentScans.length === 0 ? (
+        <div class="text-center py-8 text-xs text-slate-500">
+          No scan activity recorded yet. Share your dynamic QR codes to track scans!
         </div>
       ) : (
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs">
-            <thead class="bg-slate-50 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800 text-slate-500 font-bold uppercase tracking-wider">
+            <thead class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
               <tr>
-                <th class="py-3 px-4">Name</th>
-                <th class="py-3 px-4">Type</th>
-                <th class="py-3 px-4">Destination</th>
-                <th class="py-3 px-4">Scans</th>
-                <th class="py-3 px-4 text-right">Actions</th>
+                <th class="py-2.5 px-4">Timestamp</th>
+                <th class="py-2.5 px-4">Campaign Name</th>
+                <th class="py-2.5 px-4">Location</th>
+                <th class="py-2.5 px-4">Device Platform</th>
+                <th class="py-2.5 px-4">Browser</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-slate-800/80">
-              {recentQrs.map((qr: any) => (
-                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30">
-                  <td class="py-3.5 px-4 font-bold text-slate-900 dark:text-white">
-                    <a href={`/dashboard/qr/${qr.id}`} class="hover:text-indigo-600 dark:hover:text-indigo-400">
-                      {qr.name}
+              {recentScans.map((s: any) => (
+                <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                  <td class="py-3 px-4 font-mono text-slate-400 text-[11px]">
+                    {new Date(s.scanned_at).toLocaleString()}
+                  </td>
+                  <td class="py-3 px-4 font-bold text-slate-900 dark:text-white">
+                    <a href={`/dashboard/qr/${s.qr_id}/analytics`} class="hover:text-indigo-600 hover:underline">
+                      {s.qr_name || s.qr_id}
                     </a>
                   </td>
-                  <td class="py-3.5 px-4">
-                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                      {qr.type} {qr.is_dynamic ? '• Dyn' : ''}
-                    </span>
+                  <td class="py-3 px-4 text-slate-600 dark:text-slate-300">
+                    {s.country || 'Unknown'}, {s.city || 'Unknown'}
                   </td>
-                  <td class="py-3.5 px-4 text-slate-500 truncate max-w-xs font-mono text-[11px]">
-                    {qr.destination || qr.payload}
+                  <td class="py-3 px-4 capitalize text-slate-700 dark:text-slate-300 font-medium">
+                    {s.device_type}
                   </td>
-                  <td class="py-3.5 px-4 font-bold text-slate-700 dark:text-slate-300">
-                    {qr.scans_count || 0}
-                  </td>
-                  <td class="py-3.5 px-4 text-right space-x-1">
-                    <a
-                      href={`/dashboard/qr/${qr.id}`}
-                      class="px-2 py-1 rounded text-[11px] font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-                    >
-                      Details
-                    </a>
-                    <a
-                      href={`/?edit=${qr.id}`}
-                      class="px-2 py-1 rounded text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-                    >
-                      Edit
-                    </a>
+                  <td class="py-3 px-4 text-slate-500 text-[11px]">
+                    {s.browser} on {s.os}
                   </td>
                 </tr>
               ))}
@@ -138,5 +361,6 @@ const recentQrs = recentRes.results || [];
         </div>
       )}
     </div>
+
   </div>
 </DashboardLayout>

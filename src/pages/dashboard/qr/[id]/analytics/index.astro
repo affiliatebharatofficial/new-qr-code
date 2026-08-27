@@ -19,49 +19,96 @@ if (!qr) {
   return Astro.redirect('/dashboard/qr');
 }
 
-// IDOR Protection
+// Strict IDOR Verification
 if (qr.user_id !== user.id && user.role !== 'admin') {
   return Astro.redirect('/dashboard/qr');
 }
 
-// Fetch Scans
-const scansRes = await db.prepare('SELECT * FROM qr_scans WHERE qr_id = ? ORDER BY scanned_at DESC').bind(id).all();
-const scans = scansRes.results || [];
+const url = new URL(Astro.request.url);
+const range = url.searchParams.get('range') || '30d';
 
 const now = Date.now();
-const oneDayAgo = now - 24 * 60 * 60 * 1000;
-const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
+let periodMs = 30 * 24 * 60 * 60 * 1000;
+let periodLabel = 'Last 30 Days';
+let timelineBuckets = 14;
+
+if (range === 'today') {
+  periodMs = 24 * 60 * 60 * 1000;
+  periodLabel = 'Today (24h)';
+  timelineBuckets = 24;
+} else if (range === '7d') {
+  periodMs = 7 * 24 * 60 * 60 * 1000;
+  periodLabel = 'Last 7 Days';
+  timelineBuckets = 7;
+} else if (range === '90d') {
+  periodMs = 90 * 24 * 60 * 60 * 1000;
+  periodLabel = 'Last 90 Days';
+  timelineBuckets = 12;
+} else if (range === '12m') {
+  periodMs = 365 * 24 * 60 * 60 * 1000;
+  periodLabel = 'Last 12 Months';
+  timelineBuckets = 12;
+}
+
+const currentPeriodStart = now - periodMs;
+const prevPeriodStart = currentPeriodStart - periodMs;
+
+// Fetch Scans for this QR
+const [scansRes, prevScansRes] = await Promise.all([
+  db.prepare('SELECT * FROM qr_scans WHERE qr_id = ? AND scanned_at >= ? ORDER BY scanned_at DESC').bind(id, currentPeriodStart).all(),
+  db.prepare('SELECT COUNT(*) as count FROM qr_scans WHERE qr_id = ? AND scanned_at >= ? AND scanned_at < ?').bind(id, prevPeriodStart, currentPeriodStart).all(),
+]);
+
+const scans = scansRes.results || [];
+const prevCount = (prevScansRes.results?.[0] as any)?.count || 0;
+const currentCount = scans.length;
 
 let todayCount = 0;
-let last7dCount = 0;
+let weekCount = 0;
 const uniqueIps = new Set<string>();
 
 const devicesMap: Record<string, number> = {};
 const countriesMap: Record<string, number> = {};
 const browsersMap: Record<string, number> = {};
 const osMap: Record<string, number> = {};
+const referrerMap: Record<string, number> = {};
+const timeOfDayMap: Record<string, number> = {
+  'Night (12am-6am)': 0,
+  'Morning (6am-12pm)': 0,
+  'Afternoon (12pm-6pm)': 0,
+  'Evening (6pm-12am)': 0,
+};
+const dayOfWeekMap: Record<string, number> = {
+  'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0, 'Sat': 0, 'Sun': 0
+};
+const daysArr = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-// Build last 14 days timeline
-const days = 14;
-const timelineMap: Record<string, { dateStr: string; count: number }> = {};
-for (let i = days - 1; i >= 0; i--) {
-  const d = new Date(now - i * 24 * 60 * 60 * 1000);
-  const dateKey = d.toISOString().split('T')[0];
-  const displayDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  timelineMap[dateKey] = { dateStr: displayDate, count: 0 };
+// Build timeline buckets
+const timelineMap: Record<string, { label: string; count: number }> = {};
+const bucketDays = Math.max(1, Math.round(periodMs / (timelineBuckets * 24 * 60 * 60 * 1000)));
+
+for (let i = timelineBuckets - 1; i >= 0; i--) {
+  const d = new Date(now - i * bucketDays * 24 * 60 * 60 * 1000);
+  const key = d.toISOString().split('T')[0];
+  const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  timelineMap[key] = { label, count: 0 };
 }
 
-for (const s of scans) {
+const oneDayAgo = now - 24 * 60 * 60 * 1000;
+const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
+
+for (const s of scans as any[]) {
   if (s.ip_hash) uniqueIps.add(s.ip_hash);
   if (s.scanned_at >= oneDayAgo) todayCount++;
-  if (s.scanned_at >= sevenDaysAgo) last7dCount++;
+  if (s.scanned_at >= sevenDaysAgo) weekCount++;
 
-  const dateKey = new Date(s.scanned_at).toISOString().split('T')[0];
+  const dObj = new Date(s.scanned_at);
+  const dateKey = dObj.toISOString().split('T')[0];
   if (timelineMap[dateKey]) {
     timelineMap[dateKey].count++;
   }
 
-  const dev = s.device_type || 'Unknown';
+  const dev = s.device_type || 'Mobile';
   devicesMap[dev] = (devicesMap[dev] || 0) + 1;
 
   const c = s.country || 'Unknown';
@@ -72,6 +119,20 @@ for (const s of scans) {
 
   const o = s.os || 'Unknown';
   osMap[o] = (osMap[o] || 0) + 1;
+
+  const r = s.referrer || 'Direct Scan';
+  referrerMap[r] = (referrerMap[r] || 0) + 1;
+
+  const hour = dObj.getHours();
+  if (hour < 6) timeOfDayMap['Night (12am-6am)']++;
+  else if (hour < 12) timeOfDayMap['Morning (6am-12pm)']++;
+  else if (hour < 18) timeOfDayMap['Afternoon (12pm-6pm)']++;
+  else timeOfDayMap['Evening (6pm-12am)']++;
+
+  const dayName = daysArr[dObj.getDay()];
+  if (dayOfWeekMap[dayName] !== undefined) {
+    dayOfWeekMap[dayName]++;
+  }
 }
 
 const timeline = Object.values(timelineMap);
@@ -79,239 +140,247 @@ const maxDailyCount = Math.max(...timeline.map((t) => t.count), 1);
 
 const topCountries = Object.entries(countriesMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
 const topDevices = Object.entries(devicesMap).sort((a, b) => b[1] - a[1]);
-const topBrowsers = Object.entries(browsersMap).sort((a, b) => b[1] - a[1]);
-const topOs = Object.entries(osMap).sort((a, b) => b[1] - a[1]);
+const topBrowsers = Object.entries(browsersMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+const topOs = Object.entries(osMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
-const shortUrl = qr.short_code ? `https://qrcode.page/r/${qr.short_code}` : null;
+let growthPctStr = '0%';
+if (prevCount === 0) {
+  growthPctStr = currentCount > 0 ? '+100%' : '0%';
+} else {
+  const pct = Math.round(((currentCount - prevCount) / prevCount) * 100);
+  growthPctStr = pct >= 0 ? `+${pct}%` : `${pct}%`;
+}
+
+const shortUrl = qr.short_code ? `https://freeqrcode-generator.com/r/${qr.short_code}` : null;
 ---
 
 <DashboardLayout title={`Analytics: ${qr.name}`} activeNav="qr">
   <div class="space-y-8 max-w-5xl mx-auto">
-    <!-- Breadcrumb & Header -->
+    
+    <!-- Top Header & Breadcrumb -->
     <div>
-      <a href={`/dashboard/qr/${qr.id}`} class="text-xs font-semibold text-slate-500 hover:text-indigo-600 flex items-center gap-1 mb-3">
-        &larr; Back to QR Details
-      </a>
+      <div class="flex items-center gap-2 text-xs text-slate-500 mb-2">
+        <a href="/dashboard/qr" class="hover:text-indigo-600 hover:underline">&larr; Back to My QR Codes</a>
+        <span>/</span>
+        <span class="text-slate-800 dark:text-slate-200 font-semibold">{qr.name}</span>
+      </div>
+
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div class="flex items-center gap-2">
-            <span class="px-2.5 py-0.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
-              {qr.is_dynamic ? 'Dynamic QR' : 'Static QR'}
-            </span>
             <span class={`px-2.5 py-0.5 rounded-lg text-xs font-bold uppercase tracking-wider ${
-              qr.status === 'active'
-                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
-                : 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800'
+              qr.is_dynamic 
+                ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
             }`}>
-              {qr.status}
+              {qr.is_dynamic ? 'Dynamic Campaign' : 'Static QR Code'}
             </span>
+            <span class="text-xs text-slate-400 font-mono">ID: {qr.id}</span>
           </div>
-          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-1">
-            {qr.name} Analytics
+
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-1">
+            {qr.name}
           </h1>
-          {qr.destination && (
-            <p class="text-xs text-slate-500 mt-1 truncate max-w-lg">
-              Destination: <a href={qr.destination} target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline">{qr.destination}</a>
+          {shortUrl && (
+            <p class="text-xs text-slate-500 font-mono mt-0.5">
+              Live Edge Route: <a href={shortUrl} target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline">{shortUrl} ↗</a>
             </p>
           )}
         </div>
 
-        {shortUrl && (
-          <div class="flex items-center gap-2">
-            <button
-              type="button"
-              id="copy-short-url-btn"
-              data-url={shortUrl}
-              class="px-4 py-2.5 rounded-2xl text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-500 text-slate-800 dark:text-slate-200 shadow-sm transition-all cursor-pointer"
-            >
-              <span id="copy-btn-label">Copy Short URL</span>
-            </button>
+        <!-- Date Range Filter Selector -->
+        {qr.is_dynamic ? (
+          <div class="flex flex-wrap items-center gap-1.5 bg-white dark:bg-slate-900 p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs shadow-card">
             <a
-              href={`/?edit=${qr.id}`}
-              class="px-4 py-2.5 rounded-2xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-600/20 transition-all"
+              href={`/dashboard/qr/${qr.id}/analytics?range=today`}
+              class={`px-3 py-1.5 rounded-lg font-bold transition-colors ${range === 'today' ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600'}`}
             >
-              Edit Destination
+              Today
+            </a>
+            <a
+              href={`/dashboard/qr/${qr.id}/analytics?range=7d`}
+              class={`px-3 py-1.5 rounded-lg font-bold transition-colors ${range === '7d' ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600'}`}
+            >
+              7 Days
+            </a>
+            <a
+              href={`/dashboard/qr/${qr.id}/analytics?range=30d`}
+              class={`px-3 py-1.5 rounded-lg font-bold transition-colors ${range === '30d' ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600'}`}
+            >
+              30 Days
+            </a>
+            <a
+              href={`/dashboard/qr/${qr.id}/analytics?range=12m`}
+              class={`px-3 py-1.5 rounded-lg font-bold transition-colors ${range === '12m' ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600'}`}
+            >
+              12 Months
             </a>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
 
-    <!-- Summary Metric Cards -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-      <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
-        <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Scans</div>
-        <div class="text-3xl font-black text-slate-900 dark:text-white">{scans.length}</div>
-        <div class="text-[11px] text-slate-400">All-time scan events</div>
-      </div>
-
-      <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
-        <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Unique Scans</div>
-        <div class="text-3xl font-black text-indigo-600 dark:text-indigo-400">{uniqueIps.size}</div>
-        <div class="text-[11px] text-slate-400">Estimated unique devices</div>
-      </div>
-
-      <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
-        <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Today</div>
-        <div class="text-3xl font-black text-emerald-600 dark:text-emerald-400">{todayCount}</div>
-        <div class="text-[11px] text-slate-400">Scans in past 24 hours</div>
-      </div>
-
-      <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
-        <div class="text-xs font-semibold uppercase tracking-wider text-slate-500">Last 7 Days</div>
-        <div class="text-3xl font-black text-amber-600 dark:text-amber-400">{last7dCount}</div>
-        <div class="text-[11px] text-slate-400">Past 7 days volume</div>
-      </div>
-    </div>
-
-    {scans.length === 0 ? (
-      <div class="p-12 text-center rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-        <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
+    <!-- Static QR Notice (if applicable) -->
+    {!qr.is_dynamic ? (
+      <div class="p-6 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 space-y-3">
+        <div class="flex items-center gap-2 text-amber-800 dark:text-amber-300 font-bold text-sm">
+          <span>ℹ️</span> Static QR Code — Real-Time Scan Tracking Unavailable
         </div>
-        <h3 class="text-base font-bold text-slate-900 dark:text-white">No scans yet</h3>
-        <p class="text-xs text-slate-500 max-w-sm mx-auto">
-          Share your dynamic QR code on print flyers, posters, or packaging to start collecting real-time scan analytics.
+        <p class="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
+          This is an offline Static QR code. The payload data is directly encoded into the barcode modules and connects directly without passing through an edge redirection server. To track lifetime scan volume, countries, devices, and engagement times, convert or create a <strong>Dynamic QR Code</strong>.
         </p>
+        <div class="pt-1">
+          <a
+            href="/"
+            class="inline-block px-4 py-2 rounded-lg text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white shadow-sm transition-colors"
+          >
+            Create Dynamic QR Campaign &rarr;
+          </a>
+        </div>
       </div>
     ) : (
       <>
-        <!-- Timeline Chart Card -->
-        <div class="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
-          <div class="flex items-center justify-between">
-            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">Scan Activity (Last 14 Days)</h2>
-            <span class="text-xs font-semibold text-slate-500">Daily Breakdown</span>
+        <!-- 4 Primary KPI Summary Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-1">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Period Scans ({periodLabel})</span>
+            <div class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{currentCount}</div>
+            <p class={`text-[11px] font-bold ${growthPctStr.startsWith('+') ? 'text-emerald-600' : 'text-slate-400'}`}>
+              {growthPctStr} vs prev period
+            </p>
           </div>
 
-          <div class="h-44 flex items-end gap-2 pt-6 pb-2 px-2 border-b border-slate-100 dark:border-slate-800">
-            {timeline.map((point) => {
-              const heightPct = Math.max((point.count / maxDailyCount) * 100, 6);
-              return (
-                <div class="flex-1 flex flex-col items-center gap-1 group relative">
-                  <div class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                    {point.count}
-                  </div>
-                  <div
-                    style={`height: ${heightPct}%;`}
-                    class="w-full max-w-[28px] rounded-t-lg bg-indigo-500 group-hover:bg-indigo-600 transition-all shadow-xs"
-                  ></div>
-                  <span class="text-[9px] text-slate-400 whitespace-nowrap overflow-hidden text-ellipsis">
-                    {point.dateStr.split(' ')[1]}
-                  </span>
-                </div>
-              );
-            })}
+          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-1">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Unique Daily Hashes</span>
+            <div class="text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-400">{uniqueIps.size}</div>
+            <p class="text-[11px] text-slate-400 font-mono">anonymized salted IP</p>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-1">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Scans Today</span>
+            <div class="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">{todayCount}</div>
+            <p class="text-[11px] text-slate-400 font-mono">{weekCount} this week</p>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-1">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Lifetime Total</span>
+            <div class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{qr.scans_count || 0}</div>
+            <p class="text-[11px] text-slate-400 font-mono">since creation</p>
           </div>
         </div>
 
-        <!-- Demographics Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Top Countries -->
-          <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">Top Countries</h2>
-            <div class="space-y-3">
-              {topCountries.map(([country, count]) => {
-                const pct = Math.round((count / scans.length) * 100);
-                return (
-                  <div class="space-y-1">
-                    <div class="flex justify-between text-xs font-bold text-slate-800 dark:text-slate-200">
-                      <span>{country}</span>
-                      <span class="text-slate-500">{count} ({pct}%)</span>
-                    </div>
-                    <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                      <div class="h-full bg-indigo-500 rounded-full" style={`width: ${pct}%`}></div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+        <!-- Scan Growth Graph -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-card space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <span>📈</span> Scan Trajectory ({periodLabel})
+            </h2>
+            <span class="text-xs text-slate-400 font-mono">Total in window: {currentCount} scans</span>
           </div>
 
-          <!-- Device Breakdown -->
-          <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">Device Category</h2>
-            <div class="space-y-3">
-              {topDevices.map(([device, count]) => {
-                const pct = Math.round((count / scans.length) * 100);
-                return (
-                  <div class="space-y-1">
-                    <div class="flex justify-between text-xs font-bold text-slate-800 dark:text-slate-200 capitalize">
-                      <span>{device}</span>
-                      <span class="text-slate-500">{count} ({pct}%)</span>
-                    </div>
-                    <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                      <div class="h-full bg-emerald-500 rounded-full" style={`width: ${pct}%`}></div>
-                    </div>
-                  </div>
-                );
-              })}
+          {currentCount === 0 ? (
+            <div class="text-center py-12 text-xs text-slate-500">
+              No scans recorded for this QR code during this time window.
             </div>
+          ) : (
+            <div class="pt-4">
+              <div class="h-44 flex items-end gap-2 sm:gap-3 border-b border-slate-100 dark:border-slate-800 pb-2">
+                {timeline.map((point) => {
+                  const heightPercent = Math.max(8, Math.round((point.count / maxDailyCount) * 100));
+                  return (
+                    <div class="flex-1 flex flex-col items-center gap-1 group relative h-full justify-end">
+                      <div class="absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[10px] py-1 px-2 rounded font-mono pointer-events-none whitespace-nowrap z-20 shadow-lg">
+                        {point.count} scans ({point.label})
+                      </div>
+                      <div
+                        class="w-full rounded-t-md bg-indigo-500 hover:bg-indigo-600 transition-all cursor-pointer"
+                        style={`height: ${heightPercent}%;`}
+                      ></div>
+                      <span class="text-[9px] text-slate-400 font-mono hidden sm:block truncate w-full text-center">
+                        {point.label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <!-- Breakdown Grid: Device, Country, OS, Browser -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <!-- Device -->
+          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-3">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Device Platform</h3>
+            {topDevices.length === 0 ? (
+              <p class="text-xs text-slate-400 py-3 text-center">No device data.</p>
+            ) : (
+              <div class="space-y-2 text-xs">
+                {topDevices.map(([dev, count]) => (
+                  <div class="flex justify-between">
+                    <span class="capitalize font-semibold text-slate-700 dark:text-slate-300">{dev}</span>
+                    <span class="font-mono text-indigo-600 dark:text-indigo-400 font-bold">{count}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          <!-- Top Browsers -->
-          <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">Browsers</h2>
-            <div class="space-y-3">
-              {topBrowsers.map(([browser, count]) => {
-                const pct = Math.round((count / scans.length) * 100);
-                return (
-                  <div class="space-y-1">
-                    <div class="flex justify-between text-xs font-bold text-slate-800 dark:text-slate-200">
-                      <span>{browser}</span>
-                      <span class="text-slate-500">{count} ({pct}%)</span>
-                    </div>
-                    <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                      <div class="h-full bg-purple-500 rounded-full" style={`width: ${pct}%`}></div>
-                    </div>
+          <!-- Country -->
+          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-3">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Top Countries</h3>
+            {topCountries.length === 0 ? (
+              <p class="text-xs text-slate-400 py-3 text-center">No country data.</p>
+            ) : (
+              <div class="space-y-2 text-xs">
+                {topCountries.map(([c, count]) => (
+                  <div class="flex justify-between">
+                    <span class="font-semibold text-slate-700 dark:text-slate-300">{c}</span>
+                    <span class="font-mono text-emerald-600 dark:text-emerald-400 font-bold">{count}</span>
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          <!-- Operating Systems -->
-          <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">Operating Systems</h2>
-            <div class="space-y-3">
-              {topOs.map(([os, count]) => {
-                const pct = Math.round((count / scans.length) * 100);
-                return (
-                  <div class="space-y-1">
-                    <div class="flex justify-between text-xs font-bold text-slate-800 dark:text-slate-200">
-                      <span>{os}</span>
-                      <span class="text-slate-500">{count} ({pct}%)</span>
-                    </div>
-                    <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                      <div class="h-full bg-amber-500 rounded-full" style={`width: ${pct}%`}></div>
-                    </div>
+          <!-- OS -->
+          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-3">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Operating System</h3>
+            {topOs.length === 0 ? (
+              <p class="text-xs text-slate-400 py-3 text-center">No OS data.</p>
+            ) : (
+              <div class="space-y-2 text-xs">
+                {topOs.map(([os, count]) => (
+                  <div class="flex justify-between">
+                    <span class="font-semibold text-slate-700 dark:text-slate-300">{os}</span>
+                    <span class="font-mono text-purple-600 dark:text-purple-400 font-bold">{count}</span>
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
+
+          <!-- Browser -->
+          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-3">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Browser Client</h3>
+            {topBrowsers.length === 0 ? (
+              <p class="text-xs text-slate-400 py-3 text-center">No browser data.</p>
+            ) : (
+              <div class="space-y-2 text-xs">
+                {topBrowsers.map(([b, count]) => (
+                  <div class="flex justify-between">
+                    <span class="font-semibold text-slate-700 dark:text-slate-300">{b}</span>
+                    <span class="font-mono text-slate-600 dark:text-slate-300 font-bold">{count}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
         </div>
       </>
     )}
+
   </div>
 </DashboardLayout>
-
-<script>
-  const copyBtn = document.getElementById('copy-short-url-btn');
-  const copyLabel = document.getElementById('copy-btn-label');
-
-  copyBtn?.addEventListener('click', async () => {
-    const url = copyBtn.getAttribute('data-url');
-    if (!url) return;
-    try {
-      await navigator.clipboard.writeText(url);
-      if (copyLabel) {
-        copyLabel.innerText = 'Copied!';
-        setTimeout(() => (copyLabel.innerText = 'Copy Short URL'), 2000);
-      }
-    } catch {
-      alert('Failed to copy URL.');
-    }
-  });
-</script>
