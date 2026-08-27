@@ -13,6 +13,8 @@ interface Props {
   jsonLd?: Record<string, any> | Array<Record<string, any>>;
   noIndex?: boolean;
   locale?: Locale;
+  hideFooter?: boolean;
+  hideNavbar?: boolean;
 }
 
 const {
@@ -23,6 +25,8 @@ const {
   jsonLd,
   noIndex = false,
   locale: explicitLocale,
+  hideFooter = false,
+  hideNavbar = false,
 } = Astro.props;
 
 const currentPath = Astro.url.pathname;
@@ -139,12 +143,12 @@ const finalJsonLd = jsonLd
     </script>
   </head>
   <body class="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-200">
-    <Navbar locale={currentLocale} />
+    {!hideNavbar && <Navbar locale={currentLocale} />}
     
-    <main class="flex-grow">
+    <main class="flex-grow flex flex-col">
       <slot />
     </main>
 
-    <Footer locale={currentLocale} />
+    {!hideFooter && <Footer locale={currentLocale} />}
   </body>
 </html>
