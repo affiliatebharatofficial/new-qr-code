@@ -5,21 +5,24 @@ import QRCustomization from './QRCustomization.astro';
 import QRPreview from './QRPreview.astro';
 import QRDownload from './QRDownload.astro';
 import type { QRType } from '../../lib/qr/types';
+import type { Locale } from '../../lib/i18n/config';
 
 interface Props {
   initialType?: QRType;
   headline?: string;
   subheadline?: string;
+  locale?: Locale;
 }
 
 const {
   initialType = 'url',
   headline = 'Free QR Code Generator',
   subheadline = 'Create high-resolution, branded QR codes instantly. 100% free, runs entirely in your browser.',
+  locale = 'en',
 } = Astro.props;
 ---
 
-<section id="generator-app" class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8" data-initial-type={initialType}>
+<section id="generator-app" class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8" data-initial-type={initialType} data-locale={locale}>
   <!-- Section Title -->
   <div class="text-center max-w-3xl mx-auto mb-8">
     <h1 id="generator-heading" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white">

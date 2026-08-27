@@ -1,11 +1,13 @@
 ---
 import QRGenerator from './QRGenerator.astro';
 import type { QRType } from '../../lib/qr/types';
+import type { Locale } from '../../lib/i18n/config';
 
 interface Props {
   initialType?: QRType;
   headline?: string;
   subheadline?: string;
+  locale?: Locale;
 }
 
 const props = Astro.props;

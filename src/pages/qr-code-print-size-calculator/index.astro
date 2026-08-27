@@ -3,61 +3,25 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import QRPrintSizeCalculator from '../../components/calculator/QRPrintSizeCalculator.astro';
 import { PRINT_PRESETS } from '../../lib/calculator/print';
 import { extractLocaleFromPath, DEFAULT_LOCALE, type Locale } from '../../lib/i18n/config';
+import { getPrintCalculatorPageData } from '../../lib/i18n/content/calculatorPages';
 
 const currentPath = Astro.url.pathname;
 const { locale } = extractLocaleFromPath(currentPath);
+const printData = getPrintCalculatorPageData(locale);
 
 const breadcrumbs = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
     { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://freeqrcode-generator.com/' },
-    { '@type': 'ListItem', position: 2, name: 'QR Code Print Size Calculator', item: 'https://freeqrcode-generator.com/qr-code-print-size-calculator' },
+    { '@type': 'ListItem', position: 2, name: printData.h1, item: 'https://freeqrcode-generator.com/qr-code-print-size-calculator' },
   ],
 };
 
-const printFaqs = [
-  {
-    question: 'What is the best QR code size and DPI for printing?',
-    answer:
-      'For handheld printed materials (such as business cards, brochures, flyers, and restaurant menus), the industry standard is 300 DPI with a minimum physical dimension of 2.5 × 2.5 cm (1 × 1 in) to 5.0 × 5.0 cm (2 × 2 in). At 300 DPI, a 5 × 5 cm QR code requires approximately 591 × 591 pixels. For commercial print runs, always prefer vector SVG to eliminate resolution dependency completely.',
-  },
-  {
-    question: 'What DPI should I use for a printed QR code?',
-    answer:
-      'Use 300 DPI for any material held in a person’s hands (business cards, table tents, product packaging, book pages). For mid-range signage and posters viewed from 1 to 2 meters, 150 DPI is sufficient. For large outdoor billboards, tradeshow backdrops, and vehicle wraps viewed from 5+ meters, 100 to 150 DPI is acceptable because individual dots blend at distance.',
-  },
-  {
-    question: 'How many pixels does a QR code need for printing?',
-    answer:
-      'Calculate required pixels using the formula: Pixels = Physical Inches × DPI. For metric measurements: Pixels = (Centimeters / 2.54) × DPI. For example, a 10 × 10 cm poster QR code printed at 300 DPI requires exactly (10 / 2.54) × 300 = 1,181 × 1,181 pixels in raster PNG format.',
-  },
-  {
-    question: 'Should I use SVG or PNG for professional commercial printing?',
-    answer:
-      'Always use SVG (Scalable Vector Graphics) for professional graphic design, prepress layout (Adobe InDesign, Illustrator, CorelDRAW), and commercial printing. SVG files consist of mathematical vectors rather than fixed pixel grids, allowing the symbol to be enlarged to any scale without edge blur, pixelation, or loss of optical sharpness.',
-  },
-  {
-    question: 'How big should a QR code be on a business card?',
-    answer:
-      'On a standard 3.5 × 2.0 inch (8.9 × 5.1 cm) business card, a QR code should measure between 2.5 × 2.5 cm (1.0 × 1.0 in) and 3.0 × 3.0 cm (1.2 × 1.2 in). Ensure the data payload is kept minimal (such as a shortened dynamic URL) so the QR version remains low (Version 2 to 4), keeping individual module dots large and crisp.',
-  },
-  {
-    question: 'How big should a QR code be on a poster or window sign?',
-    answer:
-      'On indoor wall posters viewed from 1 to 1.5 meters away, size the QR code between 10 × 10 cm and 15 × 15 cm (4 × 4 in to 6 × 6 in). For storefront window signs scanned from the sidewalk (1.5 to 2.5 meters away), size the QR code between 18 × 18 cm and 25 × 25 cm (7 × 7 in to 10 × 10 in).',
-  },
-  {
-    question: 'Does DPI affect the physical size of a QR code?',
-    answer:
-      'No. DPI (Dots Per Inch) determines the pixel density and sharpness of the raster image, not its physical measurement. A 10 × 10 cm QR code printed at 72 DPI and another printed at 300 DPI will both measure exactly 10 × 10 cm on paper, but the 300 DPI version will have 1181 × 1181 pixels with crisp module boundaries, whereas the 72 DPI version will have only 283 × 283 pixels with blurry, pixelated edges.',
-  },
-];
-
-const printFaqJsonLd = {
+const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: printFaqs.map((f) => ({
+  mainEntity: printData.faqs.map((f) => ({
     '@type': 'Question',
     name: f.question,
     acceptedAnswer: {
@@ -69,9 +33,10 @@ const printFaqJsonLd = {
 ---
 
 <BaseLayout
-  title="QR Code Print Size Calculator — DPI, Pixels & Prepress Guide"
-  description="Calculate exact print dimensions, required raster pixels at 300 DPI, vector SVG prepress recommendations, and optical scan ranges for business cards, flyers, posters, and packaging."
-  jsonLd={[breadcrumbs, printFaqJsonLd]}
+  title={printData.title}
+  description={printData.description}
+  locale={locale}
+  jsonLd={[breadcrumbs, faqJsonLd]}
 >
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-12">
     
@@ -81,10 +46,10 @@ const printFaqJsonLd = {
         <span>🖨️</span> Prepress Print Calculator
       </div>
       <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
-        QR Code Print Size Calculator
+        {printData.h1}
       </h1>
       <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-        Ensure razor-sharp commercial print output. Calculate exact pixel dimensions at 300 DPI, module thickness, and prepress quality metrics for any print medium.
+        {printData.subheadline}
       </p>
     </div>
 
@@ -95,11 +60,8 @@ const printFaqJsonLd = {
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
       <div>
         <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <span>📦</span> Standard Commercial Print Size Presets
+          <span>📦</span> {printData.tableTitle}
         </h2>
-        <p class="text-xs text-slate-500 mt-1">
-          Recommended baseline physical dimensions and printer resolutions across commercial print formats.
-        </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -114,155 +76,33 @@ const printFaqJsonLd = {
             <p class="text-[11px] text-slate-500 leading-relaxed">
               {preset.description}
             </p>
-            <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-200/60 dark:border-slate-800/60">
-              <span>Resolution: {preset.defaultDpi} DPI</span>
-              <span>Distance: {preset.recommendedDistance}</span>
-            </div>
           </div>
         ))}
       </div>
     </div>
 
-    <!-- Educational Prepress & Print Quality Content (700-1000 words) -->
+    <!-- Educational Prepress & Print Quality Content -->
     <article class="prose dark:prose-invert max-w-none space-y-8 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-200 dark:border-slate-800 pt-10">
-      
       <section class="space-y-3">
         <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-          How QR Code Printing Size Works
+          {printData.overviewTitle}
         </h2>
-        <p>
-          Preparing a QR code for commercial offset, digital, flexographic, or screen printing requires synchronizing physical millimeter dimensions with digital raster resolution. While on-screen mobile interfaces render barcodes at 72 or 96 pixels per inch, physical print presses operate at <strong>300 to 2400 Dots Per Inch (DPI)</strong>.
-        </p>
-        <p>
-          If a digital graphic has insufficient pixel resolution, the commercial RIP (Raster Image Processor) software must interpolate and upscale the raster grid, producing soft, anti-aliased module corners. Smartphone camera decoders rely on crisp, high-contrast black-to-white edge transitions; blurred module edges reduce the optical scannability threshold and cause camera timeout errors.
-        </p>
+        {printData.overviewParagraphs.map((p) => (
+          <p>{p}</p>
+        ))}
       </section>
-
-      <section class="space-y-3">
-        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-          QR Code Size vs DPI: The Mathematics of Print Resolution
-        </h2>
-        <p>
-          To calculate the exact pixel dimensions required for a printed QR code raster image, use the standard prepress conversion formula:
-        </p>
-        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 font-mono text-xs text-indigo-600 dark:text-indigo-400">
-          Pixels = Physical Inches × DPI = (Physical Centimeters / 2.54) × DPI
-        </div>
-        <p>
-          Consider three examples of physical size printed at standard <code>300 DPI</code>:
-        </p>
-        <ul class="list-disc pl-5 space-y-1">
-          <li><strong>Business Card (3 × 3 cm / 1.18 × 1.18 in):</strong> <code>(3 / 2.54) × 300 = 354 × 354 pixels</code></li>
-          <li><strong>Flyer / Menu (6 × 6 cm / 2.36 × 2.36 in):</strong> <code>(6 / 2.54) × 300 = 709 × 709 pixels</code></li>
-          <li><strong>Poster / Wall Sign (15 × 15 cm / 5.91 × 5.91 in):</strong> <code>(15 / 2.54) × 300 = 1,772 × 1,772 pixels</code></li>
-        </ul>
-      </section>
-
-      <section class="space-y-3">
-        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-          Sizing by Specific Print Media
-        </h2>
-        
-        <div class="space-y-4">
-          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5">
-            <h3 class="text-sm font-bold text-slate-900 dark:text-white">1. Business Cards &amp; Stationery (vCard)</h3>
-            <p>
-              Business cards offer limited real estate. While the standard card measures 3.5 × 2.0 inches, the QR code must be at least <strong>2.5 × 2.5 cm (1.0 × 1.0 in)</strong>. If encoding a full vCard contact record, use a short dynamic redirection URL to keep the QR version at Version 3 (29×29 modules) rather than Version 12 (65×65 modules).
-            </p>
-          </div>
-
-          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5">
-            <h3 class="text-sm font-bold text-slate-900 dark:text-white">2. Restaurant Menus &amp; Tabletop Tents</h3>
-            <p>
-              Diners seated at a restaurant table typically scan menus from a distance of 30 to 50 cm. Sizing the QR code between <strong>5.0 × 5.0 cm and 7.0 × 7.0 cm</strong> allows quick scanning even in moody, dim ambient dining lighting without requiring guests to lean across the table.
-            </p>
-          </div>
-
-          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5">
-            <h3 class="text-sm font-bold text-slate-900 dark:text-white">3. Product Packaging, Labels &amp; Boxes</h3>
-            <p>
-              For consumer packaged goods (CPG), bottles, and cosmetic cartons, the QR code should measure at least <strong>2.5 × 2.5 cm to 4.0 × 4.0 cm</strong>. Ensure the QR code is placed on a flat, non-curved surface; printing on tight cylindrical vials distorts the timing pattern grid.
-            </p>
-          </div>
-
-          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5">
-            <h3 class="text-sm font-bold text-slate-900 dark:text-white">4. Event Posters, Banners &amp; Trade Show Displays</h3>
-            <p>
-              For indoor event posters (A2 / A1 size), allocate at least <strong>12 × 12 cm to 20 × 20 cm</strong>. For tradeshow rollup banners viewed from 3 to 4 meters away, expand the QR code to <strong>30 × 30 cm or larger</strong> and position it at chest height (1.2 to 1.5 meters from the floor) for effortless scanning.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section class="space-y-3">
-        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-          SVG vs PNG for Commercial Prepress Workflows
-        </h2>
-        <p>
-          In professional publishing and packaging design, the choice of file format determines final print fidelity:
-        </p>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs font-sans">
-            <thead class="bg-slate-50 dark:bg-slate-950 text-slate-400 font-bold uppercase">
-              <tr>
-                <th class="py-2.5 px-3">Feature</th>
-                <th class="py-2.5 px-3">Vector SVG (Recommended)</th>
-                <th class="py-2.5 px-3">Raster PNG (300 DPI)</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-              <tr>
-                <td class="py-2.5 px-3 font-semibold text-slate-900 dark:text-white">Resolution</td>
-                <td class="py-2.5 px-3 text-emerald-600 dark:text-emerald-400 font-bold">Infinite (Vector Math)</td>
-                <td class="py-2.5 px-3 text-slate-500">Fixed Pixel Grid</td>
-              </tr>
-              <tr>
-                <td class="py-2.5 px-3 font-semibold text-slate-900 dark:text-white">Scalability</td>
-                <td class="py-2.5 px-3 text-emerald-600 dark:text-emerald-400 font-bold">Resize without quality loss</td>
-                <td class="py-2.5 px-3 text-slate-500">Pixelates if enlarged beyond 100%</td>
-              </tr>
-              <tr>
-                <td class="py-2.5 px-3 font-semibold text-slate-900 dark:text-white">File Size</td>
-                <td class="py-2.5 px-3 text-emerald-600 dark:text-emerald-400 font-bold">Tiny (~3–8 KB)</td>
-                <td class="py-2.5 px-3 text-slate-500">Medium (~100–500 KB)</td>
-              </tr>
-              <tr>
-                <td class="py-2.5 px-3 font-semibold text-slate-900 dark:text-white">Design Tools</td>
-                <td class="py-2.5 px-3 text-emerald-600 dark:text-emerald-400 font-bold">InDesign, Illustrator, Figma, Corel</td>
-                <td class="py-2.5 px-3 text-slate-500">Canva, Word, Photoshop, Web</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="space-y-3">
-        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-          Pre-Flight Print Quality Checklist
-        </h2>
-        <ul class="list-disc pl-5 space-y-1.5">
-          <li><strong>High Optical Contrast:</strong> Ensure dark foreground modules against a clean white or light solid substrate. Never invert to light dots on a dark background unless verified.</li>
-          <li><strong>4-Module Quiet Zone:</strong> Verify an unobstructed border of at least 4 modules width around the entire code symbol.</li>
-          <li><strong>Surface Finishes:</strong> Avoid high-gloss laminates or metallic foils directly over the QR code, which cause specular laser/camera reflections. Prefer matte or soft-touch coatings.</li>
-          <li><strong>Ink Bleed Compensation:</strong> On highly absorbent substrates (such as newsprint or unbleached Kraft paper), increase physical size by 20% to compensate for dot gain.</li>
-        </ul>
-      </section>
-
     </article>
 
     <!-- Structured FAQ Section -->
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
       <div>
         <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
-          Frequently Asked Questions About Printing QR Codes
+          {printData.faqsTitle}
         </h2>
-        <p class="text-xs text-slate-500 mt-1">
-          Technical answers to questions on DPI, pixel resolution, raster vs vector formats, and commercial printing.
-        </p>
       </div>
 
       <div class="divide-y divide-slate-100 dark:divide-slate-800 space-y-4">
-        {printFaqs.map((faq) => (
+        {printData.faqs.map((faq) => (
           <div class="pt-4 space-y-1.5">
             <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-start gap-2">
               <span class="text-indigo-600 dark:text-indigo-400 font-bold">Q:</span>
@@ -284,9 +124,7 @@ const printFaqJsonLd = {
         <span>•</span>
         <a href="/qr-code-size-calculator" class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold">QR Code Size &amp; Distance Calculator</a>
         <span>•</span>
-        <a href="/guides/how-to-use-qr-codes-for-restaurants" class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold">Restaurant QR Menu Guide</a>
-        <span>•</span>
-        <a href="/guides" class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold">All QR Guides</a>
+        <a href="/guides" class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold">QR Guides</a>
       </div>
 
       <div>

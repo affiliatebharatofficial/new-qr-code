@@ -3,61 +3,25 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import QRSizeCalculator from '../../components/calculator/QRSizeCalculator.astro';
 import { SCAN_DISTANCE_REFERENCE_TABLE } from '../../lib/calculator/size';
 import { extractLocaleFromPath, DEFAULT_LOCALE, type Locale } from '../../lib/i18n/config';
+import { getSizeCalculatorPageData } from '../../lib/i18n/content/calculatorPages';
 
 const currentPath = Astro.url.pathname;
 const { locale } = extractLocaleFromPath(currentPath);
+const sizeData = getSizeCalculatorPageData(locale);
 
 const breadcrumbs = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
     { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://freeqrcode-generator.com/' },
-    { '@type': 'ListItem', position: 2, name: 'QR Code Size Calculator', item: 'https://freeqrcode-generator.com/qr-code-size-calculator' },
+    { '@type': 'ListItem', position: 2, name: sizeData.h1, item: 'https://freeqrcode-generator.com/qr-code-size-calculator' },
   ],
 };
-
-const faqs = [
-  {
-    question: 'How big should a QR code be for scanning?',
-    answer:
-      'As a practical rule of thumb, a QR code should have a physical width and height equal to roughly 1/10th of the expected scanning distance. For example, a restaurant menu scanned from 30 cm away should be at least 3 × 3 cm, while a poster scanned from 1 meter away should be at least 10 × 10 cm. For handheld scanning, never print a QR code smaller than 2.0 × 2.0 cm (0.8 × 0.8 in).',
-  },
-  {
-    question: 'What is the absolute minimum QR code size for printing?',
-    answer:
-      'The absolute safe minimum physical size for a standard smartphone camera to reliably lock focus and decode a QR code is 2.0 × 2.0 cm (0.8 × 0.8 in). Printing below this dimension causes autofocus lag and decoding errors, especially on older smartphone camera lenses or with dense data payloads like vCards.',
-  },
-  {
-    question: 'How does scan distance affect QR code size?',
-    answer:
-      'As scan distance increases, the QR code occupies a smaller angle of view on the camera sensor. To compensate, the physical symbol must scale proportionately. Using a practical 10:1 ratio, a QR code viewed from 2 meters requires approximately 20 × 20 cm, while an outdoor billboard viewed from 10 meters requires at least 100 × 100 cm (1 × 1 meter).',
-  },
-  {
-    question: 'Does QR code error correction level affect the required size?',
-    answer:
-      'Yes. Higher error correction levels (such as Level H at ~30% recovery) add redundancy bits to the symbol, increasing the total number of modules (e.g. from 29×29 to 45×45 modules). Because each module becomes physically smaller within the same overall area, high-error-correction QR codes require slightly larger physical dimensions to maintain optimal readability.',
-  },
-  {
-    question: 'What is a QR code module and why does module size matter?',
-    answer:
-      'A module is an individual black or white square that makes up the QR code grid. For reliable optical reading on printed media, each individual module should measure at least 0.45 mm to 0.5 mm in physical width. If individual modules are printed smaller than 0.4 mm, ink bleed on paper or low-resolution camera sensors can merge adjacent dots and cause scan failure.',
-  },
-  {
-    question: 'How much quiet zone margin does a QR code need?',
-    answer:
-      'According to the ISO/IEC 18004 QR code standard, a QR code requires a clean, unobstructed quiet zone of at least 4 modules width on all four sides. The quiet zone must be free of text, borders, artwork, and busy background patterns so camera sensors can isolate the symbol timing patterns.',
-  },
-  {
-    question: 'Should I export my QR code as SVG or PNG for physical sizing?',
-    answer:
-      'For commercial printing and large physical displays, always choose SVG (Scalable Vector Graphics). SVG is resolution-independent and can be scaled to any physical size (from a 2 cm sticker to a 10-meter billboard) with razor-sharp geometric edges. If using PNG, ensure it is exported at 300+ DPI at your target print dimensions.',
-  },
-];
 
 const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: faqs.map((f) => ({
+  mainEntity: sizeData.faqs.map((f) => ({
     '@type': 'Question',
     name: f.question,
     acceptedAnswer: {
@@ -69,8 +33,9 @@ const faqJsonLd = {
 ---
 
 <BaseLayout
-  title="QR Code Size Calculator — Recommended Sizing & Distance Guide"
-  description="Calculate the exact recommended physical QR code size and pixel resolution based on scan distance, error correction, and content density. Includes 10:1 ratio tables and DPI math."
+  title={sizeData.title}
+  description={sizeData.description}
+  locale={locale}
   jsonLd={[breadcrumbs, faqJsonLd]}
 >
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-12">
@@ -78,155 +43,64 @@ const faqJsonLd = {
     <!-- Top Header -->
     <div class="text-center space-y-3 max-w-3xl mx-auto">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
-        <span>📏</span> Optical QR Sizing Utility
+        <span>📏</span> Optical Sizing Tool
       </div>
       <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
-        QR Code Size Calculator
+        {sizeData.h1}
       </h1>
       <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-        Determine the optimal physical dimensions, module size, and raster pixel resolution for your QR codes based on real-world scanning distance and content complexity.
+        {sizeData.subheadline}
       </p>
     </div>
 
-    <!-- Calculator Interactive Form & Output Card -->
+    <!-- Size Calculator Widget -->
     <QRSizeCalculator locale={locale} />
 
-    <!-- Scan Distance Reference Table Card -->
+    <!-- Scan Distance Reference Table -->
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
       <div>
         <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <span>📊</span> Practical Scan Distance Reference Table
+          <span>📊</span> {sizeData.tableTitle}
         </h2>
         <p class="text-xs text-slate-500 mt-1">
-          Quick reference benchmarks based on consumer smartphone optical sensors and the practical 10:1 distance-to-size ratio.
+          Quick-reference benchmarks calculated using practical 10:1 distance ratio across common print scenarios.
         </p>
       </div>
 
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs sm:text-sm">
-          <thead class="bg-slate-50 dark:bg-slate-950 text-slate-400 font-bold uppercase text-[11px]">
+        <table class="w-full text-left text-xs font-sans">
+          <thead class="bg-slate-50 dark:bg-slate-950 text-slate-400 font-bold uppercase">
             <tr>
-              <th class="py-3 px-4 rounded-l-xl">Scan Distance</th>
-              <th class="py-3 px-4">Recommended QR Size</th>
-              <th class="py-3 px-4 rounded-r-xl">Typical Commercial Use Case</th>
+              <th class="py-2.5 px-3">{sizeData.tableHeaders[0]}</th>
+              <th class="py-2.5 px-3">{sizeData.tableHeaders[1]}</th>
+              <th class="py-2.5 px-3">{sizeData.tableHeaders[2]}</th>
+              <th class="py-2.5 px-3">{sizeData.tableHeaders[3]}</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100 dark:divide-slate-800 font-mono text-xs">
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
             {SCAN_DISTANCE_REFERENCE_TABLE.map((row) => (
-              <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                <td class="py-3 px-4 font-bold text-slate-900 dark:text-white">{row.distance}</td>
-                <td class="py-3 px-4 text-indigo-600 dark:text-indigo-400 font-bold">{row.recommendedSize}</td>
-                <td class="py-3 px-4 font-sans text-slate-600 dark:text-slate-400">{row.useCase}</td>
+              <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                <td class="py-2.5 px-3 font-semibold text-slate-900 dark:text-white">{row.distanceMeters} m ({row.distanceFeet} ft)</td>
+                <td class="py-2.5 px-3 text-slate-500 font-mono">{row.minSizeCm} × {row.minSizeCm} cm</td>
+                <td class="py-2.5 px-3 text-indigo-600 dark:text-indigo-400 font-bold font-mono">{row.recommendedSizeCm} × {row.recommendedSizeCm} cm</td>
+                <td class="py-2.5 px-3 text-slate-600 dark:text-slate-400">{row.useCase}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <p class="text-[11px] text-slate-400 italic">
-        * Note: Values represent recommended starting sizes for standard contrast and lighting conditions. For high-density codes (e.g. vCard) or angled scanning, increase size by 15–25%.
-      </p>
     </div>
 
-    <!-- Educational & SEO Deep-Dive Content (700-1000 words) -->
+    <!-- Educational Technical Content -->
     <article class="prose dark:prose-invert max-w-none space-y-8 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-200 dark:border-slate-800 pt-10">
       
       <section class="space-y-3">
         <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-          How QR Code Size Is Calculated
+          {sizeData.overviewTitle}
         </h2>
-        <p>
-          Calculating the correct physical size of a Quick Response (QR) code is critical for ensuring effortless readability across diverse smartphone cameras, ambient lighting conditions, and print media. When a user points their phone at a printed symbol, the smartphone lens projects the pattern onto its CMOS optical sensor. For the decoder algorithm to distinguish the dark modules from the light background, each individual module must cover a minimum threshold of optical pixels.
-        </p>
-        <p>
-          The fundamental relationship governing QR code sizing is the <strong>Distance-to-Size Ratio</strong>. In standard optical conditions with standard modern smartphones, a baseline ratio of <strong>10:1</strong> is widely accepted in commercial packaging and signage design. This means that for every 10 units of distance between the camera and the QR code, the code symbol should measure at least 1 unit in physical width and height.
-        </p>
-      </section>
-
-      <section class="space-y-3">
-        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-          QR Code Modules &amp; Version Density Explained
-        </h2>
-        <p>
-          A QR code is constructed from a square grid of individual black and white squares known as <strong>modules</strong>. The total number of modules in a symbol is strictly determined by its <strong>QR Code Version</strong> (ranging from Version 1 up to Version 40):
-        </p>
-        <ul class="list-disc pl-5 space-y-1 font-mono text-xs">
-          <li><strong>Version 1:</strong> 21 × 21 modules (smallest payload, e.g. short numeric ID)</li>
-          <li><strong>Version 3:</strong> 29 × 29 modules (standard short URL e.g. https://domain.com/abc)</li>
-          <li><strong>Version 6:</strong> 41 × 41 modules (medium text, Wi-Fi credentials)</li>
-          <li><strong>Version 10:</strong> 57 × 57 modules (dense vCard contact records, long URLs)</li>
-          <li><strong>Version 40:</strong> 177 × 177 modules (maximum capacity)</li>
-        </ul>
-        <p>
-          The formula to calculate the module dimension for any version $V$ is:
-          <code class="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-indigo-600 dark:text-indigo-400 font-bold">Modules = 4 × Version + 17</code>.
-          As payload volume increases, the version goes up, packing more modules into the same physical square. If you do not enlarge the physical print size accordingly, each individual module shrinks, increasing the risk of scanning failure.
-        </p>
-      </section>
-
-      <section class="space-y-3">
-        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-          The 4-Module Quiet Zone Rule
-        </h2>
-        <p>
-          Every compliant QR code requires a clean, solid background margin around the entire outer perimeter, known as the <strong>Quiet Zone</strong>. According to ISO/IEC 18004 standards, this margin must be at least <strong>4 modules wide</strong> on all four sides.
-        </p>
-        <p>
-          The quiet zone is not merely decorative—it allows the edge-detection algorithm inside barcode scanning libraries (such as ZXing and Apple VisionKit) to locate the finder patterns and calibrate luminance thresholds. Encroaching on the quiet zone with text, decorative borders, or dark background illustrations is one of the most common causes of scanning failure in print advertising.
-        </p>
-      </section>
-
-      <section class="space-y-3">
-        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-          Error Correction Level &amp; Sizing Impact
-        </h2>
-        <p>
-          QR codes utilize <em>Reed-Solomon Error Correction</em> to restore damaged, obscured, or decorated symbols. The standard defines four levels:
-        </p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 font-sans text-xs">
-          <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-            <span class="font-bold text-slate-900 dark:text-white block">Level L (~7% recovery)</span>
-            <span class="text-slate-500">Fewest redundancy modules. Best when physical print area is strictly limited.</span>
-          </div>
-          <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-            <span class="font-bold text-slate-900 dark:text-white block">Level M (~15% recovery)</span>
-            <span class="text-slate-500">Standard default for 90% of commercial marketing and website links.</span>
-          </div>
-          <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-            <span class="font-bold text-slate-900 dark:text-white block">Level Q (~25% recovery)</span>
-            <span class="text-slate-500">Industrial use environments prone to dust, moisture, or surface abrasion.</span>
-          </div>
-          <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-            <span class="font-bold text-slate-900 dark:text-white block">Level H (~30% recovery)</span>
-            <span class="text-slate-500">Mandatory when embedding central logos or brand badges inside the QR code.</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="space-y-3">
-        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-          Physical Size vs Pixel Resolution (DPI)
-        </h2>
-        <p>
-          It is essential to distinguish between <strong>physical dimensions (cm / inches)</strong> and <strong>raster pixel dimensions (px at DPI)</strong>:
-        </p>
-        <p>
-          A digital raster image that measures <code>1200 × 1200 pixels</code> does not have a fixed physical size on paper until a printer resolution (DPI - Dots Per Inch) is assigned. Printed at <code>300 DPI</code>, that 1200 px image produces a <code>4 × 4 inch (10.16 × 10.16 cm)</code> physical QR code. Printed at <code>100 DPI</code>, the exact same pixels stretch across a <code>12 × 12 inch (30.48 × 30.48 cm)</code> sign.
-        </p>
-        <p>
-          For vector files (<strong>SVG</strong>), pixel resolution is irrelevant because vector math draws shapes with infinite precision at whatever physical size your printing plate or laser cutter requires.
-        </p>
-      </section>
-
-      <section class="space-y-3">
-        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-          How to Test a Printed QR Code Before Production
-        </h2>
-        <ol class="list-decimal pl-5 space-y-1.5">
-          <li><strong>Print a 1:1 Scale Proof:</strong> Print a sample proof on your actual target stock (paper, vinyl, or corrugated cardboard) with scaling set to 100% (do not use "Fit to Page").</li>
-          <li><strong>Test with Multiple Devices:</strong> Scan with both high-end flagship devices (iPhone Pro, Samsung Galaxy) and budget Android devices with basic autofocus lenses.</li>
-          <li><strong>Test at Target Distance &amp; Angles:</strong> Stand at the actual expected distance (e.g. 1 meter for a poster, 30 cm for a table tent) and test at a 30-degree angle.</li>
-          <li><strong>Test Under Dim &amp; Glare Conditions:</strong> Verify scan response in low restaurant lighting as well as under direct retail spotlights to spot surface reflection issues.</li>
-        </ol>
+        {sizeData.overviewParagraphs.map((p) => (
+          <p>{p}</p>
+        ))}
       </section>
 
     </article>
@@ -235,15 +109,12 @@ const faqJsonLd = {
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
       <div>
         <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
-          Frequently Asked Questions About QR Code Sizing
+          {sizeData.faqsTitle}
         </h2>
-        <p class="text-xs text-slate-500 mt-1">
-          Detailed technical answers to common questions about physical sizing, distance ratios, and module density.
-        </p>
       </div>
 
       <div class="divide-y divide-slate-100 dark:divide-slate-800 space-y-4">
-        {faqs.map((faq) => (
+        {sizeData.faqs.map((faq) => (
           <div class="pt-4 space-y-1.5">
             <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-start gap-2">
               <span class="text-indigo-600 dark:text-indigo-400 font-bold">Q:</span>
@@ -263,16 +134,14 @@ const faqJsonLd = {
         <span class="font-bold text-slate-900 dark:text-white">Related Tools:</span>
         <a href="/" class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold">QR Code Generator</a>
         <span>•</span>
-        <a href="/qr-code-print-size-calculator" class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold">Print Size &amp; DPI Calculator</a>
+        <a href="/qr-code-print-size-calculator" class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold">QR Code Print Size Calculator</a>
         <span>•</span>
-        <a href="/guides/static-vs-dynamic-qr" class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold">Static vs Dynamic QR Guide</a>
-        <span>•</span>
-        <a href="/guides" class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold">All QR Guides</a>
+        <a href="/guides" class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold">QR Guides</a>
       </div>
 
       <div>
-        <a href="/" class="px-5 py-2.5 rounded-xl font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors">
-          Create Free QR Code &rarr;
+        <a href="/" class="px-5 py-2.5 rounded-xl font-bold bg-indigo-600 text-white hover:bg-indigo-500 transition-colors shadow-sm">
+          Create Custom QR Code &rarr;
         </a>
       </div>
     </div>

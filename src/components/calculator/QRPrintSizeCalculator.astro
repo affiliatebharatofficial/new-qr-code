@@ -5,12 +5,14 @@ import {
 } from '../../lib/calculator/print';
 import type { DistanceUnit, ErrorCorrectionLevel, PrintMaterial, SizeUnit } from '../../lib/calculator/types';
 import type { Locale } from '../../lib/i18n/config';
+import { getCalculatorTranslations } from '../../lib/i18n/calculator';
 
 interface Props {
   locale?: Locale;
 }
 
 const { locale = 'en' } = Astro.props;
+const t = getCalculatorTranslations(locale).print;
 
 // Initial server-side default calculation (10 x 10 cm, 300 DPI, Poster, Level M)
 const initialResult = calculatePrintReadiness({
@@ -23,17 +25,17 @@ const initialResult = calculatePrintReadiness({
 });
 ---
 
-<div id="print-calculator-widget" class="space-y-8">
+<div id="print-calculator-widget" class="space-y-8" data-locale={locale}>
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
     
     <!-- Left Column: Interactive Print Form (7 Cols) -->
     <div class="lg:col-span-7 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
       <div class="border-b border-slate-100 dark:border-slate-800 pb-4">
         <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <span>🖨️</span> QR Code Print Size &amp; DPI Calculator
+          <span>🖨️</span> {t.inputsTitle}
         </h2>
         <p class="text-xs text-slate-500 mt-0.5">
-          Calculate exact raster pixel dimensions, vector SVG recommendations, and prepress quality checklists.
+          {t.inputsDesc}
         </p>
       </div>
 
@@ -42,11 +44,11 @@ const initialResult = calculatePrintReadiness({
         <!-- Input 1: Physical Size & Units -->
         <div class="space-y-2">
           <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-            A. Target Print Physical Size (Width × Height) <span class="text-red-500">*</span>
+            {t.widthLabel} &amp; {t.heightLabel} <span class="text-red-500">*</span>
           </label>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <div>
-              <span class="text-[10px] text-slate-400 font-semibold block mb-0.5">Width:</span>
+              <span class="text-[10px] text-slate-400 font-semibold block mb-0.5">{t.widthLabel}:</span>
               <input
                 type="number"
                 id="print-width"
@@ -55,11 +57,11 @@ const initialResult = calculatePrintReadiness({
                 step="any"
                 required
                 class="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                placeholder="Width"
+                placeholder="10"
               />
             </div>
             <div>
-              <span class="text-[10px] text-slate-400 font-semibold block mb-0.5">Height:</span>
+              <span class="text-[10px] text-slate-400 font-semibold block mb-0.5">{t.heightLabel}:</span>
               <input
                 type="number"
                 id="print-height"
@@ -68,11 +70,11 @@ const initialResult = calculatePrintReadiness({
                 step="any"
                 required
                 class="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                placeholder="Height"
+                placeholder="10"
               />
             </div>
             <div>
-              <span class="text-[10px] text-slate-400 font-semibold block mb-0.5">Unit:</span>
+              <span class="text-[10px] text-slate-400 font-semibold block mb-0.5">{t.unitLabel}:</span>
               <select
                 id="print-unit"
                 class="w-full px-3 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -89,205 +91,141 @@ const initialResult = calculatePrintReadiness({
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="space-y-2">
             <label for="print-dpi" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-              B. Printer / Output DPI
+              {t.dpiLabel}
             </label>
             <select
               id="print-dpi"
               class="w-full px-3.5 py-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
             >
-              <option value="300" selected>300 DPI (Standard Commercial Print / Packaging)</option>
-              <option value="600">600 DPI (Ultra Fine Offset / Premium Magazines)</option>
-              <option value="150">150 DPI (Large Format Posters / Digital Signs)</option>
-              <option value="100">100 DPI (Outdoor Banners / Billboards)</option>
-              <option value="96">96 DPI (Standard Desktop Displays)</option>
-              <option value="72">72 DPI (Web Draft / Email Proof)</option>
+              <option value="300" selected>300 DPI (Commercial Standard)</option>
+              <option value="600">600 DPI (Offset / Fine Magazine)</option>
+              <option value="150">150 DPI (Poster / Digital Sign)</option>
+              <option value="100">100 DPI (Billboard / Mesh Banner)</option>
+              <option value="72">72 DPI (Web Only - Not for Print)</option>
             </select>
           </div>
 
           <div class="space-y-2">
-            <label for="print-ec-level" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-              C. Error Correction Level
+            <label for="print-ec" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              Error Correction
             </label>
             <select
-              id="print-ec-level"
+              id="print-ec"
               class="w-full px-3.5 py-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
             >
               <option value="L">L — Low (~7% recovery)</option>
-              <option value="M" selected>M — Medium (~15% recovery, standard)</option>
-              <option value="Q">Q — Quartile (~25% recovery)</option>
-              <option value="H">H — High (~30% recovery, logo embedding)</option>
+              <option value="M" selected>M — Medium (~15% standard)</option>
+              <option value="Q">Q — Quartile (~25% industrial)</option>
+              <option value="H">H — High (~30% logo embedding)</option>
             </select>
           </div>
         </div>
 
-        <!-- Input 3: Optional Scan Distance & Print Material -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="space-y-2">
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-              D. Optional Scan Distance
-            </label>
-            <div class="flex gap-2">
-              <input
-                type="number"
-                id="print-distance-val"
-                min="0.1"
-                step="any"
-                placeholder="Optional"
-                class="flex-1 px-3.5 py-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-              />
-              <select
-                id="print-distance-unit"
-                class="w-24 px-2 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-              >
-                <option value="m" selected>m</option>
-                <option value="cm">cm</option>
-                <option value="ft">ft</option>
-                <option value="in">in</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="space-y-2">
-            <label for="print-material" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-              E. Print Medium / Use Case
-            </label>
-            <select
-              id="print-material"
-              class="w-full px-3.5 py-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-            >
-              <option value="poster" selected>Wall Poster / Indoor Sign</option>
-              <option value="business_card">Business Card (vCard)</option>
-              <option value="flyer">Flyer / Leaflet / Brochure</option>
-              <option value="menu">Restaurant Tabletop Menu</option>
-              <option value="packaging">Product Packaging Box / Bottle</option>
-              <option value="window_sign">Storefront Window Sign</option>
-              <option value="banner">Trade Show Rollup Banner</option>
-              <option value="outdoor_sign">Outdoor Billboard / Banner</option>
-              <option value="label">Adhesive Label / Sticker</option>
-              <option value="other">Other Commercial Print</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Industry Print Size Presets -->
+        <!-- Quick Commercial Print Presets -->
         <div class="space-y-1.5 pt-1">
-          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Industry Print Presets:</span>
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t.presetsLabel}</span>
           <div class="flex flex-wrap gap-1.5 text-xs">
-            {PRINT_PRESETS.map((p) => (
-              <button
-                type="button"
-                class="print-preset-btn px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer transition-colors"
-                data-w={p.widthCm}
-                data-h={p.heightCm}
-                data-unit="cm"
-                data-dpi={p.defaultDpi}
-              >
-                {p.category} ({p.widthCm}×{p.heightCm} cm)
-              </button>
-            ))}
+            <button type="button" class="print-preset-btn px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer transition-colors" data-w="3" data-h="3" data-unit="cm" data-dpi="300" data-mat="business_card">
+              {t.presets.businessCard}
+            </button>
+            <button type="button" class="print-preset-btn px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer transition-colors" data-w="5" data-h="5" data-unit="cm" data-dpi="300" data-mat="flyer">
+              {t.presets.flyer}
+            </button>
+            <button type="button" class="print-preset-btn px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer transition-colors" data-w="6" data-h="6" data-unit="cm" data-dpi="300" data-mat="menu">
+              {t.presets.menu}
+            </button>
+            <button type="button" class="print-preset-btn px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer transition-colors" data-w="3.5" data-h="3.5" data-unit="cm" data-dpi="300" data-mat="packaging">
+              {t.presets.packaging}
+            </button>
+            <button type="button" class="print-preset-btn px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer transition-colors" data-w="15" data-h="15" data-unit="cm" data-dpi="300" data-mat="poster">
+              {t.presets.poster}
+            </button>
+            <button type="button" class="print-preset-btn px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer transition-colors" data-w="20" data-h="20" data-unit="cm" data-dpi="150" data-mat="window_sign">
+              {t.presets.windowSign}
+            </button>
+            <button type="button" class="print-preset-btn px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer transition-colors" data-w="30" data-h="30" data-unit="cm" data-dpi="150" data-mat="banner">
+              {t.presets.banner}
+            </button>
+            <button type="button" class="print-preset-btn px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer transition-colors" data-w="100" data-h="100" data-unit="cm" data-dpi="100" data-mat="billboard">
+              {t.presets.billboard}
+            </button>
           </div>
         </div>
 
       </form>
     </div>
 
-    <!-- Right Column: Print Readiness & Output Card (5 Cols) -->
+    <!-- Right Column: Print Prepress Specifications (5 Cols) -->
     <div class="lg:col-span-5 space-y-6">
       
-      <!-- Print Recommendation Card -->
-      <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-indigo-500/30 space-y-5">
-        <div class="flex items-center justify-between border-b border-indigo-500/20 pb-3">
-          <span class="text-[10px] uppercase font-black tracking-widest text-indigo-400">
-            Print Readiness Card
+      <!-- Primary Output Highlight Card -->
+      <div class="bg-gradient-to-br from-purple-950 via-slate-900 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-purple-500/30 space-y-5">
+        <div class="flex items-center justify-between border-b border-purple-500/20 pb-3">
+          <span class="text-[10px] uppercase font-black tracking-widest text-purple-400">
+            {t.resultsTitle}
           </span>
-          <span id="print-status-pill" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-            {initialResult.readinessLabel}
+          <span id="print-readiness-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+            {t.statusReady}
           </span>
         </div>
 
-        <!-- Prominent Pixel & Dimension Output -->
+        <!-- Prominent Pixel Grid Output -->
         <div class="space-y-1">
-          <div id="print-pixels-primary" class="text-3xl sm:text-4xl font-black tracking-tight text-white">
-            {initialResult.rasterOutput.widthPx} × {initialResult.rasterOutput.heightPx} px
+          <div id="print-pixel-output" class="text-3xl sm:text-4xl font-black tracking-tight text-white">
+            {initialResult.rasterPixels.widthPx} × {initialResult.rasterPixels.heightPx} px
           </div>
-          <div id="print-dims-secondary" class="text-xs sm:text-sm text-slate-300 font-mono">
-            {initialResult.physicalDimensions.widthCm} × {initialResult.physicalDimensions.heightCm} cm ({initialResult.physicalDimensions.widthInches} × {initialResult.physicalDimensions.heightInches} in) @ <span id="print-selected-dpi-label">{initialResult.rasterOutput.dpi}</span> DPI
+          <div id="print-size-output" class="text-xs sm:text-sm text-slate-300 font-mono">
+            {initialResult.convertedDimensions.widthCm} × {initialResult.convertedDimensions.heightCm} cm ({initialResult.convertedDimensions.widthInches} × {initialResult.convertedDimensions.heightInches} in)
           </div>
         </div>
 
         <!-- Specifications Breakdown -->
         <div class="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2 text-xs">
           <div class="flex justify-between items-center text-slate-300">
-            <span>Recommended Prepress Format:</span>
-            <span class="font-bold text-emerald-400">SVG (Scalable Vector)</span>
+            <span>{t.recommendedDpi}:</span>
+            <span id="print-spec-dpi" class="font-bold text-white font-mono">{initialResult.dpi} DPI</span>
           </div>
           <div class="flex justify-between items-center text-slate-300">
-            <span>Estimated Module Size:</span>
-            <span id="print-mod-size" class="font-mono text-white font-bold">{initialResult.qrSpecs.estimatedModuleSizeMm} mm</span>
+            <span>{t.maxScanDistance}:</span>
+            <span id="print-spec-distance" class="font-bold text-indigo-300 font-mono">{initialResult.estimatedMaxScanDistanceM} m</span>
           </div>
-          <div class="flex justify-between items-center text-slate-300">
-            <span>4-Module Quiet Zone:</span>
-            <span id="print-quiet-zone" class="font-mono text-white font-bold">{initialResult.qrSpecs.quietZoneMm} mm margin</span>
-          </div>
-          <div class="flex justify-between items-center text-slate-300 pt-1 border-t border-white/5">
-            <span>Max Comfortable Scan Distance:</span>
-            <span id="print-max-dist" class="font-mono text-indigo-300 font-bold">~{initialResult.opticalDistance.recommendedMaxDistanceMeters} m ({initialResult.opticalDistance.recommendedMaxDistanceFeet} ft)</span>
+          <div class="flex justify-between items-center text-slate-400 text-[11px] pt-1 border-t border-white/5">
+            <span>{t.vectorRecommendation}:</span>
+            <span class="font-bold text-emerald-400 font-mono">Vector SVG</span>
           </div>
         </div>
 
-        <!-- Print Quality Pre-flight Checklist -->
-        <div class="space-y-2">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Pre-Flight Print Checklist:</span>
-          <div id="print-checklist-container" class="space-y-1.5 text-xs">
-            {initialResult.checklist.map((item) => (
-              <div class="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5">
-                <span class="text-slate-300">{item.label}</span>
-                <span class={item.passed ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
-                  {item.passed ? '✓ Pass' : '⚠️ Review'}
-                </span>
-              </div>
-            ))}
+        <!-- Prepress Quality Checklist -->
+        <div class="space-y-2 pt-1 text-xs">
+          <div class="text-[11px] font-bold text-purple-300 uppercase tracking-wider">{t.prepressChecklistTitle}</div>
+          <div class="space-y-1.5 text-slate-300 text-[11px]">
+            <div class="flex items-center gap-2">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span>{t.checklist.contrast}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span>{t.checklist.quietZone}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span>{t.checklist.finish}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span>{t.checklist.vector}</span>
+            </div>
           </div>
         </div>
 
-        <!-- Call to Action Buttons -->
+        <!-- CTA Buttons -->
         <div class="pt-2 space-y-2.5">
           <a
-            id="print-create-cta"
-            href="/?utm_source=print_size_calculator"
-            class="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl font-bold text-xs sm:text-sm bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
+            href="/"
+            class="block w-full py-3.5 px-4 text-center rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition-colors shadow-lg"
           >
-            <span>🖨️</span> Generate Print-Ready QR Code &rarr;
+            Create Vector SVG QR Code &rarr;
           </a>
-
-          <a
-            href="/qr-code-size-calculator"
-            class="w-full flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
-          >
-            <span>📏</span> Need distance-based calculations? Try Size Calculator &rarr;
-          </a>
-        </div>
-
-      </div>
-
-      <!-- Vector SVG vs Raster PNG Explanation Card -->
-      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-3">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-          SVG vs PNG for Printing
-        </h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-          <div class="p-3.5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 space-y-1">
-            <span class="font-bold text-emerald-800 dark:text-emerald-300 block">SVG (Vector) — Best for Print</span>
-            <p class="text-[11px] text-slate-600 dark:text-slate-400">
-              Infinite resolution, zero pixelation at any scale. Directly supported by Adobe InDesign, Illustrator, and commercial RIP software.
-            </p>
-          </div>
-          <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-1">
-            <span class="font-bold text-slate-800 dark:text-slate-200 block">PNG (300 DPI) — Raster</span>
-            <p class="text-[11px] text-slate-600 dark:text-slate-400">
-              Fixed pixel grid. Excellent for office laser printers and Canva templates when exported at 300+ DPI.
-            </p>
-          </div>
         </div>
       </div>
 
@@ -296,140 +234,91 @@ const initialResult = calculatePrintReadiness({
   </div>
 </div>
 
-<!-- Real-Time Client Print Calculator Script -->
 <script>
   import { calculatePrintReadiness } from '../../lib/calculator/print';
-  import type { DistanceUnit, ErrorCorrectionLevel, PrintMaterial, SizeUnit } from '../../lib/calculator/types';
+  import type { ErrorCorrectionLevel, PrintMaterial, SizeUnit } from '../../lib/calculator/types';
 
-  function runPrintCalculation() {
-    const wInput = document.getElementById('print-width') as HTMLInputElement | null;
-    const hInput = document.getElementById('print-height') as HTMLInputElement | null;
-    const unitSelect = document.getElementById('print-unit') as HTMLSelectElement | null;
-    const dpiSelect = document.getElementById('print-dpi') as HTMLSelectElement | null;
-    const ecSelect = document.getElementById('print-ec-level') as HTMLSelectElement | null;
-    const distInput = document.getElementById('print-distance-val') as HTMLInputElement | null;
-    const distUnitSelect = document.getElementById('print-distance-unit') as HTMLSelectElement | null;
-    const materialSelect = document.getElementById('print-material') as HTMLSelectElement | null;
+  function initPrintCalculator() {
+    const form = document.getElementById('print-calc-form') as HTMLFormElement | null;
+    if (!form) return;
 
-    if (!wInput || !hInput || !unitSelect || !dpiSelect || !ecSelect || !materialSelect) return;
+    const widthInput = document.getElementById('print-width') as HTMLInputElement;
+    const heightInput = document.getElementById('print-height') as HTMLInputElement;
+    const unitSelect = document.getElementById('print-unit') as HTMLSelectElement;
+    const dpiSelect = document.getElementById('print-dpi') as HTMLSelectElement;
+    const ecSelect = document.getElementById('print-ec') as HTMLSelectElement;
 
-    const physicalWidth = parseFloat(wInput.value);
-    const physicalHeight = parseFloat(hInput.value);
-    if (isNaN(physicalWidth) || isNaN(physicalHeight) || physicalWidth <= 0 || physicalHeight <= 0) return;
+    // Output elements
+    const pixelOutput = document.getElementById('print-pixel-output');
+    const sizeOutput = document.getElementById('print-size-output');
+    const specDpi = document.getElementById('print-spec-dpi');
+    const specDistance = document.getElementById('print-spec-distance');
+    const readinessBadge = document.getElementById('print-readiness-badge');
 
-    const sizeUnit = (unitSelect.value as SizeUnit) || 'cm';
-    const dpi = parseInt(dpiSelect.value, 10) || 300;
-    const errorCorrection = (ecSelect.value as ErrorCorrectionLevel) || 'M';
-    const printMaterial = (materialSelect.value as PrintMaterial) || 'poster';
+    function updateCalculations() {
+      const w = parseFloat(widthInput.value) || 10;
+      const h = parseFloat(heightInput.value) || 10;
+      const unit = unitSelect.value as SizeUnit;
+      const dpi = parseInt(dpiSelect.value, 10) || 300;
+      const ec = ecSelect.value as ErrorCorrectionLevel;
 
-    let scanDistance: number | undefined;
-    let distanceUnit: DistanceUnit | undefined;
-    if (distInput && distInput.value) {
-      const parsedDist = parseFloat(distInput.value);
-      if (!isNaN(parsedDist) && parsedDist > 0) {
-        scanDistance = parsedDist;
-        distanceUnit = (distUnitSelect?.value as DistanceUnit) || 'm';
+      const result = calculatePrintReadiness({
+        physicalWidth: w,
+        physicalHeight: h,
+        sizeUnit: unit,
+        dpi,
+        errorCorrection: ec,
+      });
+
+      if (pixelOutput) {
+        pixelOutput.textContent = `${result.rasterPixels.widthPx} × ${result.rasterPixels.heightPx} px`;
+      }
+      if (sizeOutput) {
+        sizeOutput.textContent = `${result.convertedDimensions.widthCm} × ${result.convertedDimensions.heightCm} cm (${result.convertedDimensions.widthInches} × ${result.convertedDimensions.heightInches} in)`;
+      }
+      if (specDpi) {
+        specDpi.textContent = `${result.dpi} DPI`;
+      }
+      if (specDistance) {
+        specDistance.textContent = `${result.estimatedMaxScanDistanceM} m`;
+      }
+      if (readinessBadge) {
+        if (result.dpi >= 300) {
+          readinessBadge.textContent = 'Print Ready (300+ DPI)';
+          readinessBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+        } else if (result.dpi >= 150) {
+          readinessBadge.textContent = 'Acceptable (150 DPI)';
+          readinessBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30';
+        } else {
+          readinessBadge.textContent = 'Low Resolution (< 150 DPI)';
+          readinessBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30';
+        }
       }
     }
 
-    const res = calculatePrintReadiness({
-      physicalWidth,
-      physicalHeight,
-      sizeUnit,
-      dpi,
-      errorCorrection,
-      scanDistance,
-      distanceUnit,
-      printMaterial,
+    [widthInput, heightInput, unitSelect, dpiSelect, ecSelect].forEach((el) => {
+      el?.addEventListener('input', updateCalculations);
+      el?.addEventListener('change', updateCalculations);
     });
 
-    // Update DOM
-    const pxPrimary = document.getElementById('print-pixels-primary');
-    const dimsSecondary = document.getElementById('print-dims-secondary');
-    const statusPill = document.getElementById('print-status-pill');
-    const modSize = document.getElementById('print-mod-size');
-    const quietZone = document.getElementById('print-quiet-zone');
-    const maxDist = document.getElementById('print-max-dist');
-    const dpiLabel = document.getElementById('print-selected-dpi-label');
-    const checklistContainer = document.getElementById('print-checklist-container');
-    const ctaLink = document.getElementById('print-create-cta') as HTMLAnchorElement | null;
+    // Presets
+    document.querySelectorAll('.print-preset-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const w = btn.getAttribute('data-w');
+        const h = btn.getAttribute('data-h');
+        const unit = btn.getAttribute('data-unit');
+        const dpi = btn.getAttribute('data-dpi');
 
-    if (pxPrimary) pxPrimary.innerText = `${res.rasterOutput.widthPx} × ${res.rasterOutput.heightPx} px`;
-    if (dimsSecondary) {
-      dimsSecondary.innerText = `${res.physicalDimensions.widthCm} × ${res.physicalDimensions.heightCm} cm (${res.physicalDimensions.widthInches} × ${res.physicalDimensions.heightInches} in) @ ${res.rasterOutput.dpi} DPI`;
-    }
-    if (dpiLabel) dpiLabel.innerText = `${res.rasterOutput.dpi}`;
-    if (statusPill) {
-      statusPill.innerText = res.readinessLabel;
-      statusPill.className = `px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-        res.readinessStatus === 'optimal'
-          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-          : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-      }`;
-    }
-    if (modSize) modSize.innerText = `${res.qrSpecs.estimatedModuleSizeMm} mm`;
-    if (quietZone) quietZone.innerText = `${res.qrSpecs.quietZoneMm} mm margin`;
-    if (maxDist) {
-      maxDist.innerText = `~${res.opticalDistance.recommendedMaxDistanceMeters} m (${res.opticalDistance.recommendedMaxDistanceFeet} ft)`;
-    }
+        if (w && widthInput) widthInput.value = w;
+        if (h && heightInput) heightInput.value = h;
+        if (unit && unitSelect) unitSelect.value = unit;
+        if (dpi && dpiSelect) dpiSelect.value = dpi;
 
-    if (checklistContainer) {
-      checklistContainer.innerHTML = res.checklist
-        .map(
-          (item) => `
-          <div class="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/5">
-            <span class="text-slate-300">${item.label}</span>
-            <span class="${item.passed ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}">
-              ${item.passed ? '✓ Pass' : '⚠️ Review'}
-            </span>
-          </div>
-        `
-        )
-        .join('');
-    }
-
-    if (ctaLink) {
-      ctaLink.href = `/?utm_source=print_calculator&ec=${errorCorrection}&size=${res.physicalDimensions.widthCm * 10}`;
-    }
+        updateCalculations();
+      });
+    });
   }
 
-  // Attach live event listeners
-  const formInputs = [
-    'print-width',
-    'print-height',
-    'print-unit',
-    'print-dpi',
-    'print-ec-level',
-    'print-distance-val',
-    'print-distance-unit',
-    'print-material',
-  ];
-
-  formInputs.forEach((id) => {
-    const el = document.getElementById(id);
-    el?.addEventListener('input', runPrintCalculation);
-    el?.addEventListener('change', runPrintCalculation);
-  });
-
-  // Print Presets buttons
-  document.querySelectorAll('.print-preset-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const w = btn.getAttribute('data-w');
-      const h = btn.getAttribute('data-h');
-      const unit = btn.getAttribute('data-unit');
-      const dpi = btn.getAttribute('data-dpi');
-
-      const wInput = document.getElementById('print-width') as HTMLInputElement | null;
-      const hInput = document.getElementById('print-height') as HTMLInputElement | null;
-      const unitSelect = document.getElementById('print-unit') as HTMLSelectElement | null;
-      const dpiSelect = document.getElementById('print-dpi') as HTMLSelectElement | null;
-
-      if (wInput && w) wInput.value = w;
-      if (hInput && h) hInput.value = h;
-      if (unitSelect && unit) unitSelect.value = unit;
-      if (dpiSelect && dpi) dpiSelect.value = dpi;
-
-      runPrintCalculation();
-    });
-  });
+  initPrintCalculator();
+  document.addEventListener('astro:page-load', initPrintCalculator);
 </script>

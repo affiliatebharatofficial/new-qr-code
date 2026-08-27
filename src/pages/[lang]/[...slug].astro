@@ -6,6 +6,9 @@ import QRSizeCalculator from '../../components/calculator/QRSizeCalculator.astro
 import QRPrintSizeCalculator from '../../components/calculator/QRPrintSizeCalculator.astro';
 import { isValidLocale, DEFAULT_LOCALE, type Locale } from '../../lib/i18n/config';
 import { getLocalizedPageContent } from '../../lib/i18n/content/index';
+import { getSizeCalculatorPageData, getPrintCalculatorPageData } from '../../lib/i18n/content/calculatorPages';
+import { SCAN_DISTANCE_REFERENCE_TABLE } from '../../lib/calculator/size';
+import { PRINT_PRESETS } from '../../lib/calculator/print';
 import type { QRType } from '../../lib/qr/types';
 
 const { lang, slug } = Astro.params;
@@ -15,110 +18,276 @@ if (!isValidLocale(lang) || lang === DEFAULT_LOCALE) {
 }
 
 const currentSlug = slug || '';
+const currentLocale = lang as Locale;
 
-// Handle Size Calculator Route
-if (currentSlug === 'qr-code-size-calculator') {
-  const titles: Record<Locale, { title: string; desc: string; h1: string; sub: string }> = {
-    en: {
-      title: 'QR Code Size Calculator — Recommended Sizing & Distance Guide',
-      desc: 'Calculate the exact recommended physical QR code size and pixel resolution based on scan distance, error correction, and content density.',
-      h1: 'QR Code Size Calculator',
-      sub: 'Determine the optimal physical dimensions, module size, and raster pixel resolution for your QR codes based on real-world scanning distance and content complexity.',
-    },
-    es: {
-      title: 'Calculadora de Tamaño de Código QR — Guía de Distancia y Dimensiones',
-      desc: 'Calcula el tamaño físico y resolución en píxeles recomendada para códigos QR según la distancia de escaneo y densidad de datos.',
-      h1: 'Calculadora de Tamaño de Código QR',
-      sub: 'Calcula las dimensiones físicas óptimas y la resolución en píxeles para imprimir o exhibir códigos QR nítidos y fáciles de escanear.',
-    },
-    de: {
-      title: 'QR-Code-Größenrechner — Empfohlene Maße & Distanzrechner',
-      desc: 'Berechnen Sie die empfohlene physische QR-Code-Größe und Pixelauflösung basierend auf Scan-Distanz, Fehlerkorrektur und Datenkomplexität.',
-      h1: 'QR-Code-Größenrechner',
-      sub: 'Ermitteln Sie die optimalen Maße und Auflösungen für gestochen scharfe und scanbare QR-Codes.',
-    },
-    fr: {
-      title: 'Calculateur de Taille de QR Code — Guide de Distance et Dimensions',
-      desc: 'Calculez la taille physique idéale et la résolution en pixels de vos QR codes en fonction de la distance de numérisation.',
-      h1: 'Calculateur de Taille de QR Code',
-      sub: 'Déterminez les dimensions optimales pour vos QR codes imprimés et affichages grand format.',
-    },
-    pt: {
-      title: 'Calculadora de Tamanho de QR Code — Guia de Distância e Dimensões',
-      desc: 'Calcule as dimensões físicas recomendadas e a resolução em pixels para códigos QR com base na distância de leitura.',
-      h1: 'Calculadora de Tamanho de QR Code',
-      sub: 'Descubra o tamanho ideal para impressão de códigos QR com base na distância de leitura e resolução DPI.',
-    },
-    it: {
-      title: 'Calcolatore Dimensioni QR Code — Guida a Distanza e Misure',
-      desc: 'Calcola la dimensione fisica e la risoluzione in pixel consigliata per i tuoi codici QR in base alla distanza di scansione.',
-      h1: 'Calcolatore Dimensioni QR Code',
-      sub: 'Ottimizza le dimensioni di stampa e la densità dei moduli per una scansione immediata da smartphone.',
-    },
-    hi: {
-      title: 'क्यूआर कोड आकार कैलकुलेटर — दूरी और अनुशंसित आकार गाइड',
-      desc: 'स्कैनिंग दूरी और डेटा घनत्व के आधार पर अपने क्यूआर कोड का सही भौतिक आकार और रिज़ॉल्यूशन मापें।',
-      h1: 'क्यूआर कोड आकार कैलकुलेटर',
-      sub: 'स्मार्टफोन से आसान और तेज़ स्कैनिंग के लिए अपने क्यूआर कोड का सही प्रिंट आकार निर्धारित करें।',
-    },
-  };
+const isSizeCalculator = currentSlug === 'qr-code-size-calculator';
+const isPrintCalculator = currentSlug === 'qr-code-print-size-calculator';
 
-  const meta = titles[lang as Locale] || titles.en;
-  return Astro.rewrite('/qr-code-size-calculator');
-}
+// Size calculator data
+const sizeData = isSizeCalculator ? getSizeCalculatorPageData(currentLocale) : null;
+const sizeBreadcrumbs = sizeData ? {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `https://freeqrcode-generator.com/${lang}` },
+    { '@type': 'ListItem', position: 2, name: sizeData.h1, item: `https://freeqrcode-generator.com/${lang}/qr-code-size-calculator` },
+  ],
+} : null;
 
-// Handle Print Size Calculator Route
-if (currentSlug === 'qr-code-print-size-calculator') {
-  return Astro.rewrite('/qr-code-print-size-calculator');
-}
-
-const content = getLocalizedPageContent(currentSlug, lang as Locale);
-
-if (!content) {
-  return Astro.redirect(`/${lang}`);
-}
-
-const faqJsonLd = {
+const sizeFaqJsonLd = sizeData ? {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   inLanguage: lang,
-  mainEntity: content.faqs.map((faq) => ({
+  mainEntity: sizeData.faqs.map((f) => ({
     '@type': 'Question',
-    name: faq.question,
+    name: f.question,
     acceptedAnswer: {
       '@type': 'Answer',
-      text: faq.answer,
+      text: f.answer,
     },
   })),
-};
+} : null;
+
+// Print calculator data
+const printData = isPrintCalculator ? getPrintCalculatorPageData(currentLocale) : null;
+const printBreadcrumbs = printData ? {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `https://freeqrcode-generator.com/${lang}` },
+    { '@type': 'ListItem', position: 2, name: printData.h1, item: `https://freeqrcode-generator.com/${lang}/qr-code-print-size-calculator` },
+  ],
+} : null;
+
+const printFaqJsonLd = printData ? {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  inLanguage: lang,
+  mainEntity: printData.faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
+    },
+  })),
+} : null;
+
+// Standard page content
+let content: ReturnType<typeof getLocalizedPageContent> = null;
+let standardFaqJsonLd: any = null;
+
+if (!isSizeCalculator && !isPrintCalculator) {
+  content = getLocalizedPageContent(currentSlug, currentLocale);
+  if (!content) {
+    return Astro.redirect(`/${lang}`);
+  }
+  standardFaqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    inLanguage: lang,
+    mainEntity: content.faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  };
+}
 ---
 
-<BaseLayout
-  title={content.title}
-  description={content.description}
-  locale={lang as Locale}
-  jsonLd={faqJsonLd}
->
-  <!-- Generator Interface Above The Fold -->
-  <QRGenerator
-    initialType={(content.qrTypeId as QRType) || 'url'}
-    headline={content.h1}
-    subheadline={content.subheadline}
-  />
+{isSizeCalculator && sizeData && (
+  <BaseLayout
+    title={sizeData.title}
+    description={sizeData.description}
+    locale={currentLocale}
+    jsonLd={[sizeBreadcrumbs, sizeFaqJsonLd]}
+  >
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-12">
+      <div class="text-center space-y-3 max-w-3xl mx-auto">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+          <span>📏</span> {sizeData.h1}
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+          {sizeData.h1}
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+          {sizeData.subheadline}
+        </p>
+      </div>
 
-  <!-- Rich Localized SEO Content -->
-  <LandingContent
-    heading={content.heading}
-    subheading={content.subheading}
-    overviewTitle={content.overviewTitle}
-    overviewParagraphs={content.overviewParagraphs}
-    sectors={content.sectors}
-    howItWorks={content.howItWorks}
-    useCases={content.useCases}
-    tips={content.tips}
-    technicalNotes={content.technicalNotes}
-    faqs={content.faqs}
-    relatedTools={content.relatedTools}
-    locale={lang as Locale}
-  />
-</BaseLayout>
+      <QRSizeCalculator locale={currentLocale} />
+
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
+        <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span>📊</span> {sizeData.tableTitle}
+        </h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs font-sans">
+            <thead class="bg-slate-50 dark:bg-slate-950 text-slate-400 font-bold uppercase">
+              <tr>
+                <th class="py-2.5 px-3">{sizeData.tableHeaders[0]}</th>
+                <th class="py-2.5 px-3">{sizeData.tableHeaders[1]}</th>
+                <th class="py-2.5 px-3">{sizeData.tableHeaders[2]}</th>
+                <th class="py-2.5 px-3">{sizeData.tableHeaders[3]}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+              {SCAN_DISTANCE_REFERENCE_TABLE.map((row) => (
+                <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                  <td class="py-2.5 px-3 font-semibold text-slate-900 dark:text-white">{row.distanceMeters} m ({row.distanceFeet} ft)</td>
+                  <td class="py-2.5 px-3 text-slate-500 font-mono">{row.minSizeCm} × {row.minSizeCm} cm</td>
+                  <td class="py-2.5 px-3 text-indigo-600 dark:text-indigo-400 font-bold font-mono">{row.recommendedSizeCm} × {row.recommendedSizeCm} cm</td>
+                  <td class="py-2.5 px-3 text-slate-600 dark:text-slate-400">{row.useCase}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <article class="prose dark:prose-invert max-w-none space-y-6 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-200 dark:border-slate-800 pt-10">
+        <section class="space-y-3">
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+            {sizeData.overviewTitle}
+          </h2>
+          {sizeData.overviewParagraphs.map((p) => (
+            <p>{p}</p>
+          ))}
+        </section>
+      </article>
+
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+          {sizeData.faqsTitle}
+        </h2>
+        <div class="divide-y divide-slate-100 dark:divide-slate-800 space-y-4">
+          {sizeData.faqs.map((faq) => (
+            <div class="pt-4 space-y-1.5">
+              <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-start gap-2">
+                <span class="text-indigo-600 dark:text-indigo-400 font-bold">Q:</span>
+                <span>{faq.question}</span>
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed pl-5">
+                {faq.answer}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </BaseLayout>
+)}
+
+{isPrintCalculator && printData && (
+  <BaseLayout
+    title={printData.title}
+    description={printData.description}
+    locale={currentLocale}
+    jsonLd={[printBreadcrumbs, printFaqJsonLd]}
+  >
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-12">
+      <div class="text-center space-y-3 max-w-3xl mx-auto">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+          <span>🖨️</span> {printData.h1}
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+          {printData.h1}
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+          {printData.subheadline}
+        </p>
+      </div>
+
+      <QRPrintSizeCalculator locale={currentLocale} />
+
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div>
+          <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span>📦</span> {printData.tableTitle}
+          </h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {PRINT_PRESETS.map((preset) => (
+            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-900 dark:text-white">{preset.category}</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-bold">
+                  {preset.widthCm} × {preset.heightCm} cm
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-500 leading-relaxed">
+                {preset.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <article class="prose dark:prose-invert max-w-none space-y-6 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-200 dark:border-slate-800 pt-10">
+        <section class="space-y-3">
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+            {printData.overviewTitle}
+          </h2>
+          {printData.overviewParagraphs.map((p) => (
+            <p>{p}</p>
+          ))}
+        </section>
+      </article>
+
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+          {printData.faqsTitle}
+        </h2>
+        <div class="divide-y divide-slate-100 dark:divide-slate-800 space-y-4">
+          {printData.faqs.map((faq) => (
+            <div class="pt-4 space-y-1.5">
+              <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-start gap-2">
+                <span class="text-indigo-600 dark:text-indigo-400 font-bold">Q:</span>
+                <span>{faq.question}</span>
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed pl-5">
+                {faq.answer}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </BaseLayout>
+)}
+
+{!isSizeCalculator && !isPrintCalculator && content && (
+  <BaseLayout
+    title={content.title}
+    description={content.description}
+    locale={currentLocale}
+    jsonLd={standardFaqJsonLd}
+  >
+    <!-- Generator Interface Above The Fold -->
+    <QRGenerator
+      initialType={(content.qrTypeId as QRType) || 'url'}
+      headline={content.h1}
+      subheadline={content.subheadline}
+      locale={currentLocale}
+    />
+
+    <!-- Rich Localized SEO Content -->
+    <LandingContent
+      heading={content.heading}
+      subheading={content.subheading}
+      overviewTitle={content.overviewTitle}
+      overviewParagraphs={content.overviewParagraphs}
+      sectors={content.sectors}
+      howItWorks={content.howItWorks}
+      useCases={content.useCases}
+      tips={content.tips}
+      technicalNotes={content.technicalNotes}
+      faqs={content.faqs}
+      relatedTools={content.relatedTools}
+      locale={currentLocale}
+    />
+  </BaseLayout>
+)}
