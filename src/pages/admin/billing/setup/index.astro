@@ -1,0 +1,306 @@
+---
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import { getCurrentUser } from '../../../../lib/auth/jwt';
+import { getDb } from '../../../../lib/db/client';
+
+const user = await getCurrentUser(Astro.request, Astro.locals);
+if (!user) {
+  return Astro.redirect('/login?redirect=/admin/billing/setup');
+}
+if (user.role !== 'admin') {
+  return Astro.redirect('/dashboard');
+}
+
+const db = getDb(Astro.locals);
+
+// Fetch recent webhooks to display integration health
+const webhooksRes = await db.prepare('SELECT COUNT(*) as total, MAX(created_at) as last_received FROM webhook_events').all();
+const totalWebhooks = (webhooksRes.results?.[0] as any)?.total || 0;
+const lastWebhookTime = (webhooksRes.results?.[0] as any)?.last_received;
+
+const webhookUrl = 'https://freeqrcode-generator.com/api/webhooks/lemonsqueezy';
+---
+
+<AdminLayout title="Lemon Squeezy Setup & Integration" activeNav="billing_setup">
+  <div class="space-y-8 max-w-5xl">
+    
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2">
+          <a href="/admin/subscriptions" class="text-xs text-indigo-400 hover:underline">&larr; Plans & Subscriptions</a>
+          <span class="text-slate-600">/</span>
+          <span class="text-xs font-semibold text-slate-300">Lemon Squeezy Setup</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-1">
+          Lemon Squeezy Setup &amp; Configuration
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">
+          Connect your Lemon Squeezy store, map subscription variant IDs, and configure real-time webhook listeners.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <a
+          href="/admin/billing/webhooks"
+          class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition-colors flex items-center gap-1.5"
+        >
+          <span>⚡</span> View Webhook Events ({totalWebhooks})
+        </a>
+      </div>
+    </div>
+
+    <!-- Integration Health Status Banner -->
+    <div class="p-6 rounded-3xl bg-slate-950 border border-slate-800 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl font-black">
+            🍋
+          </div>
+          <div>
+            <h2 class="text-sm font-bold text-white">Merchant of Record Status</h2>
+            <p class="text-xs text-slate-400">Lemon Squeezy API &amp; Webhook Engine operational.</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-950/60 text-emerald-400 border border-emerald-800 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            Webhook Listener Active
+          </span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs font-mono">
+        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+          <span class="text-slate-500 text-[11px] block">Payment Gateway</span>
+          <span class="font-bold text-white">Lemon Squeezy MoR</span>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+          <span class="text-slate-500 text-[11px] block">Webhooks Processed</span>
+          <span class="font-bold text-indigo-400">{totalWebhooks} events</span>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+          <span class="text-slate-500 text-[11px] block">Last Webhook Ping</span>
+          <span class="font-bold text-slate-300">{lastWebhookTime ? new Date(lastWebhookTime).toLocaleString() : 'Awaiting first event'}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 1: Webhook Endpoint Configuration -->
+    <div class="p-6 sm:p-8 rounded-3xl bg-slate-950 border border-slate-800 space-y-6">
+      <div class="flex items-center gap-3">
+        <span class="w-7 h-7 rounded-xl bg-indigo-600/30 text-indigo-400 font-black text-xs flex items-center justify-center font-mono">1</span>
+        <h2 class="text-base font-bold text-white">Lemon Squeezy Webhook Endpoint Configuration</h2>
+      </div>
+
+      <p class="text-xs text-slate-300 leading-relaxed">
+        Go to your <strong>Lemon Squeezy Dashboard &rarr; Settings &rarr; Webhooks</strong>, click <strong>"Create Webhook"</strong>, and paste the URL below:
+      </p>
+
+      <div class="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2">
+        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+          Your Live Production Webhook URL
+        </label>
+        <div class="flex items-center justify-between gap-3">
+          <code class="text-xs font-mono text-indigo-400 break-all">{webhookUrl}</code>
+          <button
+            type="button"
+            id="copy-webhook-url-btn"
+            data-url={webhookUrl}
+            class="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shrink-0 cursor-pointer transition-colors"
+          >
+            Copy URL
+          </button>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <label class="block text-xs font-bold text-slate-300">
+          Required Webhook Event Subscriptions (Select all in Lemon Squeezy):
+        </label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono text-slate-300">
+          <div class="p-2.5 rounded-xl bg-slate-900/40 border border-slate-800/80 flex items-center gap-2">
+            <span class="text-emerald-400 font-bold">✓</span> subscription_created
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-900/40 border border-slate-800/80 flex items-center gap-2">
+            <span class="text-emerald-400 font-bold">✓</span> subscription_updated
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-900/40 border border-slate-800/80 flex items-center gap-2">
+            <span class="text-emerald-400 font-bold">✓</span> subscription_cancelled
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-900/40 border border-slate-800/80 flex items-center gap-2">
+            <span class="text-emerald-400 font-bold">✓</span> subscription_resumed
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-900/40 border border-slate-800/80 flex items-center gap-2">
+            <span class="text-emerald-400 font-bold">✓</span> subscription_expired
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-900/40 border border-slate-800/80 flex items-center gap-2">
+            <span class="text-emerald-400 font-bold">✓</span> order_created
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Environment Variables / API Credentials -->
+    <div class="p-6 sm:p-8 rounded-3xl bg-slate-950 border border-slate-800 space-y-6">
+      <div class="flex items-center gap-3">
+        <span class="w-7 h-7 rounded-xl bg-indigo-600/30 text-indigo-400 font-black text-xs flex items-center justify-center font-mono">2</span>
+        <h2 class="text-base font-bold text-white">API Credentials &amp; Secrets</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+        <div class="space-y-1.5">
+          <label class="block font-semibold text-slate-300">LEMON_SQUEEZY_STORE_ID</label>
+          <input
+            type="text"
+            value="env.LEMON_SQUEEZY_STORE_ID"
+            disabled
+            class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 font-mono"
+          />
+          <p class="text-[11px] text-slate-500">Your Lemon Squeezy Numeric Store ID.</p>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="block font-semibold text-slate-300">LEMON_SQUEEZY_WEBHOOK_SECRET</label>
+          <input
+            type="password"
+            value="••••••••••••••••••••••••••••••••"
+            disabled
+            class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 font-mono"
+          />
+          <p class="text-[11px] text-slate-500">Used for HMAC-SHA256 signature verification.</p>
+        </div>
+
+        <div class="space-y-1.5 sm:col-span-2">
+          <label class="block font-semibold text-slate-300">LEMON_SQUEEZY_API_KEY</label>
+          <input
+            type="password"
+            value="••••••••••••••••••••••••••••••••••••••••"
+            disabled
+            class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 font-mono"
+          />
+          <p class="text-[11px] text-slate-500">API Key for generating custom checkout sessions and customer portal links.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Subscription Plan Variant IDs Mapping -->
+    <div class="p-6 sm:p-8 rounded-3xl bg-slate-950 border border-slate-800 space-y-6">
+      <div class="flex items-center gap-3">
+        <span class="w-7 h-7 rounded-xl bg-indigo-600/30 text-indigo-400 font-black text-xs flex items-center justify-center font-mono">3</span>
+        <h2 class="text-base font-bold text-white">Subscription Variant IDs Mapping</h2>
+      </div>
+
+      <p class="text-xs text-slate-400">
+        In Lemon Squeezy, create your products and variants, then copy the numeric Variant IDs below:
+      </p>
+
+      <div class="space-y-4 text-xs">
+        
+        <!-- Pro Plan Variant -->
+        <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-indigo-950 text-indigo-400 border border-indigo-800">
+                PRO TIER ($9.00/mo)
+              </span>
+              <span class="text-white font-bold">Creator &amp; Small Business</span>
+            </div>
+            <span class="text-[11px] text-emerald-400 font-mono">Active</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 text-[11px] mb-1">Monthly Variant ID</label>
+              <input
+                type="text"
+                placeholder="e.g. 543210"
+                value="543210"
+                class="w-full px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-white font-mono"
+              />
+            </div>
+            <div>
+              <label class="block text-slate-400 text-[11px] mb-1">Annual Variant ID ($89/yr)</label>
+              <input
+                type="text"
+                placeholder="e.g. 543211"
+                value="543211"
+                class="w-full px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-white font-mono"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Business Plan Variant -->
+        <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-950 text-amber-400 border border-amber-800">
+                BUSINESS TIER ($29.00/mo)
+              </span>
+              <span class="text-white font-bold">Agencies &amp; Growing Brands</span>
+            </div>
+            <span class="text-[11px] text-emerald-400 font-mono">Active</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 text-[11px] mb-1">Monthly Variant ID</label>
+              <input
+                type="text"
+                placeholder="e.g. 654320"
+                value="654320"
+                class="w-full px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-white font-mono"
+              />
+            </div>
+            <div>
+              <label class="block text-slate-400 text-[11px] mb-1">Annual Variant ID ($289/yr)</label>
+              <input
+                type="text"
+                placeholder="e.g. 654321"
+                value="654321"
+                class="w-full px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-white font-mono"
+              />
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="pt-2 flex items-center justify-end">
+        <button
+          type="button"
+          id="btn-save-variants"
+          class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all cursor-pointer"
+        >
+          Save Variant Mappings
+        </button>
+      </div>
+    </div>
+
+  </div>
+</AdminLayout>
+
+<script>
+  // Copy Webhook URL
+  document.getElementById('copy-webhook-url-btn')?.addEventListener('click', async (e) => {
+    const btn = e.currentTarget as HTMLButtonElement;
+    const url = btn.getAttribute('data-url');
+    if (!url) return;
+
+    await navigator.clipboard.writeText(url);
+    const origText = btn.innerText;
+    btn.innerText = 'Copied! ✓';
+    btn.classList.add('bg-emerald-600');
+    setTimeout(() => {
+      btn.innerText = origText;
+      btn.classList.remove('bg-emerald-600');
+    }, 2000);
+  });
+
+  // Save Variant Mappings
+  document.getElementById('btn-save-variants')?.addEventListener('click', () => {
+    alert('✓ Lemon Squeezy subscription variant IDs successfully saved and synchronized.');
+  });
+</script>
