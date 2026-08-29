@@ -17,7 +17,7 @@ export function getSizeCalculatorPageData(locale: Locale): CalculatorPageData {
   switch (locale) {
     case 'es':
       return {
-        title: 'Calculadora de Tamaño de Código QR — Guía de Distancia y Dimensiones',
+        title: 'Calculadora de Tamaño de Código QR — Distancia y Medidas',
         description: 'Calcula el tamaño físico y resolución en píxeles recomendada para códigos QR según la distancia de escaneo y densidad de datos.',
         h1: 'Calculadora de Tamaño de Código QR',
         subheadline: 'Calcula las dimensiones físicas óptimas, el tamaño de módulo y la resolución en píxeles para imprimir o exhibir códigos QR nítidos y fáciles de escanear.',
@@ -42,7 +42,7 @@ export function getSizeCalculatorPageData(locale: Locale): CalculatorPageData {
       };
     case 'de':
       return {
-        title: 'QR-Code-Größenrechner — Empfohlene Maße & Distanzrechner',
+        title: 'QR-Code-Größenrechner — Maße & Scan-Distanz',
         description: 'Berechnen Sie die empfohlene physische QR-Code-Größe und Pixelauflösung basierend auf Scan-Distanz, Fehlerkorrektur und Datenkomplexität.',
         h1: 'QR-Code-Größenrechner',
         subheadline: 'Ermitteln Sie die optimalen Maße und Auflösungen für gestochen scharfe und scanbare QR-Codes basierend auf Leseabstand und Datenmenge.',
@@ -67,7 +67,7 @@ export function getSizeCalculatorPageData(locale: Locale): CalculatorPageData {
       };
     case 'fr':
       return {
-        title: 'Calculateur de Taille de QR Code — Guide de Distance et Dimensions',
+        title: 'Calculateur de Taille de QR Code — Distance et Dimensions',
         description: 'Calculez la taille physique idéale et la résolution en pixels de vos QR codes en fonction de la distance de numérisation.',
         h1: 'Calculateur de Taille de QR Code',
         subheadline: 'Déterminez les dimensions optimales pour vos QR codes imprimés et affichages grand format en fonction de la distance de visionnage.',
@@ -92,7 +92,7 @@ export function getSizeCalculatorPageData(locale: Locale): CalculatorPageData {
       };
     case 'pt':
       return {
-        title: 'Calculadora de Tamanho de QR Code — Guia de Distância e Dimensões',
+        title: 'Calculadora de Tamanho de QR Code — Medidas e Distância',
         description: 'Calcule as dimensões físicas recomendadas e a resolução em pixels para códigos QR com base na distância de leitura.',
         h1: 'Calculadora de Tamanho de QR Code',
         subheadline: 'Descubra o tamanho ideal para impressão de códigos QR com base na distância de leitura e resolução DPI.',
@@ -117,7 +117,7 @@ export function getSizeCalculatorPageData(locale: Locale): CalculatorPageData {
       };
     case 'it':
       return {
-        title: 'Calcolatore Dimensioni QR Code — Guida a Distanza e Misure',
+        title: 'Calcolatore Dimensioni QR Code — Misure e Distanza',
         description: 'Calcola la dimensione fisica e la risoluzione in pixel consigliata per i tuoi codici QR in base alla distanza di scansione.',
         h1: 'Calcolatore Dimensioni QR Code',
         subheadline: 'Ottimizza le dimensioni di stampa e la densità dei moduli per una scansione immediata da smartphone.',
@@ -142,7 +142,7 @@ export function getSizeCalculatorPageData(locale: Locale): CalculatorPageData {
       };
     case 'hi':
       return {
-        title: 'क्यूआर कोड आकार कैलकुलेटर — दूरी और अनुशंसित आकार गाइड',
+        title: 'क्यूआर कोड आकार कैलकुलेटर — दूरी और सही साइज़',
         description: 'स्कैनिंग दूरी और डेटा घनत्व के आधार पर अपने क्यूआर कोड का सही भौतिक आकार और रिज़ॉल्यूशन मापें।',
         h1: 'क्यूआर कोड आकार कैलकुलेटर',
         subheadline: 'स्मार्टफोन से आसान और तेज़ स्कैनिंग के लिए अपने क्यूआर कोड का सही प्रिंट आकार निर्धारित करें।',
@@ -167,7 +167,7 @@ export function getSizeCalculatorPageData(locale: Locale): CalculatorPageData {
       };
     default: // 'en'
       return {
-        title: 'QR Code Size Calculator — Recommended Sizing & Distance Guide',
+        title: 'QR Code Size Calculator — Scan Distance & Dimensions',
         description: 'Calculate the exact recommended physical QR code size and pixel resolution based on scan distance, error correction, and content density.',
         h1: 'QR Code Size Calculator',
         subheadline: 'Determine the optimal physical dimensions, module size, and raster pixel resolution for your QR codes based on real-world scanning distance and content complexity.',
@@ -197,7 +197,7 @@ export function getPrintCalculatorPageData(locale: Locale): CalculatorPageData {
   switch (locale) {
     case 'es':
       return {
-        title: 'Calculadora de Tamaño de Impresión de Código QR — DPI y Píxeles',
+        title: 'Calculadora de Impresión de Código QR — DPI y Píxeles',
         description: 'Calcula dimensiones exactas para imprenta, píxeles requeridos a 300 DPI y checklist de preimpresión para tarjetas, folletos y carteles.',
         h1: 'Calculadora de Tamaño de Impresión de Código QR',
         subheadline: 'Garantiza una nitidez perfecta en imprenta comercial. Calcula píxeles exactos a 300 DPI, grosor de módulo y checklist de preimpresión.',
@@ -222,7 +222,7 @@ export function getPrintCalculatorPageData(locale: Locale): CalculatorPageData {
       };
     case 'de':
       return {
-        title: 'QR-Code-Druckgrößenrechner — DPI, Pixel & Druckvorstufen-Guide',
+        title: 'QR-Code-Druckgrößenrechner — DPI, Pixel & Prepress',
         description: 'Berechnen Sie exakte Druckmaße, Pixel bei 300 DPI und Vektor-SVG-Empfehlungen für Visitenkarten, Flyer und Plakate.',
         h1: 'QR-Code-Druckgrößenrechner',
         subheadline: 'Garantiert gestochen scharfen Druck. Berechnen Sie Pixel bei 300 DPI, Modulstärken und Druckqualitäts-Kriterien.',
@@ -247,7 +247,7 @@ export function getPrintCalculatorPageData(locale: Locale): CalculatorPageData {
       };
     case 'fr':
       return {
-        title: 'Calculateur de Taille d\'Impression QR Code — DPI et Pixels',
+        title: 'Calculateur d\'Impression QR Code — DPI et Pixels',
         description: 'Calculez les dimensions d\'impression exactes, les pixels à 300 DPI et les recommandations vectorielles SVG pour cartes et affiches.',
         h1: 'Calculateur de Taille d\'Impression QR Code',
         subheadline: 'Assurez une netteté parfaite à l\'impression. Calculez les pixels exacts à 300 DPI, l\'épaisseur des modules et le checklist prépresse.',
@@ -272,7 +272,7 @@ export function getPrintCalculatorPageData(locale: Locale): CalculatorPageData {
       };
     case 'pt':
       return {
-        title: 'Calculadora de Tamanho de Impressão de QR Code — DPI e Pixels',
+        title: 'Calculadora de Impressão de QR Code — DPI e Pixels',
         description: 'Calcule as medidas exatas para gráfica, pixels necessários a 300 DPI e checklist de pré-impressão para cartões e cartazes.',
         h1: 'Calculadora de Tamanho de Impressão de QR Code',
         subheadline: 'Garanta máxima nitidez para gráficas. Calcule pixels exatos a 300 DPI, espessura dos módulos e checklist pré-impressão.',
@@ -297,7 +297,7 @@ export function getPrintCalculatorPageData(locale: Locale): CalculatorPageData {
       };
     case 'it':
       return {
-        title: 'Calcolatore Dimensioni Stampa QR Code — DPI e Pixel per la Stampa',
+        title: 'Calcolatore Stampa QR Code — DPI e Pixel per Tipografia',
         description: 'Calcola le dimensioni di stampa esatte, i pixel a 300 DPI e le linee guida vettoriali SVG per tipografie e packaging.',
         h1: 'Calcolatore Dimensioni Stampa QR Code',
         subheadline: 'Assicura massima nitidezza in tipografia. Calcola i pixel esatti a 300 DPI, lo spessore dei moduli e la checklist di pre-stampa.',
@@ -322,7 +322,7 @@ export function getPrintCalculatorPageData(locale: Locale): CalculatorPageData {
       };
     case 'hi':
       return {
-        title: 'क्यूआर कोड प्रिंट आकार कैलकुलेटर — डीपीआई और पिक्सेल गाइड',
+        title: 'क्यूआर कोड प्रिंट आकार कैलकुलेटर — DPI और पिक्सेल',
         description: 'प्रिंटिंग के लिए सटीक भौतिक साइज़, 300 DPI पर आवश्यक पिक्सेल और विज़िटिंग कार्ड व पोस्टर हेतु प्रीप्रेस गाइड मापें।',
         h1: 'क्यूआर कोड प्रिंट आकार कैलकुलेटर',
         subheadline: 'प्रिंटिंग में साफ और स्पष्ट क्वालिटी सुनिश्चित करें। 300 DPI पर पिक्सेल, मॉड्यूल की मोटाई और प्रीप्रेस गाइड मापें।',
@@ -347,7 +347,7 @@ export function getPrintCalculatorPageData(locale: Locale): CalculatorPageData {
       };
     default: // 'en'
       return {
-        title: 'QR Code Print Size Calculator — DPI, Pixels & Prepress Guide',
+        title: 'QR Code Print Size Calculator — DPI, Pixels & Prepress',
         description: 'Calculate exact print dimensions, required raster pixels at 300 DPI, vector SVG prepress recommendations, and optical scan ranges.',
         h1: 'QR Code Print Size Calculator',
         subheadline: 'Ensure razor-sharp commercial print output. Calculate exact pixel dimensions at 300 DPI, module thickness, and prepress quality metrics for any print medium.',

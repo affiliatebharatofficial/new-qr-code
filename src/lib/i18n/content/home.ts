@@ -367,7 +367,7 @@ export function getHomeContent(locale: Locale): LocalizedPageContent {
       return {
         slug: '',
         qrTypeId: 'url',
-        title: 'Free QR Code Generator with Logo — High-Resolution Vector SVG & PNG',
+        title: 'Free QR Code Generator with Logo — Vector SVG & PNG',
         description: 'Create custom QR codes with custom colors, frames, and logos. Generate static and dynamic QR codes for URL, Wi-Fi, vCard, WhatsApp, and digital menus.',
         h1: 'Free QR Code Generator with Logo',
         subheadline: 'Generate high-resolution, vector-crisp, and custom-styled QR codes instantly. 100% free, private, and client-side in your browser.',

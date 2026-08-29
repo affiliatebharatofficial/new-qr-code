@@ -248,12 +248,14 @@ const user = sessionToken ? await verifySessionToken(sessionToken) : null;
         <div class="flex items-center gap-2">
           <a
             href="/login"
+            rel="nofollow"
             class="px-2.5 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-white transition-colors"
           >
             {ui.nav.login}
           </a>
           <a
             href="/signup"
+            rel="nofollow"
             class="hidden sm:inline-flex px-3.5 py-2 text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all"
           >
             {ui.nav.signup}
@@ -304,6 +306,7 @@ const user = sessionToken ? await verifySessionToken(sessionToken) : null;
             {user.role === 'admin' && (
               <a
                 href="/admin"
+                rel="nofollow"
                 class="py-2 text-center text-xs font-bold rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20"
               >
                 Admin Panel
@@ -311,6 +314,7 @@ const user = sessionToken ? await verifySessionToken(sessionToken) : null;
             )}
             <a
               href="/dashboard"
+              rel="nofollow"
               class={`py-2 text-center text-xs font-bold rounded-lg bg-indigo-600 text-white shadow-sm ${user.role !== 'admin' ? 'col-span-2' : ''}`}
             >
               Dashboard &rarr;
@@ -321,12 +325,14 @@ const user = sessionToken ? await verifySessionToken(sessionToken) : null;
         <div class="grid grid-cols-2 gap-2">
           <a
             href="/login"
+            rel="nofollow"
             class="py-2.5 text-center text-xs font-bold rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900"
           >
             {ui.nav.login}
           </a>
           <a
             href="/signup"
+            rel="nofollow"
             class="py-2.5 text-center text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
           >
             {ui.nav.signup}

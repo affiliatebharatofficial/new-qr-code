@@ -35,7 +35,41 @@ const currentLocale = explicitLocale || detectedLocale || DEFAULT_LOCALE;
 
 const siteName = 'Free QR Code Generator';
 const siteUrl = 'https://freeqrcode-generator.com';
-const pageTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
+
+function formatPageTitle(rawTitle: string): string {
+  if (!rawTitle) return siteName;
+  const trimmed = rawTitle.trim();
+  if (trimmed.includes(siteName)) {
+    return trimmed.length <= 60 ? trimmed : trimmed.slice(0, 57) + '...';
+  }
+  if (trimmed.length + 3 + siteName.length <= 60) {
+    return `${trimmed} | ${siteName}`;
+  }
+  if (trimmed.length <= 60) {
+    return trimmed;
+  }
+  if (trimmed.includes(' — ')) {
+    const [mainPart] = trimmed.split(' — ');
+    if (mainPart && mainPart.length + 3 + siteName.length <= 60) {
+      return `${mainPart} | ${siteName}`;
+    }
+    if (mainPart && mainPart.length <= 60) {
+      return mainPart;
+    }
+  }
+  if (trimmed.includes(' - ')) {
+    const [mainPart] = trimmed.split(' - ');
+    if (mainPart && mainPart.length + 3 + siteName.length <= 60) {
+      return `${mainPart} | ${siteName}`;
+    }
+    if (mainPart && mainPart.length <= 60) {
+      return mainPart;
+    }
+  }
+  return trimmed.slice(0, 57) + '...';
+}
+
+const pageTitle = formatPageTitle(title);
 
 // Self-referencing clean canonical URL
 const cleanPathname = currentPath === '/' ? '/' : currentPath.replace(/\/+$/, '');
