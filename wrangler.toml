@@ -1,5 +1,5 @@
 name = "qr-code-generator"
-account_id = "ed96d4cf5dacddf0033a768d878b6cbc"
+account_id = "8ae7dd4a86c2253fe2b4597a9ac54b8a"
 main = "./dist/_worker.js/index.js"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
@@ -13,7 +13,7 @@ binding = "ASSETS"
 [[d1_databases]]
 binding = "DB"
 database_name = "qr_generator_db"
-database_id = "8b44bfa0-2c12-47ed-87b4-015d55a9b30b"
+database_id = "329f39df-2ae3-4950-8442-769b34f8dbcb"
 
 [[r2_buckets]]
 binding = "STORAGE"
