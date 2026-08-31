@@ -14,7 +14,7 @@ import type { QRType } from '../../lib/qr/types';
 const { lang, slug } = Astro.params;
 
 if (!isValidLocale(lang) || lang === DEFAULT_LOCALE) {
-  return Astro.redirect('/');
+  return new Response('Not Found', { status: 404 });
 }
 
 const currentSlug = (slug || '').replace(/^\/+|\/+$/g, '');
