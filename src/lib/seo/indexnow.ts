@@ -1,4 +1,4 @@
-export const INDEXNOW_KEY = '294a4320de694170b74889fe1ec3e625';
+export const INDEXNOW_KEY = 'e565b30e52084612bf099ab4c3a5ffb4';
 export const INDEXNOW_HOST = 'freeqrcode-generator.com';
 export const INDEXNOW_KEY_LOCATION = `https://${INDEXNOW_HOST}/${INDEXNOW_KEY}.txt`;
 

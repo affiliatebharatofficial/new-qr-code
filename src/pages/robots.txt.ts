@@ -14,12 +14,10 @@ Allow: /disclaimer
 Allow: /contact
 Allow: /llms.txt
 
-# Disallow private dashboards, authentication, edge redirects, and internal APIs
+# Disallow private dashboards, edge redirects, and internal APIs
 Disallow: /dashboard/
 Disallow: /admin/
 Disallow: /api/
-Disallow: /login
-Disallow: /signup
 Disallow: /r/
 Disallow: /p/
 

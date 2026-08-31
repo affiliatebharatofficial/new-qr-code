@@ -5,9 +5,9 @@ import * as path from 'path';
 
 describe('IndexNow Configuration & Key File Verification', () => {
   it('should have the correct IndexNow API key configured', () => {
-    expect(INDEXNOW_KEY).toBe('294a4320de694170b74889fe1ec3e625');
+    expect(INDEXNOW_KEY).toBe('e565b30e52084612bf099ab4c3a5ffb4');
     expect(INDEXNOW_HOST).toBe('freeqrcode-generator.com');
-    expect(INDEXNOW_KEY_LOCATION).toBe('https://freeqrcode-generator.com/294a4320de694170b74889fe1ec3e625.txt');
+    expect(INDEXNOW_KEY_LOCATION).toBe('https://freeqrcode-generator.com/e565b30e52084612bf099ab4c3a5ffb4.txt');
   });
 
   it('should have the physical verification txt file in the public folder matching the API key', () => {
