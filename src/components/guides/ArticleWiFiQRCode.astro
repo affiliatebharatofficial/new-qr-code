@@ -1,0 +1,376 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+interface Props {
+  canonicalUrl?: string;
+}
+
+const { canonicalUrl = 'https://freeqrcode-generator.com/guides/how-to-create-a-wifi-qr-code' } = Astro.props;
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://freeqrcode-generator.com/' },
+    { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://freeqrcode-generator.com/guides' },
+    { '@type': 'ListItem', position: 3, name: 'Create Wi-Fi QR Code', item: canonicalUrl },
+  ],
+};
+
+const articleJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'How to Create a Wi-Fi QR Code for Instant Guest Access: Complete Guide',
+  description: 'Learn how to create a secure Wi-Fi QR code for guests, cafes, offices, and hotels. Step-by-step setup, syntax, device scanning, and privacy guarantee.',
+  publisher: {
+    '@type': 'Organization',
+    name: 'Free QR Code Generator',
+    url: 'https://freeqrcode-generator.com',
+  },
+  datePublished: '2026-08-25',
+  dateModified: '2026-09-08',
+};
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'Does a Wi-Fi QR code work on both iPhone and Android?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes! Modern iOS (iOS 11+) and Android (Android 10+) devices natively support the standard WIFI: URI schema directly in their built-in camera apps without requiring any third-party app downloads.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Is my Wi-Fi password stored on your server when I generate a code?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No. Our Wi-Fi QR code generator runs 100% client-side in your web browser using HTML5 Canvas. Your network name and password are never transmitted over the internet or saved to any external database.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Can a Wi-Fi QR code connect to a hidden network?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. The Wi-Fi QR protocol supports hidden networks using the "H:true" flag. Simply check the "Hidden Network" box in our generator before downloading your code.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Why is my phone failing to connect after scanning the Wi-Fi QR code?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'The most common causes are: (1) SSID case mismatch (Wi-Fi names are case-sensitive), (2) Incorrect encryption type selected (WPA2 vs WPA3), or (3) The print size is too small for the camera to resolve individual modules.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is the minimum size to print a Wi-Fi QR code?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'For tabletop displays and counter standees scanned from 30 to 50 cm away, print at least 3.0 x 3.0 cm (1.2 x 1.2 inches). For wall posters viewed from 1 meter away, print at least 10 x 10 cm.',
+      },
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="How to Create a Wi-Fi QR Code"
+  description="Step-by-step guide to generating scannable Wi-Fi credentials for restaurants, hotels, offices, and homes without sharing passwords."
+  canonical={canonicalUrl}
+  jsonLd={[breadcrumbJsonLd, articleJsonLd, faqJsonLd]}
+>
+  <article class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-12">
+    <!-- Breadcrumbs -->
+    <nav class="flex items-center gap-2 text-xs font-semibold text-slate-400" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-indigo-600 transition-colors">Home</a>
+      <span>/</span>
+      <a href="/guides" class="hover:text-indigo-600 transition-colors">Guides</a>
+      <span>/</span>
+      <span class="text-slate-600 dark:text-slate-300 truncate">Create Wi-Fi QR Code</span>
+    </nav>
+
+    <!-- Header Section -->
+    <header class="space-y-4 border-b border-slate-200 dark:border-slate-800 pb-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+        <span>📶</span> Connectivity Tutorial
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+        How to Create a Wi-Fi QR Code for Instant Guest Connection
+      </h1>
+      <p class="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-3xl">
+        Stop spelling out 20-character passwords across noisy rooms. Discover how to encode WPA2/WPA3 credentials into an instant scannable barcode for cafes, Airbnb rentals, corporate offices, and your living room.
+      </p>
+      <div class="flex flex-wrap items-center gap-4 text-xs text-slate-400 font-mono pt-2">
+        <span>Updated: September 2026</span>
+        <span>•</span>
+        <span>Reading Time: 6 min</span>
+        <span>•</span>
+        <span>Protocol: IEEE 802.11 / WIFI: URI</span>
+      </div>
+    </header>
+
+    <!-- Interactive CTA Mini Bar -->
+    <div class="p-6 rounded-3xl bg-slate-900 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg">
+      <div class="space-y-1 text-center sm:text-left">
+        <div class="font-bold text-base flex items-center justify-center sm:justify-start gap-2">
+          <span>⚡</span> Need to make a Wi-Fi QR Code right now?
+        </div>
+        <p class="text-xs text-slate-300">
+          Use our 100% private, browser-based generator. No registration required.
+        </p>
+      </div>
+      <a
+        href="/wifi-qr-code-generator"
+        class="px-5 py-2.5 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-500 text-white shrink-0 transition-all shadow-md"
+      >
+        Open Wi-Fi Generator &rarr;
+      </a>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 text-xs sm:text-sm">
+      <h3 class="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-xs">Table of Contents</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-indigo-600 dark:text-indigo-400">
+        <a href="#why-wifi-qr" class="hover:underline">1. The Problem with Verbal Wi-Fi Passwords</a>
+        <a href="#syntax" class="hover:underline">2. The Official WIFI: URI Protocol Syntax</a>
+        <a href="#step-by-step" class="hover:underline">3. Step-by-Step Creation Instructions</a>
+        <a href="#device-scanning" class="hover:underline">4. How iOS, Android &amp; Windows Scan Codes</a>
+        <a href="#display-ideas" class="hover:underline">5. Professional Display Ideas for Hospitality</a>
+        <a href="#privacy" class="hover:underline">6. Security &amp; Client-Side Privacy Guarantee</a>
+        <a href="#troubleshooting" class="hover:underline">7. Troubleshooting Connection Failures</a>
+        <a href="#faqs" class="hover:underline">8. Frequently Asked Questions</a>
+      </div>
+    </div>
+
+    <!-- Content Sections -->
+    <div class="space-y-10 text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
+      <!-- Section 1 -->
+      <section id="why-wifi-qr" class="space-y-4">
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+          1. The Problem with Verbal Wi-Fi Passwords
+        </h2>
+        <p>
+          Anyone who has run a coffee shop, hosted an Airbnb guest, or welcomed clients into a conference room knows the frustration of sharing wireless access:
+        </p>
+        <ul class="list-disc pl-6 space-y-2 text-xs sm:text-sm">
+          <li><strong>Spelling Ambiguity:</strong> Customers constantly confuse uppercase "O" with number "0", lowercase "l" with capital "I", or miss punctuation marks.</li>
+          <li><strong>Staff Interruption:</strong> Baristas and front-desk staff spend dozens of hours every month answering the exact same question: <em>"What’s the Wi-Fi password?"</em></li>
+          <li><strong>Security Vulnerability:</strong> Scribbling passwords on chalkboard menus or refrigerator magnets leaves credentials exposed to casual observation.</li>
+        </ul>
+        <p>
+          A Wi-Fi QR code completely solves this problem. A customer points their phone camera at a stylish table standee, a single notification pops up, and they tap <strong>"Join"</strong>. Connection happens in under one second without typing a single letter.
+        </p>
+      </section>
+
+      <!-- Section 2: Syntax -->
+      <section id="syntax" class="space-y-4">
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+          2. The Official WIFI: URI Protocol Syntax
+        </h2>
+        <p>
+          Behind the scenes, a Wi-Fi QR code uses a standardized syntax recognized natively by mobile operating systems:
+        </p>
+        <div class="p-4 rounded-2xl bg-slate-900 text-slate-100 font-mono text-xs sm:text-sm overflow-x-auto">
+          WIFI:S:&lt;SSID&gt;;T:&lt;EncryptionType&gt;;P:&lt;Password&gt;;H:&lt;Hidden&gt;;;
+        </div>
+        <p>Here is what each parameter represents:</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
+          <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
+            <span class="font-mono font-bold text-indigo-600">S: (SSID)</span>
+            <p class="text-slate-500">The exact broadcast name of your wireless network (case-sensitive).</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
+            <span class="font-mono font-bold text-indigo-600">T: (Authentication Type)</span>
+            <p class="text-slate-500">Security protocol: <code>WPA</code> (for WPA/WPA2/WPA3), <code>WEP</code>, or <code>nopass</code> (for open networks).</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
+            <span class="font-mono font-bold text-indigo-600">P: (Password)</span>
+            <p class="text-slate-500">Your network security key. If your network has no password, this parameter is omitted.</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
+            <span class="font-mono font-bold text-indigo-600">H: (Hidden Flag)</span>
+            <p class="text-slate-500">Set to <code>true</code> if your router does not broadcast its SSID; otherwise <code>false</code>.</p>
+          </div>
+        </div>
+        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-500">
+          <strong>Special Character Escaping:</strong> If your SSID or password contains special characters such as backslashes (<code>\</code>), colons (<code>:</code>), or semicolons (<code>;</code>), they must be escaped with a leading backslash (e.g. <code>\;</code>). Our generator handles this escaping automatically.
+        </div>
+      </section>
+
+      <!-- Section 3: Step by Step -->
+      <section id="step-by-step" class="space-y-4">
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+          3. Step-by-Step: How to Generate Your Wi-Fi QR Code
+        </h2>
+        <div class="space-y-4">
+          <div class="flex gap-4 items-start p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shrink-0">1</div>
+            <div class="space-y-1 text-xs sm:text-sm">
+              <h4 class="font-bold text-slate-900 dark:text-white">Open the Dedicated Generator</h4>
+              <p class="text-slate-500">Navigate to our <a href="/wifi-qr-code-generator" class="text-indigo-600 font-bold hover:underline">Wi-Fi QR Code Generator</a> page.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 items-start p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shrink-0">2</div>
+            <div class="space-y-1 text-xs sm:text-sm">
+              <h4 class="font-bold text-slate-900 dark:text-white">Enter Exact Network Name (SSID)</h4>
+              <p class="text-slate-500">Type your network name exactly as it appears in router settings. Remember: <em>"Bistro_Guest"</em> is different from <em>"bistro_guest"</em>.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 items-start p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shrink-0">3</div>
+            <div class="space-y-1 text-xs sm:text-sm">
+              <h4 class="font-bold text-slate-900 dark:text-white">Select Encryption &amp; Enter Password</h4>
+              <p class="text-slate-500">Choose <strong>WPA/WPA2/WPA3</strong> (standard for 99% of home and business routers) and enter your security passkey.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 items-start p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shrink-0">4</div>
+            <div class="space-y-1 text-xs sm:text-sm">
+              <h4 class="font-bold text-slate-900 dark:text-white">Customize Appearance</h4>
+              <p class="text-slate-500">Choose corporate brand colors, round module corners, and upload a Wi-Fi icon or company logo for the center of the code.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 items-start p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shrink-0">5</div>
+            <div class="space-y-1 text-xs sm:text-sm">
+              <h4 class="font-bold text-slate-900 dark:text-white">Export &amp; Print</h4>
+              <p class="text-slate-500">Download high-resolution PNG for digital signage, or vector SVG for professional commercial printing onto acrylic or metal signs.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 4: Device Scanning -->
+      <section id="device-scanning" class="space-y-4">
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+          4. How Different Operating Systems Scan Wi-Fi Codes
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs sm:text-sm">
+          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+            <div class="font-bold text-slate-900 dark:text-white text-base">🍏 Apple iOS (iPhone / iPad)</div>
+            <p class="text-slate-600 dark:text-slate-400">
+              Open the standard Camera app. Point at the code. A yellow bubble appears reading <em>"Join '[SSID]' Network"</em>. Tap the bubble, confirm "Join", and the device connects instantly.
+            </p>
+          </div>
+          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+            <div class="font-bold text-slate-900 dark:text-white text-base">🤖 Google Android</div>
+            <p class="text-slate-600 dark:text-slate-400">
+              Works natively via the stock Camera app, Google Lens, or the built-in "Scan QR code" toggle in the Quick Settings drop-down shade. Displays a prominent "Connect to Network" button.
+            </p>
+          </div>
+          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+            <div class="font-bold text-slate-900 dark:text-white text-base">💻 Windows 11 Laptops</div>
+            <p class="text-slate-600 dark:text-slate-400">
+              Open the Windows Camera app in barcode mode. Point the webcam at the printed code. Windows displays network credentials and prompts to connect automatically.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 5: Display Ideas -->
+      <section id="display-ideas" class="space-y-4">
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+          5. Professional Display Ideas for Hospitality &amp; Workplaces
+        </h2>
+        <ul class="list-disc pl-6 space-y-2 text-xs sm:text-sm">
+          <li><strong>Acrylic Table Tents (10 x 15 cm):</strong> Place sleek transparent acrylic stands on dining tables, bar counters, or coffee shop pickup stations.</li>
+          <li><strong>Airbnb Welcome Guide:</strong> Frame a modern card on the living room entryway table along with check-out instructions.</li>
+          <li><strong>Conference Room Badges:</strong> Mount an engraved wooden or metal plate beneath the meeting room projector screen for visiting corporate clients.</li>
+          <li><strong>Co-Working Space Walls:</strong> Print large 15 x 15 cm wall vinyl decals in common lounge areas and hot desk zones.</li>
+        </ul>
+      </section>
+
+      <!-- Section 6: Privacy -->
+      <section id="privacy" class="space-y-4">
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+          6. Security &amp; Client-Side Privacy Guarantee
+        </h2>
+        <div class="p-6 rounded-3xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/80 space-y-2 text-xs sm:text-sm text-emerald-900 dark:text-emerald-200">
+          <h4 class="font-bold text-base flex items-center gap-2">
+            <span>🛡️</span> Zero Data Transmission to Servers
+          </h4>
+          <p class="leading-relaxed">
+            Many online QR tools send your entered Wi-Fi credentials to a remote cloud server to render the graphic, logging your password in their database. On <strong>Free QR Code Generator</strong>, our engine operates <strong>100% in your local web browser memory</strong> using JavaScript and HTML5 Canvas. Your wireless network password never travels over the internet.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 7: Troubleshooting -->
+      <section id="troubleshooting" class="space-y-4">
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+          7. Troubleshooting Connection Failures
+        </h2>
+        <div class="space-y-3">
+          <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
+            <h4 class="font-bold text-slate-900 dark:text-white">Issue 1: Phone reads the text but doesn't offer to connect</h4>
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+              Ensure you selected the Wi-Fi generator tab, not the Plain Text tab. Only the formal <code>WIFI:S:...</code> protocol triggers automatic OS wireless joining.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
+            <h4 class="font-bold text-slate-900 dark:text-white">Issue 2: "Incorrect password" error on scanning</h4>
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+              Verify router security settings. If your router uses mixed WPA2/WPA3 mode, ensure the encryption dropdown is set to WPA/WPA2/WPA3.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
+            <h4 class="font-bold text-slate-900 dark:text-white">Issue 3: Camera won't focus or detect the code</h4>
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+              Check physical print dimensions. Never print a Wi-Fi QR code smaller than <strong>2.5 x 2.5 cm (1 x 1 inch)</strong>, and ensure there is a clear 4-module white quiet zone around the edges.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 8: FAQs -->
+      <section id="faqs" class="space-y-6 pt-4 border-t border-slate-200 dark:border-slate-800">
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+          8. Frequently Asked Questions
+        </h2>
+        <div class="space-y-4">
+          {faqJsonLd.mainEntity.map((item) => (
+            <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+              <h3 class="font-bold text-slate-900 dark:text-white text-base">
+                {item.name}
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                {item.acceptedAnswer.text}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- CTA Box -->
+      <div class="p-8 rounded-3xl bg-gradient-to-br from-indigo-600 to-indigo-800 text-white text-center space-y-4 shadow-xl shadow-indigo-600/20">
+        <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          Create Your Free Wi-Fi QR Code Now
+        </h3>
+        <p class="text-xs sm:text-sm text-indigo-100 max-w-xl mx-auto leading-relaxed">
+          Generate an elegant, passwordless Wi-Fi sign in seconds. Choose your colors, upload your establishment logo, and download print-ready vector SVG or PNG files.
+        </p>
+        <div class="pt-2 flex flex-wrap justify-center gap-3">
+          <a
+            href="/wifi-qr-code-generator"
+            class="px-6 py-3 rounded-2xl font-bold text-xs sm:text-sm bg-white text-indigo-600 hover:bg-slate-100 transition-all shadow-md"
+          >
+            Open Wi-Fi Generator &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+  </article>
+</BaseLayout>

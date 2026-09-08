@@ -10,6 +10,11 @@ import { getSizeCalculatorPageData, getPrintCalculatorPageData } from '../../lib
 import { SCAN_DISTANCE_REFERENCE_TABLE } from '../../lib/calculator/size';
 import { PRINT_PRESETS } from '../../lib/calculator/print';
 import type { QRType } from '../../lib/qr/types';
+import ArticleWhatIsAQRCode from '../../components/guides/ArticleWhatIsAQRCode.astro';
+import ArticleStaticVsDynamicQR from '../../components/guides/ArticleStaticVsDynamicQR.astro';
+import ArticleWiFiQRCode from '../../components/guides/ArticleWiFiQRCode.astro';
+import ArticleVCardQRCode from '../../components/guides/ArticleVCardQRCode.astro';
+import ArticleRestaurantQRCode from '../../components/guides/ArticleRestaurantQRCode.astro';
 
 const { lang, slug } = Astro.params;
 
@@ -73,11 +78,24 @@ const printFaqJsonLd = printData ? {
   })),
 } : null;
 
+// Guide routing
+const normalizedGuideSlug = currentSlug.replace(/^guides\//, '');
+const isGuideWhatIsAQRCode = normalizedGuideSlug === 'what-is-a-qr-code';
+const isGuideStaticVsDynamic = normalizedGuideSlug === 'static-vs-dynamic-qr';
+const isGuideWiFi = normalizedGuideSlug === 'how-to-create-a-wifi-qr-code';
+const isGuideVCard = normalizedGuideSlug === 'how-to-create-a-vcard-qr-code';
+const isGuideRestaurant = normalizedGuideSlug === 'how-to-use-qr-codes-for-restaurants';
+const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant;
+
+if (currentSlug === 'guides') {
+  return Astro.redirect('/guides');
+}
+
 // Standard page content
 let content: ReturnType<typeof getLocalizedPageContent> = null;
 let standardFaqJsonLd: any = null;
 
-if (!isSizeCalculator && !isPrintCalculator) {
+if (!isSizeCalculator && !isPrintCalculator && !isGuide) {
   content = getLocalizedPageContent(currentSlug, currentLocale);
   if (!content) {
     return Astro.redirect(`/${lang}`);
@@ -291,3 +309,10 @@ if (!isSizeCalculator && !isPrintCalculator) {
     />
   </BaseLayout>
 )}
+
+{isGuideWhatIsAQRCode && <ArticleWhatIsAQRCode canonicalUrl="https://freeqrcode-generator.com/guides/what-is-a-qr-code" />}
+{isGuideStaticVsDynamic && <ArticleStaticVsDynamicQR canonicalUrl="https://freeqrcode-generator.com/guides/static-vs-dynamic-qr" />}
+{isGuideWiFi && <ArticleWiFiQRCode canonicalUrl="https://freeqrcode-generator.com/guides/how-to-create-a-wifi-qr-code" />}
+{isGuideVCard && <ArticleVCardQRCode canonicalUrl="https://freeqrcode-generator.com/guides/how-to-create-a-vcard-qr-code" />}
+{isGuideRestaurant && <ArticleRestaurantQRCode canonicalUrl="https://freeqrcode-generator.com/guides/how-to-use-qr-codes-for-restaurants" />}
+
