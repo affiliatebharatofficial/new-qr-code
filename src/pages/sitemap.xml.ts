@@ -43,6 +43,12 @@ export const GET: APIRoute = async () => {
     { path: 'guides/how-to-create-a-wifi-qr-code', priority: '0.7', changefreq: 'monthly' },
     { path: 'guides/how-to-create-a-vcard-qr-code', priority: '0.7', changefreq: 'monthly' },
     { path: 'guides/how-to-use-qr-codes-for-restaurants', priority: '0.7', changefreq: 'monthly' },
+    // Root Guide Aliases
+    { path: 'what-is-a-qr-code', priority: '0.7', changefreq: 'monthly' },
+    { path: 'static-vs-dynamic-qr', priority: '0.7', changefreq: 'monthly' },
+    { path: 'how-to-create-a-wifi-qr-code', priority: '0.7', changefreq: 'monthly' },
+    { path: 'how-to-create-a-vcard-qr-code', priority: '0.7', changefreq: 'monthly' },
+    { path: 'how-to-use-qr-codes-for-restaurants', priority: '0.7', changefreq: 'monthly' },
     // Legal & Support & Company
     { path: 'about', priority: '0.7', changefreq: 'monthly' },
     { path: 'privacy', priority: '0.5', changefreq: 'monthly' },

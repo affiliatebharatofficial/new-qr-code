@@ -1,27 +1,39 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { type Locale, DEFAULT_LOCALE } from '../../lib/i18n/config';
+import { getVCardQRCodeData } from '../../lib/i18n/content/guides/vcardQRCode';
 
 interface Props {
+  locale?: Locale;
   canonicalUrl?: string;
 }
 
-const { canonicalUrl = 'https://freeqrcode-generator.com/guides/how-to-create-a-vcard-qr-code' } = Astro.props;
+const { locale = DEFAULT_LOCALE, canonicalUrl } = Astro.props;
+const data = getVCardQRCodeData(locale);
+
+const effectiveCanonical = canonicalUrl || (locale === DEFAULT_LOCALE 
+  ? 'https://freeqrcode-generator.com/guides/how-to-create-a-vcard-qr-code'
+  : `https://freeqrcode-generator.com/${locale}/guides/how-to-create-a-vcard-qr-code`);
+
+const breadcrumbHome = locale === DEFAULT_LOCALE ? '/' : `/${locale}`;
+const breadcrumbGuides = locale === DEFAULT_LOCALE ? '/guides' : `/${locale}/guides`;
 
 const breadcrumbJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://freeqrcode-generator.com/' },
-    { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://freeqrcode-generator.com/guides' },
-    { '@type': 'ListItem', position: 3, name: 'Create vCard QR Code', item: canonicalUrl },
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `https://freeqrcode-generator.com${breadcrumbHome}` },
+    { '@type': 'ListItem', position: 2, name: 'Guides', item: `https://freeqrcode-generator.com${breadcrumbGuides}` },
+    { '@type': 'ListItem', position: 3, name: data.h1, item: effectiveCanonical },
   ],
 };
 
 const articleJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'How to Create a vCard Digital Business Card QR Code: In-Depth Guide',
-  description: 'Learn how to encode RFC-compliant vCard contact cards into a QR code for 1-tap phone saving. Sizing rules, matrix density, and digital business card best practices.',
+  headline: data.h1,
+  description: data.description,
+  inLanguage: locale,
   publisher: {
     '@type': 'Organization',
     name: 'Free QR Code Generator',
@@ -34,291 +46,108 @@ const articleJsonLd = {
 const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: [
-    {
-      '@type': 'Question',
-      name: 'What happens when someone scans a vCard QR code?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'When scanned with an iPhone or Android camera, a contact preview automatically opens displaying full name, phone number, email, company, and website. The user can tap "Create New Contact" or "Save" to add you directly to their address book without typing.',
-      },
+  inLanguage: locale,
+  mainEntity: data.faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
     },
-    {
-      '@type': 'Question',
-      name: 'Why is a vCard QR code so much denser than a website QR code?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'A simple website URL is typically 25 to 40 characters long, requiring a low-density Version 2 or 3 matrix. A comprehensive vCard containing full names, multiple phone numbers, email, physical addresses, and job titles contains 400 to 700 characters, requiring a dense Version 10 to 14 matrix with thousands of tiny squares.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'What is the minimum physical size for a vCard QR code on a business card?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Because vCard codes are dense, you should never print them smaller than 3.0 x 3.0 cm (1.2 x 1.2 inches). Printing below this threshold causes individual modules to blur together on standard mobile camera lenses.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Can I update my contact details after printing a static vCard QR code?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'No. Static vCards encode raw contact text directly into the printed modules. If you change your phone number or email, the printed cards cannot be updated. To allow post-print contact updates, use a Dynamic Digital Business Card page instead.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Should I put a logo in the center of a static vCard QR code?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'We recommend caution. Because vCard payloads are already very dense, adding a central logo requires High (H) error correction, which further increases dot density. If you add a logo, increase your print size to at least 3.5 x 3.5 cm to preserve rapid autofocus.',
-      },
-    },
-  ],
+  })),
 };
 ---
 
 <BaseLayout
-  title="How to Create a vCard QR Code"
-  description="Learn how to create a vCard QR code for digital business cards. Step-by-step setup, scannability guidelines, and size recommendations."
-  canonical={canonicalUrl}
+  title={data.title}
+  description={data.description}
+  locale={locale}
+  canonical={effectiveCanonical}
   jsonLd={[breadcrumbJsonLd, articleJsonLd, faqJsonLd]}
 >
   <article class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-12">
     <!-- Breadcrumbs -->
     <nav class="flex items-center gap-2 text-xs font-semibold text-slate-400" aria-label="Breadcrumb">
-      <a href="/" class="hover:text-indigo-600 transition-colors">Home</a>
+      <a href={breadcrumbHome} class="hover:text-indigo-600 transition-colors">Home</a>
       <span>/</span>
-      <a href="/guides" class="hover:text-indigo-600 transition-colors">Guides</a>
+      <a href={breadcrumbGuides} class="hover:text-indigo-600 transition-colors">Guides</a>
       <span>/</span>
-      <span class="text-slate-600 dark:text-slate-300 truncate">Create vCard QR Code</span>
+      <span class="text-slate-600 dark:text-slate-300 truncate">{data.badge}</span>
     </nav>
 
     <!-- Header Section -->
     <header class="space-y-4 border-b border-slate-200 dark:border-slate-800 pb-8">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
-        <span>👤</span> Networking Tutorial
+        <span>👤</span> {data.badge}
       </div>
       <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
-        How to Create a vCard Digital Business Card QR Code
+        {data.h1}
       </h1>
       <p class="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-3xl">
-        Transform standard paper business cards into 1-tap phonebook saves. Learn the technical formatting of RFC vCard standards, solve high-density scannability challenges, and design print-ready luxury cards.
+        {data.subheadline}
       </p>
       <div class="flex flex-wrap items-center gap-4 text-xs text-slate-400 font-mono pt-2">
-        <span>Updated: September 2026</span>
+        <span>{data.updatedDate}</span>
         <span>•</span>
-        <span>Reading Time: 7 min</span>
-        <span>•</span>
-        <span>Standard: RFC 6350 / vCard 3.0 &amp; 4.0</span>
+        <span>{data.readingTime}</span>
       </div>
     </header>
 
-    <!-- Quick CTA Bar -->
-    <div class="p-6 rounded-3xl bg-slate-900 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg">
-      <div class="space-y-1 text-center sm:text-left">
-        <div class="font-bold text-base flex items-center justify-center sm:justify-start gap-2">
-          <span>💼</span> Ready to build your digital vCard code?
-        </div>
-        <p class="text-xs text-slate-300">
-          Generate an RFC-compliant vCard with custom brand colors and instant vector SVG export.
-        </p>
+    <!-- Quick Takeaways Callout -->
+    <div class="p-6 rounded-3xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-800/80 space-y-3">
+      <div class="flex items-center gap-2 text-indigo-700 dark:text-indigo-300 font-bold text-sm uppercase tracking-wider">
+        <span>⚡</span> {data.quickTakeawaysTitle}
       </div>
-      <a
-        href="/vcard-qr-code-generator"
-        class="px-5 py-2.5 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-500 text-white shrink-0 transition-all shadow-md"
-      >
-        Open vCard Generator &rarr;
-      </a>
+      <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+        {data.quickTakeaways.map((item) => (
+          <li class="flex items-start gap-2">
+            <span class="text-indigo-600 font-bold">✓</span>
+            <span><strong>{item.label}:</strong> {item.text}</span>
+          </li>
+        ))}
+      </ul>
     </div>
 
     <!-- Table of Contents -->
     <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 text-xs sm:text-sm">
-      <h3 class="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-xs">Table of Contents</h3>
+      <h3 class="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-xs">{data.tocTitle}</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-indigo-600 dark:text-indigo-400">
-        <a href="#why-vcard" class="hover:underline">1. The Death of Paper Business Cards</a>
-        <a href="#what-is-vcard" class="hover:underline">2. Understanding the RFC vCard Format</a>
-        <a href="#density-challenge" class="hover:underline">3. The High-Density Scannability Problem</a>
-        <a href="#step-by-step" class="hover:underline">4. Step-by-Step Creation Instructions</a>
-        <a href="#static-vs-dynamic" class="hover:underline">5. Static vCard vs. Dynamic Profile Pages</a>
-        <a href="#card-design-rules" class="hover:underline">6. Physical Card Printing &amp; Finish Rules</a>
-        <a href="#faqs" class="hover:underline">7. Frequently Asked Questions</a>
+        {data.sections.map((sec) => (
+          <a href={`#${sec.id}`} class="hover:underline">{sec.heading}</a>
+        ))}
       </div>
     </div>
 
     <!-- Content Sections -->
     <div class="space-y-10 text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
-      <!-- Section 1 -->
-      <section id="why-vcard" class="space-y-4">
-        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-          1. The Death of Paper Business Cards
-        </h2>
-        <p>
-          According to commercial sales research, over <strong>88% of printed business cards</strong> are discarded within one week of an exchange. Most recipients never bother to manually type in a 10-digit telephone number, corporate email, and website address into their smartphone.
-        </p>
-        <p>
-          A <strong>vCard QR code</strong> bridges this physical-to-digital gap. When prospective clients point their camera at the back of your card, a native operating system notification appears. Tapping it opens a complete, pre-filled contact card with your photo, phone numbers, company name, address, and LinkedIn profile ready to save in a single tap.
-        </p>
-      </section>
+      {data.sections.map((sec) => (
+        <section id={sec.id} class="space-y-4">
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+            {sec.heading}
+          </h2>
+          {sec.paragraphs.map((p) => (
+            <p>{p}</p>
+          ))}
+          {sec.bullets && (
+            <ul class="list-disc pl-6 space-y-2 text-xs sm:text-sm">
+              {sec.bullets.map((b) => (
+                <li>{b}</li>
+              ))}
+            </ul>
+          )}
+        </section>
+      ))}
 
-      <!-- Section 2: Format -->
-      <section id="what-is-vcard" class="space-y-4">
-        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-          2. Understanding the RFC vCard Format
-        </h2>
-        <p>
-          A vCard (electronic business card) is governed by international IETF standards (<strong>RFC 6350 / vCard 4.0</strong> and <strong>RFC 2426 / vCard 3.0</strong>). When you generate a vCard code, the generator encodes a structured text block:
-        </p>
-        <div class="p-4 rounded-2xl bg-slate-900 text-slate-100 font-mono text-xs overflow-x-auto space-y-1">
-          <div>BEGIN:VCARD</div>
-          <div>VERSION:3.0</div>
-          <div>N:Doe;Jane;;;</div>
-          <div>FN:Jane Doe</div>
-          <div>ORG:Acme Corporation</div>
-          <div>TITLE:Chief Marketing Officer</div>
-          <div>TEL;TYPE=CELL,VOICE:+1-555-0199</div>
-          <div>EMAIL;TYPE=WORK:jane.doe@acme.com</div>
-          <div>URL:https://acme.com</div>
-          <div>ADR;TYPE=WORK:;;100 Market St;San Francisco;CA;94105;USA</div>
-          <div>END:VCARD</div>
-        </div>
-        <p class="text-xs sm:text-sm text-slate-500">
-          When an iOS or Android device detects the <code>BEGIN:VCARD</code> marker, it bypasses the web browser and directly engages the native Contacts application.
-        </p>
-      </section>
-
-      <!-- Section 3: Density -->
-      <section id="density-challenge" class="space-y-4">
-        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-          3. The High-Density Scannability Problem
-        </h2>
-        <p>
-          Unlike a simple website URL (25 characters), a comprehensive vCard payload frequently contains between <strong>350 and 600 characters</strong>.
-        </p>
-        <p>
-          To fit this much data, QR code generators automatically escalate from Version 2 (25 x 25 squares) to <strong>Version 10 or 12 (65 x 65 squares)</strong>. This means hundreds of tiny, closely packed modules.
-        </p>
-        <div class="p-5 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 space-y-2 text-xs sm:text-sm text-amber-900 dark:text-amber-200">
-          <h4 class="font-bold text-base flex items-center gap-2">
-            ⚠️ The "Micro-Module" Trap on Business Cards
-          </h4>
-          <p>
-            Standard business cards measure 3.5 x 2.0 inches (89 x 51 mm). If you print a dense Version 12 vCard at a tiny size of 1.5 x 1.5 cm, each individual module is under 0.25 mm wide. Older smartphones, budget Android devices, or hands shaking in dim conference halls will completely fail to focus on the code.
-          </p>
-          <p class="font-bold">
-            Solution: Keep static vCards concise (Name, Cell, Email, Company, Website only) and never print smaller than 3.0 x 3.0 cm (1.2 x 1.2 inches).
-          </p>
-        </div>
-      </section>
-
-      <!-- Section 4: Step by Step -->
-      <section id="step-by-step" class="space-y-4">
-        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-          4. Step-by-Step: How to Generate Your vCard Code
-        </h2>
-        <div class="space-y-4">
-          <div class="flex gap-4 items-start p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shrink-0">1</div>
-            <div class="space-y-1 text-xs sm:text-sm">
-              <h4 class="font-bold text-slate-900 dark:text-white">Open the vCard Generator</h4>
-              <p class="text-slate-500">Go to our <a href="/vcard-qr-code-generator" class="text-indigo-600 font-bold hover:underline">vCard QR Code Generator</a>.</p>
-            </div>
-          </div>
-
-          <div class="flex gap-4 items-start p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shrink-0">2</div>
-            <div class="space-y-1 text-xs sm:text-sm">
-              <h4 class="font-bold text-slate-900 dark:text-white">Fill in Core Contact Fields</h4>
-              <p class="text-slate-500">Enter your First Name, Last Name, Organization, Mobile Phone, Work Email, and Portfolio/Company Website.</p>
-            </div>
-          </div>
-
-          <div class="flex gap-4 items-start p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shrink-0">3</div>
-            <div class="space-y-1 text-xs sm:text-sm">
-              <h4 class="font-bold text-slate-900 dark:text-white">Optimize Style &amp; Contrast</h4>
-              <p class="text-slate-500">Choose deep, high-contrast colors (e.g. charcoal black or deep navy modules against a white or ivory card background).</p>
-            </div>
-          </div>
-
-          <div class="flex gap-4 items-start p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shrink-0">4</div>
-            <div class="space-y-1 text-xs sm:text-sm">
-              <h4 class="font-bold text-slate-900 dark:text-white">Download Print-Ready Vector SVG</h4>
-              <p class="text-slate-500">Always download the <strong>Vector SVG</strong> format to send to your card printing service (such as Moo, Vistaprint, or local offset presses).</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Section 5: Static vs Dynamic -->
-      <section id="static-vs-dynamic" class="space-y-4">
-        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-          5. Static vCard vs. Dynamic Digital Business Card
-        </h2>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs sm:text-sm border-collapse rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
-            <thead class="bg-slate-100 dark:bg-slate-800/80 text-slate-900 dark:text-white font-bold">
-              <tr>
-                <th class="p-3">Feature</th>
-                <th class="p-3">Static vCard QR</th>
-                <th class="p-3">Dynamic Profile Landing Page</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
-              <tr>
-                <td class="p-3 font-semibold">Offline Scanning</td>
-                <td class="p-3 text-emerald-600 font-bold">✅ Works in airplane mode</td>
-                <td class="p-3 text-slate-500">Requires internet connection</td>
-              </tr>
-              <tr>
-                <td class="p-3 font-semibold">Post-Print Editability</td>
-                <td class="p-3 text-red-600 font-medium">❌ Cannot change numbers</td>
-                <td class="p-3 text-emerald-600 font-bold">✅ Edit profile anytime</td>
-              </tr>
-              <tr>
-                <td class="p-3 font-semibold">Visual Dot Density</td>
-                <td class="p-3">Dense matrix (Version 10+)</td>
-                <td class="p-3 text-emerald-600 font-bold">Clean, large squares (Version 2)</td>
-              </tr>
-              <tr>
-                <td class="p-3 font-semibold">Extra Media Support</td>
-                <td class="p-3">Text only</td>
-                <td class="p-3 text-emerald-600 font-bold">Headshots, social links, video intros</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Section 6: Print Rules -->
-      <section id="card-design-rules" class="space-y-4">
-        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-          6. Physical Business Card Design &amp; Finishing Rules
-        </h2>
-        <ul class="list-disc pl-6 space-y-2 text-xs sm:text-sm">
-          <li><strong>Avoid Metallic Foil on Modules:</strong> Gold or silver foil stamping reflects phone flash and ambient lighting, creating optical glare that prevents decoding. Use foil for your typography, but print the QR code in matte ink.</li>
-          <li><strong>Dedicate the Entire Back of the Card:</strong> Put your human-readable branding and logo on the front of the card, and place a clean, centered 3.5 x 3.5 cm QR code with clear text <em>"Scan to Save Contact"</em> on the back.</li>
-          <li><strong>Matte Lamination:</strong> Choose soft-touch matte or uncoated cotton stock over ultra-glossy UV finishes to minimize reflective glare.</li>
-          <li><strong>Test Print Proofs:</strong> Always print a test proof on your office printer at 100% scale and scan it with both an iPhone and an Android phone before approving a 1,000-card print run.</li>
-        </ul>
-      </section>
-
-      <!-- Section 7: FAQs -->
+      <!-- FAQs -->
       <section id="faqs" class="space-y-6 pt-4 border-t border-slate-200 dark:border-slate-800">
         <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-          7. Frequently Asked Questions
+          {data.faqsTitle}
         </h2>
         <div class="space-y-4">
-          {faqJsonLd.mainEntity.map((item) => (
+          {data.faqs.map((item) => (
             <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
-              <h3 class="font-bold text-slate-900 dark:text-white text-base">
-                {item.name}
-              </h3>
-              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                {item.acceptedAnswer.text}
-              </p>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base">{item.question}</h3>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{item.answer}</p>
             </div>
           ))}
         </div>
@@ -327,24 +156,26 @@ const faqJsonLd = {
       <!-- CTA Box -->
       <div class="p-8 rounded-3xl bg-gradient-to-br from-indigo-600 to-indigo-800 text-white text-center space-y-4 shadow-xl shadow-indigo-600/20">
         <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
-          Create Your vCard QR Code in Seconds
+          {data.ctaTitle}
         </h3>
         <p class="text-xs sm:text-sm text-indigo-100 max-w-xl mx-auto leading-relaxed">
-          Generate an RFC-compliant digital business card QR code for business cards, resumes, and conferences. Export in crisp Vector SVG.
+          {data.ctaDesc}
         </p>
         <div class="pt-2 flex flex-wrap justify-center gap-3">
           <a
-            href="/vcard-qr-code-generator"
+            href={data.ctaButtonLink}
             class="px-6 py-3 rounded-2xl font-bold text-xs sm:text-sm bg-white text-indigo-600 hover:bg-slate-100 transition-all shadow-md"
           >
-            Create vCard QR Code &rarr;
+            {data.ctaButtonText} &rarr;
           </a>
-          <a
-            href="/digital-business-card"
-            class="px-6 py-3 rounded-2xl font-bold text-xs sm:text-sm bg-indigo-700/80 hover:bg-indigo-700 text-white border border-indigo-500/50 transition-all"
-          >
-            Digital Business Card &rarr;
-          </a>
+          {data.ctaSecondaryText && (
+            <a
+              href={data.ctaSecondaryLink || '/'}
+              class="px-6 py-3 rounded-2xl font-bold text-xs sm:text-sm bg-indigo-700/80 hover:bg-indigo-700 text-white border border-indigo-500/50 transition-all"
+            >
+              {data.ctaSecondaryText} &rarr;
+            </a>
+          )}
         </div>
       </div>
     </div>

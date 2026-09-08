@@ -1,27 +1,39 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { type Locale, DEFAULT_LOCALE } from '../../lib/i18n/config';
+import { getWhatIsAQRCodeData } from '../../lib/i18n/content/guides/whatIsAQRCode';
 
 interface Props {
+  locale?: Locale;
   canonicalUrl?: string;
 }
 
-const { canonicalUrl = 'https://freeqrcode-generator.com/guides/what-is-a-qr-code' } = Astro.props;
+const { locale = DEFAULT_LOCALE, canonicalUrl } = Astro.props;
+const data = getWhatIsAQRCodeData(locale);
+
+const effectiveCanonical = canonicalUrl || (locale === DEFAULT_LOCALE 
+  ? 'https://freeqrcode-generator.com/guides/what-is-a-qr-code'
+  : `https://freeqrcode-generator.com/${locale}/guides/what-is-a-qr-code`);
+
+const breadcrumbHome = locale === DEFAULT_LOCALE ? '/' : `/${locale}`;
+const breadcrumbGuides = locale === DEFAULT_LOCALE ? '/guides' : `/${locale}/guides`;
 
 const breadcrumbJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://freeqrcode-generator.com/' },
-    { '@type': 'ListItem', position: 2, name: 'Guides', item: 'https://freeqrcode-generator.com/guides' },
-    { '@type': 'ListItem', position: 3, name: 'What is a QR Code', item: canonicalUrl },
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `https://freeqrcode-generator.com${breadcrumbHome}` },
+    { '@type': 'ListItem', position: 2, name: 'Guides', item: `https://freeqrcode-generator.com${breadcrumbGuides}` },
+    { '@type': 'ListItem', position: 3, name: data.h1, item: effectiveCanonical },
   ],
 };
 
 const articleJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'What is a QR Code? Complete Beginner Guide & Technical Anatomy',
-  description: 'An in-depth guide explaining how Quick Response (QR) codes work, their 2D matrix anatomy, error correction levels, data encoding modes, and best practices.',
+  headline: data.h1,
+  description: data.description,
+  inLanguage: locale,
   publisher: {
     '@type': 'Organization',
     name: 'Free QR Code Generator',
@@ -34,419 +46,122 @@ const articleJsonLd = {
 const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: [
-    {
-      '@type': 'Question',
-      name: 'What does QR stand for?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'QR stands for "Quick Response". It was designed by Denso Wave engineer Masahiro Hara in 1994 to enable high-speed decoding of complex component data in automotive factories.',
-      },
+  inLanguage: locale,
+  mainEntity: data.faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.answer,
     },
-    {
-      '@type': 'Question',
-      name: 'How much data can a QR code hold?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'A standard Version 40 QR code can store up to 7,089 numeric characters, 4,296 alphanumeric characters, 2,953 binary bytes (UTF-8), or 1,817 Kanji characters.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Can a QR code work if it is damaged or scratched?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Yes. QR codes use Reed-Solomon mathematical error correction. Depending on the chosen level (L, M, Q, or H), between 7% and 30% of the entire barcode can be completely damaged or obscured while still remaining 100% readable.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Do QR codes expire?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Static QR codes encode information directly into the pixel pattern and never expire. Dynamic QR codes route through a redirection link; they remain active as long as the underlying redirection service is maintained.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'What is the minimum physical size to print a QR code?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'The absolute minimum safe size for handheld items like business cards or menus is 2.0 x 2.0 cm (0.8 x 0.8 inches). For signs viewed at distance, maintain a 10:1 viewing distance-to-size ratio.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Why do QR codes have three squares in the corners?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Those squares are Finder Patterns (or Position Detection Patterns). They allow camera sensors to recognize the orientation, scale, and skew of the QR code from any 360-degree angle.',
-      },
-    },
-  ],
+  })),
 };
 ---
 
 <BaseLayout
-  title="What is a QR Code? Beginner Guide"
-  description="Learn what a QR code is, how 2D matrix symbology works, anatomical structure, error correction levels, data capacity, and scanning best practices."
-  canonical={canonicalUrl}
+  title={data.title}
+  description={data.description}
+  locale={locale}
+  canonical={effectiveCanonical}
   jsonLd={[breadcrumbJsonLd, articleJsonLd, faqJsonLd]}
 >
   <article class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-12">
     <!-- Breadcrumbs -->
     <nav class="flex items-center gap-2 text-xs font-semibold text-slate-400" aria-label="Breadcrumb">
-      <a href="/" class="hover:text-indigo-600 transition-colors">Home</a>
+      <a href={breadcrumbHome} class="hover:text-indigo-600 transition-colors">Home</a>
       <span>/</span>
-      <a href="/guides" class="hover:text-indigo-600 transition-colors">Guides</a>
+      <a href={breadcrumbGuides} class="hover:text-indigo-600 transition-colors">Guides</a>
       <span>/</span>
-      <span class="text-slate-600 dark:text-slate-300 truncate">What is a QR Code?</span>
+      <span class="text-slate-600 dark:text-slate-300 truncate">{data.badge}</span>
     </nav>
 
     <!-- Header Section -->
     <header class="space-y-4 border-b border-slate-200 dark:border-slate-800 pb-8">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
-        <span>📖</span> Comprehensive Guide
+        <span>📖</span> {data.badge}
       </div>
       <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
-        What is a QR Code? Anatomy, History &amp; How It Works
+        {data.h1}
       </h1>
       <p class="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-3xl">
-        Discover the engineering behind Quick Response codes: how 2D matrix patterns encode data, how optical sensors decode them in milliseconds, and how error correction enables branded logos and damaged code recovery.
+        {data.subheadline}
       </p>
       <div class="flex flex-wrap items-center gap-4 text-xs text-slate-400 font-mono pt-2">
-        <span>Updated: September 2026</span>
+        <span>{data.updatedDate}</span>
         <span>•</span>
-        <span>Reading Time: 7 min</span>
+        <span>{data.readingTime}</span>
         <span>•</span>
-        <span>Standard: ISO/IEC 18004</span>
+        <span>ISO/IEC 18004</span>
       </div>
     </header>
 
     <!-- Quick Takeaways Callout -->
     <div class="p-6 rounded-3xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-800/80 space-y-3">
       <div class="flex items-center gap-2 text-indigo-700 dark:text-indigo-300 font-bold text-sm uppercase tracking-wider">
-        <span>⚡</span> Quick Takeaways
+        <span>⚡</span> {data.quickTakeawaysTitle}
       </div>
       <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
-        <li class="flex items-start gap-2">
-          <span class="text-indigo-600 font-bold">✓</span>
-          <span><strong>2D Matrix Storage:</strong> Stores data both horizontally and vertically, holding up to 7,089 characters.</span>
-        </li>
-        <li class="flex items-start gap-2">
-          <span class="text-indigo-600 font-bold">✓</span>
-          <span><strong>360° Omnidirectional Scanning:</strong> Corner finder patterns let cameras decode from any angle.</span>
-        </li>
-        <li class="flex items-start gap-2">
-          <span class="text-indigo-600 font-bold">✓</span>
-          <span><strong>Reed-Solomon Resilience:</strong> Recovers up to 30% corrupted data or allows central logo embedding.</span>
-        </li>
-        <li class="flex items-start gap-2">
-          <span class="text-indigo-600 font-bold">✓</span>
-          <span><strong>Client-Side &amp; Permanent:</strong> Standard static QR codes never expire and require zero server hosting.</span>
-        </li>
+        {data.quickTakeaways.map((item) => (
+          <li class="flex items-start gap-2">
+            <span class="text-indigo-600 font-bold">✓</span>
+            <span><strong>{item.label}:</strong> {item.text}</span>
+          </li>
+        ))}
       </ul>
     </div>
 
     <!-- Table of Contents -->
     <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 text-xs sm:text-sm">
-      <h3 class="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-xs">Table of Contents</h3>
+      <h3 class="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-xs">{data.tocTitle}</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-indigo-600 dark:text-indigo-400">
-        <a href="#history" class="hover:underline">1. Origin &amp; History (1994 to Present)</a>
-        <a href="#how-it-works" class="hover:underline">2. How 2D Matrix Encoding Works</a>
-        <a href="#anatomy" class="hover:underline">3. Complete Anatomy Breakdown</a>
-        <a href="#error-correction" class="hover:underline">4. Reed-Solomon Error Correction</a>
-        <a href="#data-modes" class="hover:underline">5. The 4 Data Encoding Modes</a>
-        <a href="#1d-vs-2d" class="hover:underline">6. 1D Barcodes vs 2D QR Codes</a>
-        <a href="#best-practices" class="hover:underline">7. Sizing, Contrast &amp; Print Rules</a>
-        <a href="#faqs" class="hover:underline">8. Frequently Asked Questions</a>
+        {data.sections.map((sec) => (
+          <a href={`#${sec.id}`} class="hover:underline">{sec.heading}</a>
+        ))}
       </div>
     </div>
 
     <!-- Content Sections -->
     <div class="space-y-10 text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
-      <!-- Section 1 -->
-      <section id="history" class="space-y-4">
-        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-          1. The Origin and History of the QR Code
-        </h2>
-        <p>
-          The QR code was created in <strong>1994</strong> by <strong>Masahiro Hara</strong> and his engineering team at <strong>Denso Wave</strong>, a subsidiary of the Toyota automotive group in Japan. In manufacturing plants, auto workers were tracking hundreds of vehicle parts using traditional linear (1D) barcodes. Because linear barcodes could only encode around 20 alphanumeric characters, workers were frequently forced to scan up to ten different barcodes on a single shipping box to log parts.
-        </p>
-        <p>
-          Tasked with creating a barcode capable of storing exponentially more information that could be read at blinding speeds, Hara found inspiration while playing the strategic board game <em>Go</em>. Observing black and white stones placed on a grid, he realized that a two-dimensional grid of binary squares (modules) could encode information in both the X and Y axes simultaneously.
-        </p>
-        <p>
-          Denso Wave chose to release the patent for the QR code technology into the public domain without charging royalties, enabling it to become an international standard (<strong>ISO/IEC 18004</strong> in 2000). Today, over three decades later, QR codes are ubiquitous across payments, menus, boarding passes, healthcare, and physical-to-digital marketing worldwide.
-        </p>
-      </section>
+      {data.sections.map((sec) => (
+        <section id={sec.id} class="space-y-4">
+          <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+            {sec.heading}
+          </h2>
+          {sec.paragraphs.map((p) => (
+            <p>{p}</p>
+          ))}
+          {sec.subsections && (
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              {sec.subsections.map((sub) => (
+                <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+                  <h4 class="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-indigo-600"></span> {sub.subheading}
+                  </h4>
+                  <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">{sub.text}</p>
+                </div>
+              ))}
+            </div>
+          )}
+          {sec.bullets && (
+            <ul class="list-disc pl-6 space-y-2 text-xs sm:text-sm">
+              {sec.bullets.map((b) => (
+                <li>{b}</li>
+              ))}
+            </ul>
+          )}
+        </section>
+      ))}
 
-      <!-- Section 2 -->
-      <section id="how-it-works" class="space-y-4">
-        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-          2. How 2D Matrix Encoding Works
-        </h2>
-        <p>
-          To understand a QR code, think of it as an optical binary language. Traditional computers store data as binary bits: <strong>0s and 1s</strong>. A QR code translates these binary bits directly into physical geometric squares known as <strong>modules</strong>:
-        </p>
-        <ul class="list-disc pl-6 space-y-2">
-          <li><strong>Black Module:</strong> Typically represents a binary <strong>1</strong>.</li>
-          <li><strong>White Module:</strong> Represents a binary <strong>0</strong>.</li>
-        </ul>
-        <p>
-          When a camera sensor captures an image of a QR code, the software performs binarization (converting colors to high-contrast monochrome pixels), locates the boundaries, detects the orientation, and reads the sequence of dark and light squares across coordinates into a raw binary bitstream. This bitstream is then decoded according to the specified character set (such as ASCII or UTF-8).
-        </p>
-      </section>
-
-      <!-- Section 3: Anatomy -->
-      <section id="anatomy" class="space-y-4">
-        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-          3. Complete Anatomy of a QR Code
-        </h2>
-        <p>
-          A QR code is not merely a random scattering of dots. Every section has a rigorous, mathematically defined function:
-        </p>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
-            <h4 class="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-indigo-600"></span> Finder Patterns (Eyes)
-            </h4>
-            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-              The three large square targets located at the top-left, top-right, and bottom-left corners. Each finder pattern has a precise module ratio of <strong>1:1:3:1:1</strong> (black, white, black, white, black). This unique mathematical ratio never naturally occurs in scanned documents, allowing the camera algorithm to immediately identify and isolate the QR code within a split second from any 360-degree angle.
-            </p>
-          </div>
-
-          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
-            <h4 class="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-indigo-600"></span> Alignment Patterns
-            </h4>
-            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-              Smaller concentric squares placed inside higher-version codes. As QR codes grow larger to store more data, physical printing on curved surfaces (such as bottles or flexed cardboard) creates optical perspective distortion. Alignment patterns act as internal anchor points that allow the software to digitally straighten out warped grids.
-            </p>
-          </div>
-
-          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
-            <h4 class="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-indigo-600"></span> Timing Patterns
-            </h4>
-            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-              Two single-module-wide lines of alternating black and white squares connecting the finder patterns horizontally and vertically. They act like graph paper grid lines, instructing the decoder on the exact width and height of an individual module.
-            </p>
-          </div>
-
-          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
-            <h4 class="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-indigo-600"></span> Format &amp; Version Info
-            </h4>
-            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-              Specific zones adjacent to the finder patterns that encode the error correction level (L, M, Q, or H) and the mathematical mask formula used to distribute dots evenly and prevent optical glare.
-            </p>
-          </div>
-
-          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
-            <h4 class="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-indigo-600"></span> Quiet Zone (Border Margin)
-            </h4>
-            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-              A solid, unprinted blank perimeter at least <strong>4 modules wide</strong> surrounding the code. Without this safety buffer, background graphics, dark packaging, or nearby text bleed into the data grid, making scanning impossible.
-            </p>
-          </div>
-
-          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
-            <h4 class="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-indigo-600"></span> Data &amp; Error Correction Blocks
-            </h4>
-            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-              The remaining central matrix area holding your encoded payload (such as website URLs, Wi-Fi credentials, or vCard details) interwoven with Reed-Solomon redundancy parity blocks.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <!-- Section 4: Error Correction -->
-      <section id="error-correction" class="space-y-4">
-        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-          4. Reed-Solomon Error Correction Explained
-        </h2>
-        <p>
-          One of the greatest engineering innovations of QR codes is <strong>Reed-Solomon Error Correction</strong>. Originally invented in 1960 for deep-space telecommunications, Reed-Solomon algorithms add redundant polynomial equations into the binary matrix.
-        </p>
-        <p>
-          If a printed QR code gets torn, smeared with grease, sun-faded, or covered with a custom brand logo, the scanning software solves the remaining equations to mathematically reconstruct the missing data blocks.
-        </p>
-
-        <!-- Table of Error Correction -->
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs sm:text-sm border-collapse rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
-            <thead class="bg-slate-100 dark:bg-slate-800/80 text-slate-900 dark:text-white font-bold">
-              <tr>
-                <th class="p-3">Level</th>
-                <th class="p-3">Recovery Capacity</th>
-                <th class="p-3">Data Density</th>
-                <th class="p-3">Recommended Use Case</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
-              <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                <td class="p-3 font-bold text-indigo-600">Level L (Low)</td>
-                <td class="p-3 font-mono">~7% of data</td>
-                <td class="p-3">Cleanest / Lowest Density</td>
-                <td class="p-3">Clean indoor screens, digital presentation slides</td>
-              </tr>
-              <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                <td class="p-3 font-bold text-indigo-600">Level M (Medium)</td>
-                <td class="p-3 font-mono">~15% of data</td>
-                <td class="p-3">Balanced Standard</td>
-                <td class="p-3">Default for marketing flyers, receipts, and packaging</td>
-              </tr>
-              <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                <td class="p-3 font-bold text-indigo-600">Level Q (Quartile)</td>
-                <td class="p-3 font-mono">~25% of data</td>
-                <td class="p-3">Moderate Density</td>
-                <td class="p-3">Outdoor posters, warehouse shipping labels, factory floors</td>
-              </tr>
-              <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 bg-indigo-50/30 dark:bg-indigo-950/20">
-                <td class="p-3 font-bold text-indigo-600">Level H (High)</td>
-                <td class="p-3 font-mono font-bold text-indigo-600">~30% of data</td>
-                <td class="p-3">Highest Density</td>
-                <td class="p-3 font-semibold">Mandatory for codes with central logos or artwork</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Section 5: Data Modes -->
-      <section id="data-modes" class="space-y-4">
-        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-          5. The 4 Data Encoding Modes
-        </h2>
-        <p>
-          QR codes optimize storage capacity by using specialized encoding modes depending on what kind of characters are in your payload:
-        </p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
-          <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
-            <div class="font-bold text-slate-900 dark:text-white text-base">1. Numeric Mode</div>
-            <p class="text-slate-500">Digits 0 through 9 only. Encodes 3 digits into 10 bits. Max capacity: <strong>7,089 characters</strong>.</p>
-          </div>
-          <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
-            <div class="font-bold text-slate-900 dark:text-white text-base">2. Alphanumeric Mode</div>
-            <p class="text-slate-500">Digits 0-9, capital letters A-Z, and 9 symbols (space, $, %, *, +, -, ., /, :). Max capacity: <strong>4,296 characters</strong>.</p>
-          </div>
-          <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
-            <div class="font-bold text-slate-900 dark:text-white text-base">3. Byte Mode (Binary / UTF-8)</div>
-            <p class="text-slate-500">Default for website URLs, lower-case text, and international characters. Max capacity: <strong>2,953 bytes</strong>.</p>
-          </div>
-          <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
-            <div class="font-bold text-slate-900 dark:text-white text-base">4. Kanji Mode</div>
-            <p class="text-slate-500">Encodes double-byte Japanese Shift JIS characters in 13 bits per character. Max capacity: <strong>1,817 characters</strong>.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- Section 6: 1D vs 2D -->
-      <section id="1d-vs-2d" class="space-y-4">
-        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-          6. Linear (1D) Barcodes vs. 2D QR Codes
-        </h2>
-        <p>
-          Linear barcodes (such as UPC on groceries or Code 128 on courier packages) are one-dimensional: information is encoded strictly by the widths and spacings of parallel lines along a single horizontal axis.
-        </p>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs sm:text-sm border-collapse rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
-            <thead class="bg-slate-100 dark:bg-slate-800/80 text-slate-900 dark:text-white font-bold">
-              <tr>
-                <th class="p-3">Feature</th>
-                <th class="p-3">1D Barcode (UPC / Code 128)</th>
-                <th class="p-3">2D QR Code (ISO 18004)</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
-              <tr>
-                <td class="p-3 font-semibold">Dimensions</td>
-                <td class="p-3">1D (Horizontal only)</td>
-                <td class="p-3 font-semibold text-indigo-600">2D (Horizontal and Vertical)</td>
-              </tr>
-              <tr>
-                <td class="p-3 font-semibold">Data Capacity</td>
-                <td class="p-3">~20 to 80 characters</td>
-                <td class="p-3 font-semibold text-indigo-600">Up to 7,089 characters</td>
-              </tr>
-              <tr>
-                <td class="p-3 font-semibold">Scanning Speed &amp; Angles</td>
-                <td class="p-3">Requires red laser aligned with lines</td>
-                <td class="p-3 font-semibold text-indigo-600">Omnidirectional 360° reading by any smartphone camera</td>
-              </tr>
-              <tr>
-                <td class="p-3 font-semibold">Error Correction</td>
-                <td class="p-3">None (a scratch breaks the scan)</td>
-                <td class="p-3 font-semibold text-indigo-600">Up to 30% self-healing with Reed-Solomon</td>
-              </tr>
-              <tr>
-                <td class="p-3 font-semibold">Data Types</td>
-                <td class="p-3">Product lookup numbers</td>
-                <td class="p-3 font-semibold text-indigo-600">URLs, Wi-Fi keys, vCards, payments, cryptographic tokens</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Section 7: Best Practices -->
-      <section id="best-practices" class="space-y-4">
-        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-          7. Critical Sizing, Optical Contrast &amp; Print Rules
-        </h2>
-        <p>
-          Even the most elegantly designed QR code will fail in the field if basic optical physics are ignored:
-        </p>
-
-        <div class="space-y-3">
-          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
-            <h4 class="font-bold text-slate-900 dark:text-white">Rule 1: The 10:1 Distance-to-Size Ratio</h4>
-            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-              Your physical QR code width should be at least one-tenth of the intended scanning distance. If visitors scan from 1 meter (3.3 feet) away, print at least 10 x 10 cm. For billboards viewed from 10 meters away, print at least 1 x 1 meter. You can calculate exact dimensions with our <a href="/qr-code-size-calculator" class="text-indigo-600 font-bold hover:underline">QR Code Size Calculator</a>.
-            </p>
-          </div>
-
-          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
-            <h4 class="font-bold text-slate-900 dark:text-white">Rule 2: Never Violate the Quiet Zone</h4>
-            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-              Leave at least 4 modules of clean, solid white space around all four edges. Placing background graphics, gradients, or frame borders too close to the outer modules will cause camera edge-detection routines to fail.
-            </p>
-          </div>
-
-          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
-            <h4 class="font-bold text-slate-900 dark:text-white">Rule 3: Maintain High Luminosity Contrast</h4>
-            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-              Smartphone camera sensors convert images to monochrome luminance channels. Always use dark foreground modules on a light background. Never use low-contrast combinations like yellow on white or navy on black.
-            </p>
-          </div>
-
-          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1">
-            <h4 class="font-bold text-slate-900 dark:text-white">Rule 4: Always Print at 300 DPI or in Vector SVG</h4>
-            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-              For handheld print collateral, export in vector SVG for zero-pixelation printing on commercial presses. If using PNG raster graphics, calculate your required pixel dimensions using our <a href="/qr-code-print-size-calculator" class="text-indigo-600 font-bold hover:underline">QR Code Print Size Calculator</a>.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <!-- Section 8: FAQs -->
+      <!-- FAQs -->
       <section id="faqs" class="space-y-6 pt-4 border-t border-slate-200 dark:border-slate-800">
         <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-          8. Frequently Asked Questions
+          {data.faqsTitle}
         </h2>
         <div class="space-y-4">
-          {faqJsonLd.mainEntity.map((item) => (
+          {data.faqs.map((item) => (
             <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
-              <h3 class="font-bold text-slate-900 dark:text-white text-base">
-                {item.name}
-              </h3>
-              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                {item.acceptedAnswer.text}
-              </p>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base">{item.question}</h3>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{item.answer}</p>
             </div>
           ))}
         </div>
@@ -455,24 +170,26 @@ const faqJsonLd = {
       <!-- CTA Box -->
       <div class="p-8 rounded-3xl bg-gradient-to-br from-indigo-600 to-indigo-800 text-white text-center space-y-4 shadow-xl shadow-indigo-600/20">
         <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
-          Ready to Create Your Free QR Code?
+          {data.ctaTitle}
         </h3>
         <p class="text-xs sm:text-sm text-indigo-100 max-w-xl mx-auto leading-relaxed">
-          Generate custom branded QR codes with your company logo, custom colors, and instant vector SVG and high-resolution PNG downloads. 100% free with unlimited scans.
+          {data.ctaDesc}
         </p>
         <div class="pt-2 flex flex-wrap justify-center gap-3">
           <a
-            href="/"
+            href={data.ctaButtonLink}
             class="px-6 py-3 rounded-2xl font-bold text-xs sm:text-sm bg-white text-indigo-600 hover:bg-slate-100 transition-all shadow-md"
           >
-            Create QR Code Free &rarr;
+            {data.ctaButtonText} &rarr;
           </a>
-          <a
-            href="/qr-code-size-calculator"
-            class="px-6 py-3 rounded-2xl font-bold text-xs sm:text-sm bg-indigo-700/80 hover:bg-indigo-700 text-white border border-indigo-500/50 transition-all"
-          >
-            Size Calculator &rarr;
-          </a>
+          {data.ctaSecondaryText && (
+            <a
+              href={data.ctaSecondaryLink || '/'}
+              class="px-6 py-3 rounded-2xl font-bold text-xs sm:text-sm bg-indigo-700/80 hover:bg-indigo-700 text-white border border-indigo-500/50 transition-all"
+            >
+              {data.ctaSecondaryText} &rarr;
+            </a>
+          )}
         </div>
       </div>
     </div>

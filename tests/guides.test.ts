@@ -1,6 +1,15 @@
 import { describe, it, expect } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
+import { SUPPORTED_LOCALES } from '../src/lib/i18n/config';
+import {
+  getWhatIsAQRCodeData,
+  getStaticVsDynamicData,
+  getWiFiQRCodeData,
+  getVCardQRCodeData,
+  getRestaurantQRCodeData,
+  getGuideHubData,
+} from '../src/lib/i18n/content/guides/index';
 
 describe('Guides and Articles Suite', () => {
   const guideSlugs = [
@@ -16,16 +25,17 @@ describe('Guides and Articles Suite', () => {
     expect(fs.existsSync(componentsDir)).toBe(true);
 
     const files = fs.readdirSync(componentsDir);
-    expect(files.length).toBe(5);
+    expect(files.length).toBeGreaterThanOrEqual(5);
 
-    files.forEach((file) => {
-      const content = fs.readFileSync(path.join(componentsDir, file), 'utf-8');
-      // Each comprehensive article should be at least 5000 bytes
-      expect(content.length).toBeGreaterThan(5000);
-      expect(content).toContain('FAQPage');
-      expect(content).toContain('Article');
-      expect(content).toContain('BreadcrumbList');
-    });
+    files
+      .filter((f) => f.startsWith('Article'))
+      .forEach((file) => {
+        const content = fs.readFileSync(path.join(componentsDir, file), 'utf-8');
+        expect(content.length).toBeGreaterThan(3000);
+        expect(content).toContain('FAQPage');
+        expect(content).toContain('Article');
+        expect(content).toContain('BreadcrumbList');
+      });
   });
 
   it('both /guides/<slug> and /<slug> page routes exist for all 5 guides', () => {
@@ -51,5 +61,47 @@ describe('Guides and Articles Suite', () => {
     expect(content).toContain('isGuideWiFi');
     expect(content).toContain('isGuideVCard');
     expect(content).toContain('isGuideRestaurant');
+    expect(content).toContain('isGuidesIndex');
+  });
+
+  it('all 5 guides and hub return complete localized content for all 7 languages', () => {
+    SUPPORTED_LOCALES.forEach((locale) => {
+      // Hub
+      const hub = getGuideHubData(locale);
+      expect(hub.title).toBeTruthy();
+      expect(hub.h1).toBeTruthy();
+      expect(hub.guides.length).toBe(5);
+
+      // What Is A QR Code
+      const whatIs = getWhatIsAQRCodeData(locale);
+      expect(whatIs.title).toBeTruthy();
+      expect(whatIs.h1).toBeTruthy();
+      expect(whatIs.sections.length).toBeGreaterThan(3);
+      expect(whatIs.faqs.length).toBeGreaterThan(2);
+
+      // Static vs Dynamic
+      const staticVsDyn = getStaticVsDynamicData(locale);
+      expect(staticVsDyn.title).toBeTruthy();
+      expect(staticVsDyn.h1).toBeTruthy();
+      expect(staticVsDyn.sections.length).toBeGreaterThan(1);
+
+      // WiFi
+      const wifi = getWiFiQRCodeData(locale);
+      expect(wifi.title).toBeTruthy();
+      expect(wifi.h1).toBeTruthy();
+      expect(wifi.sections.length).toBeGreaterThan(1);
+
+      // vCard
+      const vcard = getVCardQRCodeData(locale);
+      expect(vcard.title).toBeTruthy();
+      expect(vcard.h1).toBeTruthy();
+      expect(vcard.sections.length).toBeGreaterThan(1);
+
+      // Restaurant
+      const rest = getRestaurantQRCodeData(locale);
+      expect(rest.title).toBeTruthy();
+      expect(rest.h1).toBeTruthy();
+      expect(rest.sections.length).toBeGreaterThan(1);
+    });
   });
 });
