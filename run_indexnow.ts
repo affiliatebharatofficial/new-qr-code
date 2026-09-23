@@ -21,6 +21,8 @@ const extraSlugs = [
   'how-to-create-a-vcard-qr-code',
   'how-to-use-qr-codes-for-restaurants',
   'about',
+  'about/firoz-khan',
+  'report-problem',
   'privacy',
   'terms',
   'disclaimer',

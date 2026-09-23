@@ -398,7 +398,7 @@ export function getSocialContent(locale: Locale): LocalizedPageContent {
           { question: 'How does a Social Media QR code work when scanned?', answer: 'When scanned with any smartphone camera, a mobile-optimized landing page opens displaying direct clickable buttons to all your configured social media profiles.' },
           { question: 'Can I link multiple social platforms to a single QR code?', answer: 'Yes! The core purpose is unifying all your social channels (Instagram, TikTok, YouTube, LinkedIn, Spotify, etc.) into one central scannable hub.' },
           { question: 'Which platforms are supported?', answer: 'Supports Instagram, TikTok, YouTube, Facebook, LinkedIn, X (Twitter), Spotify, Twitch, Discord, Pinterest, and custom website links.' },
-          { question: 'Can I add my profile picture or brand logo to the center?', answer: 'Yes. Upload your logo or portrait avatar, and our generator automatically boosts error correction to Level H (30%) for flawless scanning.' },
+          { question: 'Can I add my profile picture or brand logo to the center?', answer: 'Yes. Upload your logo or portrait avatar, and our generator automatically boosts error correction to Level H (30%) to maintain high optical readability.' },
           { question: 'Do Social Media QR codes ever expire?', answer: 'No. Static codes never expire and remain active permanently with zero subscription fees.' },
           { question: 'Is it free to generate and download?', answer: 'Yes! Creating and downloading Social Media QR codes in Vector SVG and PNG format is 100% free with unlimited scans.' }
         ],

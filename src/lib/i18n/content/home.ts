@@ -375,7 +375,7 @@ export function getHomeContent(locale: Locale): LocalizedPageContent {
         subheading: 'Create custom branded QR codes for marketing campaigns, enterprise products, hospitality, and daily personal use.',
         overviewTitle: 'Why Choose Our Free QR Code Generator?',
         overviewParagraphs: [
-          'Our enterprise-grade QR code generator empowers businesses, marketers, and creators to create static and dynamic 2D barcodes tailored for every use case: website URLs, passwordless Wi-Fi connections, digital vCard business cards, WhatsApp chats, UPI merchant payments, digital restaurant menus, mobile app downloads, and event calendars.',
+          'Our QR code generator empowers businesses, marketers, and creators to create static and dynamic 2D barcodes tailored for every use case: website URLs, passwordless Wi-Fi connections, digital vCard business cards, WhatsApp chats, UPI merchant payments, digital restaurant menus, mobile app downloads, and event calendars.',
           'Unlike generic subscription-trap QR services that expire your codes after a 14-day trial or inject unwanted third-party advertisements, our generator creates permanent static QR codes that never expire and operate completely client-side in your browser memory for 100% data privacy.',
           'Customize every visual detail: corporate color themes, gradient module fills, smooth rounded or dot geometries, unique corner eye styles, and central brand logo placement with automated Reed-Solomon Level H (30%) error correction and print-ready Vector SVG export.'
         ],
@@ -408,7 +408,7 @@ export function getHomeContent(locale: Locale): LocalizedPageContent {
         technicalNotes: 'Standards Compliance: ISO/IEC 18004 international barcode specification natively supported across all iOS, Android, and Windows camera applications.',
         faqs: [
           { question: 'Are these QR codes really 100% free and permanent?', answer: 'Yes! All static QR codes generated on our platform are 100% free, come with unlimited lifetime scans, and will never expire.' },
-          { question: 'Can I add my company logo in the center of the QR code?', answer: 'Yes! Upload your logo in PNG, JPG, or SVG format. Our generator automatically boosts error correction to Level H (30%) so the code scans flawlessly with the logo embedded.' },
+          { question: 'Can I add my company logo in the center of the QR code?', answer: 'Yes! Upload your logo in PNG, JPG, or SVG format. Our generator automatically boosts error correction to Level H (30%) so the code maintains reliable scannability with the logo embedded.' },
           { question: 'What is the difference between static and dynamic QR codes?', answer: 'A static QR code encodes data directly into the pixel matrix and cannot be altered once printed. A dynamic QR code routes through a short link that you can edit anytime without reprinting, while also tracking scan analytics.' },
           { question: 'What file format should I download for commercial printing?', answer: 'For professional printing on packaging, billboards, or business cards, always download the Vector SVG format. For websites and digital media, PNG is ideal.' },
           { question: 'Is my personal data stored or logged on your servers?', answer: 'No. Our static QR code generator runs 100% locally in your browser memory. Your Wi-Fi passwords, contact details, and messages are never stored on external databases.' },

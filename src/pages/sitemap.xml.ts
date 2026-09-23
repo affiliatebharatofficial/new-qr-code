@@ -49,8 +49,10 @@ export const GET: APIRoute = async () => {
     { path: 'how-to-create-a-wifi-qr-code', priority: '0.7', changefreq: 'monthly' },
     { path: 'how-to-create-a-vcard-qr-code', priority: '0.7', changefreq: 'monthly' },
     { path: 'how-to-use-qr-codes-for-restaurants', priority: '0.7', changefreq: 'monthly' },
-    // Legal & Support & Company
+    // Legal & Support & Company & Author
     { path: 'about', priority: '0.7', changefreq: 'monthly' },
+    { path: 'about/firoz-khan', priority: '0.7', changefreq: 'monthly' },
+    { path: 'report-problem', priority: '0.6', changefreq: 'monthly' },
     { path: 'privacy', priority: '0.5', changefreq: 'monthly' },
     { path: 'terms', priority: '0.5', changefreq: 'monthly' },
     { path: 'disclaimer', priority: '0.5', changefreq: 'monthly' },

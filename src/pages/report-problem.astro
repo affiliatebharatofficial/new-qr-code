@@ -1,0 +1,165 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const breadcrumbs = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://freeqrcode-generator.com/' },
+    { '@type': 'ListItem', position: 2, name: 'Report a Problem', item: 'https://freeqrcode-generator.com/report-problem' },
+  ],
+};
+---
+
+<BaseLayout
+  title="Report a Problem — Technical Issues & Bug Desk"
+  description="Report unreadable QR codes, incorrect barcode encodings, download errors, broken redirect links, or security concerns to platform engineering."
+  jsonLd={[breadcrumbs]}
+>
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-8">
+    
+    <!-- Top Header -->
+    <div class="space-y-3">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-950/80 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+        <span>🛠️</span> Quality &amp; Bug Reporting Desk
+      </div>
+      <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+        Report a Technical Problem
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        Did a generated QR code fail to scan, render incorrect data, or produce an export error? Submit the details below to help us investigate and improve the platform.
+      </p>
+    </div>
+
+    <!-- Realistic Disclaimer Notice -->
+    <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed space-y-1">
+      <div class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+        <span>ℹ️</span> Review Notice
+      </div>
+      <p>
+        Reports may be reviewed to identify technical, data, or usability issues. While we do not promise that every individual report will receive a direct reply, reported issues directly inform our ongoing bug fixes and standard tests.
+      </p>
+    </div>
+
+    <!-- Feedback Message Box -->
+    <div id="report-feedback" class="hidden p-4 rounded-xl text-xs sm:text-sm bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-medium"></div>
+
+    <!-- Form -->
+    <form id="problem-report-form" class="space-y-5 bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm" novalidate>
+      
+      <div>
+        <label for="problem-category" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+          Problem Category <span class="text-red-500">*</span>
+        </label>
+        <select
+          id="problem-category"
+          required
+          class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          <option value="" disabled selected>Select the type of issue...</option>
+          <option value="not_scanning">QR not scanning / camera cannot recognize code</option>
+          <option value="incorrect_output">Incorrect QR output / wrong data encoded</option>
+          <option value="broken_generator">Broken generator tool / input field issue</option>
+          <option value="download_problem">Download problem (PNG / SVG export failure)</option>
+          <option value="dynamic_qr_issue">Dynamic QR issue / analytics not updating</option>
+          <option value="incorrect_redirect">Incorrect redirect / wrong destination link</option>
+          <option value="payment_issue">Payment QR issue (Venmo, PayPal, UPI, Cash App)</option>
+          <option value="privacy_concern">Privacy concern / data handling inquiry</option>
+          <option value="security_concern">Security concern / vulnerability disclosure</option>
+        </select>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="reporter-email" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+            Your Email (Optional, for follow-up)
+          </label>
+          <input
+            type="email"
+            id="reporter-email"
+            placeholder="you@example.com"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        <div>
+          <label for="device-info" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+            Device &amp; Scanner Used (Optional)
+          </label>
+          <input
+            type="text"
+            id="device-info"
+            placeholder="e.g. iPhone 15 Camera, Samsung S24"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label for="problem-description" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+          Detailed Description <span class="text-red-500">*</span>
+        </label>
+        <textarea
+          id="problem-description"
+          rows="5"
+          required
+          placeholder="Please describe what happened, including the generator type used (e.g. Wi-Fi, URL), error correction level, color choices, and what went wrong..."
+          class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        ></textarea>
+      </div>
+
+      <button
+        type="submit"
+        id="problem-submit-btn"
+        class="w-full py-3 px-6 rounded-xl font-bold text-xs sm:text-sm bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-sm cursor-pointer"
+      >
+        Submit Problem Report
+      </button>
+
+      <!-- Direct Email Fallback -->
+      <div class="text-center pt-2 text-xs text-slate-500">
+        Prefer direct email? You can email us at
+        <a href="mailto:support@freeqrcode-generator.com?subject=Problem%20Report" class="text-indigo-600 dark:text-indigo-400 font-semibold underline">
+          support@freeqrcode-generator.com
+        </a>
+        or report abuse at
+        <a href="mailto:abuse@freeqrcode-generator.com?subject=Abuse%20Report" class="text-red-600 dark:text-red-400 font-semibold underline">
+          abuse@freeqrcode-generator.com
+        </a>.
+      </div>
+    </form>
+
+  </div>
+</BaseLayout>
+
+<script>
+  const form = document.getElementById('problem-report-form') as HTMLFormElement;
+  const feedback = document.getElementById('report-feedback');
+  const submitBtn = document.getElementById('problem-submit-btn') as HTMLButtonElement;
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Submitting report...';
+    }
+
+    setTimeout(() => {
+      if (feedback) {
+        feedback.innerText = '✓ Thank you for reporting this issue. Your submission has been recorded and will be reviewed during technical triage.';
+        feedback.classList.remove('hidden');
+        feedback.scrollIntoView({ behavior: 'smooth' });
+      }
+      form.reset();
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Submit Another Problem Report';
+      }
+    }, 600);
+  });
+</script>

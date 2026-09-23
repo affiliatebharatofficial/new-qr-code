@@ -400,7 +400,7 @@ export function getMenuContent(locale: Locale): LocalizedPageContent {
           { question: 'What is the most durable way to display QR codes on dining tables?', answer: '4x6 inch acrylic tabletop standees, laser-engraved wood blocks, and laminated vinyl stickers are the most durable and easy to sanitize between guests.' },
           { question: 'Can I change menu prices without reprinting the QR codes?', answer: 'Yes! If your QR code links to a web page or you use a Dynamic QR code, you can update your prices and menu items online anytime with zero reprinting needed.' },
           { question: 'Do restaurant menu QR codes ever expire?', answer: 'No. Static menu QR codes never expire and will remain active permanently as long as your destination menu web page remains live.' },
-          { question: 'Can I add my restaurant logo to the center of the QR code?', answer: 'Yes. Upload your logo in PNG or SVG format. Our generator automatically applies Level H error correction (30%) so the code scans flawlessly with the logo embedded.' }
+          { question: 'Can I add my restaurant logo to the center of the QR code?', answer: 'Yes. Upload your logo in PNG or SVG format. Our generator automatically applies Level H error correction (30%) so the code maintains reliable scannability with the logo embedded.' }
         ],
         relatedTools: [
           { name: 'Wi-Fi QR Generator', slug: 'wifi-qr-code-generator', description: 'Let dining guests join guest Wi-Fi without typing passwords.' },

@@ -400,7 +400,7 @@ export function getUpiContent(locale: Locale): LocalizedPageContent {
           { question: 'Can I set a fixed transaction amount inside the QR code?', answer: 'Yes! You can specify an exact payment amount (e.g. ₹500) for fixed-price products, or leave the amount blank so customers can enter the total themselves.' },
           { question: 'Does this work with all UPI apps (Google Pay, PhonePe, Paytm)?', answer: 'Yes! Because it adheres to the official NPCI interoperable URI standard, the generated QR code works across all 150+ UPI-enabled banking and payment apps in India.' },
           { question: 'Do UPI QR codes ever expire?', answer: 'No. Static UPI QR codes encode your payment address directly and will remain active permanently as long as your linked bank account and UPI ID remain open.' },
-          { question: 'Can I add my business logo to the center of the QR code?', answer: 'Yes! Upload your store logo, and our generator automatically boosts error correction to Level H (30%) so the code scans flawlessly with the logo embedded.' }
+          { question: 'Can I add my business logo to the center of the QR code?', answer: 'Yes! Upload your store logo, and our generator automatically boosts error correction to Level H (30%) so the code maintains reliable scannability with the logo embedded.' }
         ],
         relatedTools: [
           { name: 'URL QR Generator', slug: 'url-to-qr-code', description: 'Direct visitors to your website or online store.' },

@@ -81,7 +81,25 @@ const absoluteOgImage = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogIm
 // Dynamic hreflang alternates for all supported locales + x-default
 const hreflangTags = getHreflangTags(currentPath);
 
-// Base Schema.org Structured Data with inLanguage
+// Base Schema.org Structured Data with inLanguage, Creator & Publisher
+const creatorJsonLd = {
+  '@type': 'Person',
+  name: 'Firoz Khan',
+  jobTitle: 'Full Stack Developer',
+  url: 'https://freeqrcode-generator.com/about/firoz-khan',
+  sameAs: [
+    'https://www.linkedin.com/in/firoz-khan-1153358a/',
+    'https://github.com/fkdigitalmedia',
+    'https://www.instagram.com/rtibyfiroz/',
+  ],
+};
+
+const publisherJsonLd = {
+  '@type': 'Organization',
+  name: 'FK Digital Media',
+  url: 'https://freeqrcode-generator.com',
+};
+
 const baseJsonLd: Record<string, any> = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
@@ -91,6 +109,8 @@ const baseJsonLd: Record<string, any> = {
   description,
   applicationCategory: 'UtilityApplication',
   operatingSystem: 'All',
+  creator: creatorJsonLd,
+  publisher: publisherJsonLd,
   offers: {
     '@type': 'Offer',
     price: '0',

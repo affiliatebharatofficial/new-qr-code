@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import MaintainerCard from '../ui/MaintainerCard.astro';
 import { type Locale, DEFAULT_LOCALE } from '../../lib/i18n/config';
 import { getStaticVsDynamicData } from '../../lib/i18n/content/guides/staticVsDynamic';
 
@@ -34,6 +35,17 @@ const articleJsonLd = {
   headline: data.h1,
   description: data.description,
   inLanguage: locale,
+  author: {
+    '@type': 'Person',
+    name: 'Firoz Khan',
+    jobTitle: 'Full Stack Developer',
+    url: 'https://freeqrcode-generator.com/about/firoz-khan',
+    sameAs: [
+      'https://www.linkedin.com/in/firoz-khan-1153358a/',
+      'https://github.com/fkdigitalmedia',
+      'https://www.instagram.com/rtibyfiroz/',
+    ],
+  },
   publisher: {
     '@type': 'Organization',
     name: 'Free QR Code Generator',
@@ -152,6 +164,9 @@ const faqJsonLd = {
           ))}
         </div>
       </section>
+
+      <!-- Maintainer Information -->
+      <MaintainerCard variant="compact" />
 
       <!-- CTA Box -->
       <div class="p-8 rounded-3xl bg-gradient-to-br from-indigo-600 to-indigo-800 text-white text-center space-y-4 shadow-xl shadow-indigo-600/20">
