@@ -96,7 +96,7 @@ let standardFaqJsonLd: any = null;
 if (!isSizeCalculator && !isPrintCalculator && !isGuide) {
   content = getLocalizedPageContent(currentSlug, currentLocale);
   if (!content) {
-    return Astro.redirect(`/${lang}`);
+    return new Response('Not Found', { status: 404, statusText: 'Not Found' });
   }
   standardFaqJsonLd = {
     '@context': 'https://schema.org',

@@ -3,126 +3,126 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import QRGenerator from '../../components/qr/QRGenerator.astro';
 import LandingContent from '../../components/seo/LandingContent.astro';
 
-const overviewTitle = 'What is an Event QR Code Generator?';
+const overviewTitle = 'Event QR Codes for Invitations, RSVPs & Stationery';
 const overviewParagraphs = [
-  'An Event QR code generator encodes calendar invite details (iCalendar / vCalendar / .ICS standard format) into a scannable 2D barcode. When scanned with any smartphone camera, the device automatically prompts the user to add the event—including title, start and end date/time, physical venue location, and event description—straight into their native calendar app (Apple Calendar, Google Calendar, or Microsoft Outlook).',
-  'Event organizers face high drop-off rates when attendees must manually type event dates, times, and venue addresses from physical posters, flyers, or conference agendas into their personal calendars. An Event QR code automates calendar entry with a single tap, drastically improving attendee show-up rates and enabling automated calendar reminder alerts on attendee smartphones.',
-  'Deploying Event QR codes on concert posters, wedding invitations, conference schedules, trade show agendas, and seminar handouts ensures high turnout. Our generator runs 100% client-side, enabling brand styling, custom colors, and vector SVG or PNG downloads.'
+  'An Event QR code on invitations and stationery bridges the gap between luxury printed paper and digital smartphone calendars. When guests scan the printed code with their camera, their device immediately prompts them to save the event date, start and end times, ceremony or reception venue address, and dress code notes straight into Apple Calendar, Google Calendar, or Microsoft Outlook.',
+  'Traditional printed invitations suffer from high "forgot-the-date" rates because guests set the physical card aside on a mantelpiece or fridge without typing the schedule into their phones. An RSVP Event QR code eliminates this friction in under two seconds, setting automatic calendar notifications 24 hours and 2 hours before your event begins.',
+  'Whether you are designing bespoke wedding invitations, milestone birthday announcements, charity gala passes, or corporate dinner stationery, this client-side generator creates print-ready Vector SVG and high-resolution PNG codes with custom colors and elegant styling.'
 ];
 
 const sectors = [
   {
-    name: 'Conferences & Corporate Summits',
-    description: 'Print on printed conference agendas and name badges for individual keynote breakout sessions.',
-    benefit: 'Enables attendees to bookmark key sessions with automatic push reminders.'
+    name: 'Luxury Wedding Stationery Designers',
+    description: 'Print discreet, elegant codes on the back of formal wedding invitations and save-the-date cards.',
+    benefit: 'Prevents guest calendar scheduling conflicts months in advance.'
   },
   {
-    name: 'Wedding & Social Event Planners',
-    description: 'Include on formal printed RSVP save-the-date cards and invitations for ceremony and reception times.',
-    benefit: 'Ensures guests save the exact date and venue location without manual calendar entry.'
+    name: 'Charity Galas & Benefit Dinners',
+    description: 'Include on formal donor banquet invitations and VIP table place cards.',
+    benefit: 'Directs patrons to the ballroom on schedule with accurate venue GPS addresses.'
   },
   {
-    name: 'Live Concerts, Theaters & Festivals',
-    description: 'Display on festival posters, ticket confirmations, and promotional flyers.',
-    benefit: 'Boosts ticket holder attendance by placing automatic reminder alerts on smartphones.'
+    name: 'Milestone Birthdays & Anniversaries',
+    description: 'Add to custom printed postcards and party invitations sent to family and friends.',
+    benefit: 'Ensures older and younger guests alike save the party time with one simple camera scan.'
   },
   {
-    name: 'Universities & Academic Institutions',
-    description: 'Add to orientation guides, lecture schedules, and campus event bulletin boards.',
-    benefit: 'Keeps students organized across complex campus timetables.'
+    name: 'Concert & Theater Ticket Envelopes',
+    description: 'Print on physical ticket sleeves, theater playbills, and box office confirmation cards.',
+    benefit: 'Minimizes late arrivals by embedding curtain time reminders on mobile phones.'
   },
   {
-    name: 'Sports Leagues & Tournaments',
-    description: 'Print on team schedule flyers and community board notices for upcoming match times.',
-    benefit: 'Helps fans and parents save season game dates instantly.'
+    name: 'Alumni Reunions & University Formals',
+    description: 'Incorporate into printed reunion booklets, homecoming mailers, and badge lanyards.',
+    benefit: 'Coordinates multi-day campus activities effortlessly across attendees.'
   },
   {
-    name: 'Webinars, Workshops & Seminars',
-    description: 'Feature on promotional slide decks and marketing collateral for upcoming live workshops.',
-    benefit: 'Maximizes live broadcast attendance rates.'
+    name: 'Private Dining & Pop-Up Supper Clubs',
+    description: 'Display on reservation confirmation cards and secret dining location invitations.',
+    benefit: 'Locks in attendee attendance for limited-seating culinary experiences.'
   }
 ];
 
 const howItWorks = [
   {
-    title: '1. Enter Event Details',
-    description: 'Input your event title, start and end dates/times, venue location or video link, and a brief description.'
+    title: '1. Specify Invitation Details',
+    description: 'Fill in your celebration title, exact ceremony/reception start and finish times, physical venue address, and host notes.'
   },
   {
-    title: '2. Customize Theme & Styling',
-    description: 'Select brand colors, pick rounded or dot modules, and upload your event logo or calendar badge.'
+    title: '2. Match Your Stationery Palette',
+    description: 'Customize colors to match your wedding or brand palette—deep navy, forest green, champagne gold, or classic charcoal.'
   },
   {
-    title: '3. Export Vector SVG or PNG',
-    description: 'Download in scalable Vector SVG for print flyers and banners or high-DPI PNG for digital assets.'
+    title: '3. Download Print-Ready Vector SVG',
+    description: 'Export as high-precision Vector SVG for letterpress, foil stamping, or digital stationery printing at 300+ DPI.'
   }
 ];
 
 const useCases = [
   {
-    title: 'Wedding Save-the-Date Cards',
-    description: 'Printed on luxury paper cards allowing invited guests to lock the date in their phone calendar instantly.',
-    example: 'Couples sharing ceremony times and venue address on wedding stationery.'
+    title: 'Wedding Save-the-Date Postcards',
+    description: 'Printed directly on save-the-date stationery so guests can save the wedding weekend into their calendars 9 months in advance.',
+    example: 'Couples sharing hotel block info, rehearsal dinner times, and reception addresses.'
   },
   {
-    title: 'Conference Breakout Session Signs',
-    description: 'Printed at the entrance of individual conference rooms for immediate session scheduling.',
-    example: 'Tech expo attendees saving afternoon workshop times.'
+    title: 'Formal Gala RSVP Response Cards',
+    description: 'Placed alongside RSVP cards to ensure donors register the evening banquet into their digital calendars immediately upon receipt.',
+    example: 'Non-profit foundation hosting an annual charity auction.'
   },
   {
-    title: 'Community Festival Flyers',
-    description: 'Distributed in local neighborhoods for weekend street fairs, farmers markets, and parades.',
-    example: 'Town council boosting civic festival attendance.'
+    title: 'Milestone Celebration Invitations',
+    description: '50th anniversary or retirement party invitations mailed to hundreds of family members across multiple cities.',
+    example: 'Hosts eliminating duplicate reminder text messages by locking dates into phones.'
   },
   {
-    title: 'Sports Season Schedule Cards',
-    description: 'Handed out to parents and athletes with all home and away game fixtures.',
-    example: 'Youth soccer club distributing season fixture calendars.'
+    title: 'Festival & Sports Pass Lanyards',
+    description: 'Laminated VIP badge credentials featuring the weekend schedule breakdown.',
+    example: 'Music festival attendees saving stage headliner set times with zero cellular data needed.'
   }
 ];
 
 const tips = [
-  'Time Zone Accuracy: Ensure start and end times correspond to your local venue time zone to avoid calendar offset issues.',
-  'Include Venue Location: Enter a complete street address in the location field so smartphone calendar apps can offer driving alerts.',
-  'Keep Descriptions Focused: Keep event summary notes concise to maintain a clean, easily scannable QR code matrix.',
-  'High Contrast for Event Lighting: Use dark modules against clean white backgrounds for easy scanning in dimly lit auditoriums.',
-  'Verify Across Apple & Google Calendar: Always test scan with both iOS Camera (Apple Calendar) and Android Camera (Google Calendar).'
+  'Match Paper Contrast: Ensure dark QR modules against a light background. Avoid metallic gold or foil on white paper, as low contrast prevents camera sensors from decoding.',
+  'Keep Physical Size at Least 1 x 1 Inch: For wedding and formal stationery, maintain at least a 25mm x 25mm printed area with a clear quiet margin.',
+  'Include Complete Venue Address: Enter the street address, suite/hall number, and city so calendar apps provide driving directions and arrival alerts.',
+  'Double Check Time Zones: If hosting destination events, specify start times in the local destination time zone.',
+  'Test on Coated and Matte Stock: Always run a physical sample print on your final paper stock before mass printing wedding or gala stationery.'
 ];
 
-const technicalNotes = 'Standards Compliance: Generates standard vCalendar / iCalendar 2.0 ("BEGIN:VEVENT\\nSUMMARY:...\\nDTSTART:...") payloads natively parsed by Apple Calendar, Google Calendar, and Microsoft Outlook.';
+const technicalNotes = 'Stationery Standard: Generates standard vCalendar 2.0 / iCalendar RFC 5545 payloads. Completely offline and client-side; no RSVP or guest data is ever transmitted or stored on external servers.';
 
 const faqs = [
   {
-    question: 'What happens when someone scans an Event QR code?',
-    answer: 'When scanned with a smartphone camera, the device automatically recognizes the calendar payload and opens the native calendar app with the event title, start/end times, venue location, and notes pre-filled, ready to save with 1 tap.'
+    question: 'How do guests add the event to their phones when scanning the stationery?',
+    answer: 'When a guest opens their smartphone camera and points it at the printed invitation, an instant notification banner appears. Tapping it opens Apple Calendar (iPhone) or Google Calendar (Android) with all dates, times, venue location, and notes pre-filled for one-tap saving.'
   },
   {
-    question: 'Does this work on both Apple Calendar and Google Calendar?',
-    answer: 'Yes! The standard iCalendar (vEvent) format is universally supported across iOS (Apple Calendar), Android (Google Calendar), Samsung Calendar, and desktop Outlook.'
+    question: 'Does the Event QR code require cellular reception or internet to work?',
+    answer: 'No! Because standard static vCalendar data is completely self-contained inside the QR code matrix itself, the guest’s phone can read and save the event details even in venues with zero cellular or Wi-Fi service.'
   },
   {
-    question: 'Can I include a full venue address in the event?',
-    answer: 'Yes. You can specify a full street address in the Location field. When saved to the user\'s calendar, their phone can even provide automatic traffic and departure notifications based on their location.'
+    question: 'Can I print this on textured or cotton paper for wedding invitations?',
+    answer: 'Yes. However, ensure sufficient contrast between the ink color and paper. Dark charcoal, deep navy, burgundy, or black ink on white, cream, or ivory cotton paper scans reliably. Avoid pale pastels or foil stamping directly on the QR modules.'
   },
   {
-    question: 'Can I use an Event QR code for online virtual events and webinars?',
-    answer: 'Absolutely. You can paste your Zoom, Google Meet, or Microsoft Teams meeting link into the location or description field so attendees can join with a single click from their calendar.'
+    question: 'Can I add dress code notes or parking instructions?',
+    answer: 'Yes. You can include concise notes in the Description field, such as "Black tie optional," "Valet parking available at North Entrance," or "Cocktail reception to follow."'
   },
   {
-    question: 'Do Event QR codes expire?',
-    answer: 'No. Static Event QR codes encode the date and time permanently and will work indefinitely. Users can scan the code even after the event has passed to record historical dates.'
+    question: 'Will this code work forever or does it have an expiration date?',
+    answer: 'Static Event QR codes never expire. The calendar details are permanently encoded into the visual barcode pattern and will remain functional indefinitely.'
   },
   {
-    question: 'Are event details saved to your server?',
-    answer: 'No. Our Event QR code generator runs 100% locally in your browser. All calendar formatting happens in client-side memory without saving event details to external servers.'
+    question: 'Is any private event or guest information uploaded to your server?',
+    answer: 'No. The QR code generation process executes entirely in your browser using client-side JavaScript. No celebration details, private addresses, or host names are ever transmitted to or stored on our servers.'
   }
 ];
 
 const relatedTools = [
-  { name: 'Location QR Generator', slug: 'location-qr-code-generator', description: 'Guide attendees to the exact physical venue with GPS coordinates.' },
-  { name: 'URL QR Generator', slug: 'url-to-qr-code', description: 'Direct traffic to your event ticketing or registration landing page.' },
-  { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Share speaker and organizer contact cards with attendees.' },
-  { name: 'Google Reviews QR', slug: 'google-reviews-qr-code', description: 'Collect attendee reviews and feedback after the event.' }
+  { name: 'Event Calendar Generator', slug: 'event-qr-code-generator', description: 'Create general multi-platform calendar invite QR codes for conferences and webinars.' },
+  { name: 'Location QR Generator', slug: 'location-qr-code-generator', description: 'Guide guests directly to your wedding or party venue entrance with GPS coordinates.' },
+  { name: 'vCard QR Generator', slug: 'vcard-qr-code-generator', description: 'Share event planner or coordinator contact details on stationery.' },
+  { name: 'Wi-Fi QR Code Generator', slug: 'wifi-qr-code-generator', description: 'Provide one-tap guest Wi-Fi access at your party or wedding reception.' }
 ];
 
 const faqJsonLd = {
@@ -140,21 +140,21 @@ const faqJsonLd = {
 ---
 
 <BaseLayout
-  title="Event QR Code Generator — Save Dates & Calendar Invites"
-  description="Generate free Event QR codes that add dates, times, and venue locations directly to Apple and Google Calendar with 1 scan. Free vector SVG & PNG."
+  title="Event QR Code for Invitations & RSVPs — Save-the-Date QR Code"
+  description="Generate instant calendar invite QR codes for wedding invitations, RSVP cards, conference passes, and party stationery. Works with Apple & Google Calendar."
   jsonLd={faqJsonLd}
 >
   <div class="bg-grid-subtle py-4 sm:py-6 border-b border-slate-200/80 dark:border-slate-800/80">
     <QRGenerator
       initialType="event"
-      headline="Event Calendar QR Code Generator"
-      subheadline="Let attendees, guests, and fans save your event dates, times, and venue locations directly into their phone calendar in a single tap."
+      headline="Event QR Code for Invitations & RSVPs"
+      subheadline="Let wedding guests, gala patrons, and party attendees save your dates, times, and venue locations directly into their phone calendar with a single scan."
     />
   </div>
 
   <LandingContent
-    heading="Event Calendar QR Code"
-    subheading="Boost event attendance and eliminate manual calendar entry for weddings, conferences, and festivals."
+    heading="Invitation & RSVP Event QR Code"
+    subheading="Eliminate forgotten dates and manual phone entry on wedding stationery, party invitations, and event passes."
     overviewTitle={overviewTitle}
     overviewParagraphs={overviewParagraphs}
     sectors={sectors}
