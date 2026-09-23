@@ -181,7 +181,7 @@ export function getSizeCalculatorPageData(locale: Locale): CalculatorPageData {
         tableHeaders: ['Viewing Distance', 'Minimum Size', 'Recommended Size', 'Common Media / Use Case'],
         faqsTitle: 'Frequently Asked Questions About QR Code Sizing',
         faqs: [
-          { question: 'What is the formula to calculate QR code size?', answer: 'The standard formula is: Size = Distance / 10. For high-density data or Level H error correction, multiply by 1.2 to 1.3 to guarantee rapid camera focus.' },
+          { question: 'What is the formula to calculate QR code size?', answer: 'The standard formula is: Size = Distance / 10. For high-density data or Level H error correction, multiply by 1.2 to 1.3 to assist rapid camera focus.' },
           { question: 'What is the absolute minimum physical size to print a QR code?', answer: 'The minimum safety baseline is 2.0 × 2.0 cm (0.8 × 0.8 inches). For business cards and flyers, size between 2.5 × 2.5 cm and 3.5 × 3.5 cm.' },
           { question: 'Does content density affect required QR code size?', answer: 'Yes. Higher payload characters increase the QR version and dot density. Denser codes require larger physical print sizes to maintain optical scannability.' },
           { question: 'What is the quiet zone margin and why is it needed?', answer: 'The quiet zone is the clear white border surrounding the QR symbol. It must be at least 4 modules wide on all 4 sides so decoders can isolate the matrix.' },

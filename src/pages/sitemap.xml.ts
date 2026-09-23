@@ -52,6 +52,9 @@ export const GET: APIRoute = async () => {
     // Legal & Support & Company & Author
     { path: 'about', priority: '0.7', changefreq: 'monthly' },
     { path: 'about/firoz-khan', priority: '0.7', changefreq: 'monthly' },
+    { path: 'methodology', priority: '0.7', changefreq: 'monthly' },
+    { path: 'data-sources', priority: '0.6', changefreq: 'monthly' },
+    { path: 'security', priority: '0.6', changefreq: 'monthly' },
     { path: 'report-problem', priority: '0.6', changefreq: 'monthly' },
     { path: 'privacy', priority: '0.5', changefreq: 'monthly' },
     { path: 'terms', priority: '0.5', changefreq: 'monthly' },

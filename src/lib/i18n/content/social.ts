@@ -389,7 +389,7 @@ export function getSocialContent(locale: Locale): LocalizedPageContent {
         tips: [
           'Full URLs Required: Ensure social links include the full https:// prefix and your exact username handle.',
           'Clear Call-to-Action: Pair with clear copy like "Scan with your phone camera to follow our community".',
-          'High Optical Contrast: Dark module patterns on a clean white background guarantee the fastest optical scanning.',
+          'High Optical Contrast: Dark module patterns on a clean white background provide high optical contrast for camera scanning.',
           'Vector SVG for Packaging: Use Vector SVG to ensure crisp lines on cardboard boxes and kraft paper bags.',
           'Multi-Device Mobile Test: Test the landing hub across both iOS Safari and Android Chrome.'
         ],

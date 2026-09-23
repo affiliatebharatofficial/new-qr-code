@@ -1,166 +1,300 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Home',
+      item: 'https://freeqrcode-generator.com',
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: 'Privacy Policy',
+      item: 'https://freeqrcode-generator.com/privacy',
+    },
+  ],
+};
+
+const webpageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'Privacy Policy — Free QR Code Generator',
+  url: 'https://freeqrcode-generator.com/privacy',
+  description: 'Technical privacy policy disclosing static vs. dynamic QR data processing, Cloudflare D1/R2 infrastructure, cookies, analytics, and data retention standards.',
+  publisher: {
+    '@type': 'Organization',
+    name: 'FK Digital Media',
+    url: 'https://freeqrcode-generator.com',
+  },
+};
 ---
 
 <BaseLayout 
   title="Privacy Policy — Free QR Code Generator" 
-  description="Comprehensive Privacy Policy for freeqrcode-generator.com covering client-side zero-storage architecture, GDPR, CCPA, cookie disclosure, dynamic QR telemetry, and data retention standards."
+  description="Transparent Privacy Policy for FreeQRCode-Generator.com detailing client-side static QR processing, dynamic QR edge routing, Cloudflare D1/R2 data storage, cookie disclosure, and data retention."
+  jsonLd={[breadcrumbSchema, webpageSchema]}
 >
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-12 shadow-card space-y-10">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-12 shadow-sm space-y-10">
       
       <!-- Document Header -->
       <div class="border-b border-slate-100 dark:border-slate-800 pb-6 space-y-2">
-        <span class="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Legal Documentation</span>
+        <span class="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Trust &amp; Transparency Documentation</span>
         <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
           Privacy Policy
         </h1>
-        <div class="flex flex-wrap items-center gap-4 text-xs text-slate-500 pt-1 font-mono">
-          <span>Effective Date: August 27, 2026</span>
+        <div class="flex flex-wrap items-center gap-3 text-xs text-slate-500 pt-1 font-mono">
+          <span>Last Updated: September 2026</span>
           <span>•</span>
           <span>Domain: freeqrcode-generator.com</span>
           <span>•</span>
-          <span>Version: 3.2.0 (GDPR & CCPA Compliant)</span>
+          <span>Operated by: FK Digital Media</span>
         </div>
       </div>
 
-      <!-- Overview Box -->
-      <div class="p-4 sm:p-5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-        <strong class="text-slate-900 dark:text-white">Executive Summary:</strong> <span class="font-semibold">freeqrcode-generator.com</span> ("we", "us", "our", or the "Service") is engineered with an uncompromising <em>Privacy-by-Design</em> architecture. Static QR generation operates entirely inside your local web browser without transmitting your payload data to our servers. For Dynamic QR codes and authenticated user workspaces, we implement strict data minimization, zero sale of personal data, and bank-grade cryptographic protections in strict compliance with the General Data Protection Regulation (GDPR), California Consumer Privacy Act (CCPA/CPRA), and international privacy frameworks.
+      <!-- Scope & Architecture Distinction Notice -->
+      <div class="p-5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed space-y-2">
+        <div class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span>🔍</span> Core Privacy Architecture: Two Distinct Processing Modes
+        </div>
+        <p>
+          To maintain rigorous technical transparency, we distinguish between <strong>Static QR generation</strong> and <strong>Dynamic QR services / User accounts</strong>:
+        </p>
+        <ul class="list-disc list-inside space-y-1 pl-1 text-slate-600 dark:text-slate-400">
+          <li><strong>Static QR Generation:</strong> Performed locally in your web browser. Payload data (Wi-Fi passwords, contact books, plain text, URLs) is never transmitted to, stored on, or logged by our servers.</li>
+          <li><strong>Dynamic QR &amp; Account Features:</strong> Stored and processed on serverless edge infrastructure (Cloudflare Workers, Cloudflare D1 SQL database, Cloudflare R2 object storage) to enable link redirection, campaign editing, and aggregate scan analytics.</li>
+        </ul>
       </div>
 
-      <!-- Section 1 -->
+      <!-- Section 1: Static QR Data Processing -->
       <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
         <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 1. The Zero-Storage Client-Side Generation Principle
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 1. Static QR Data Processing (Browser-Side)
         </h2>
         <p>
-          Unlike conventional online generators that upload and log your sensitive input values on remote backend servers, <strong class="text-slate-800 dark:text-slate-200">freeqrcode-generator.com</strong> processes static QR codes (including Website URLs, Plain Text, Wi-Fi Network SSIDs and Passwords, vCard Contact Profiles, SMS, WhatsApp Messages, UPI Payment strings, and Geo-coordinates) entirely client-side via JavaScript running inside the User's local browser sandbox.
+          <strong class="text-slate-800 dark:text-slate-200">Static QR generation is performed locally in the browser.</strong>
         </p>
         <p>
-          Under this zero-storage architecture:
+          When you use our public generator for URLs, Wi-Fi networks, vCard contacts, plain text, SMS, phone numbers, email links, location coordinates, or payment strings:
         </p>
         <ul class="list-disc list-inside space-y-1.5 pl-2">
-          <li>Your Wi-Fi passwords, private contact books, and raw messages are never uploaded to, processed by, or cached on our web servers.</li>
-          <li>Generating, customizing, and downloading vector SVG or high-resolution PNG QR assets does not create server-side transaction logs containing your payload data.</li>
-          <li>If you close your browser tab without saving the code to an authenticated user account, the raw input data immediately ceases to exist outside your local machine.</li>
+          <li><strong>Local Execution:</strong> Barcode symbol calculations and pixel matrix rendering are executed directly on your client device using the open-source <code class="text-xs bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded">qr-code-styling</code> and <code class="text-xs bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded">qrcode-generator</code> JavaScript libraries.</li>
+          <li><strong>No Server Payload Transmission:</strong> Your input data (such as confidential Wi-Fi network passwords, personal phone numbers, or private notes) is not sent across the internet to our backend servers.</li>
+          <li><strong>Local Logo Handling:</strong> In the public static generator, any uploaded center logo file is converted locally into a base64 Data URL via the browser's native <code class="text-xs">FileReader</code> API. It remains in client memory and is never uploaded to any remote server or object bucket.</li>
+          <li><strong>Local Asset Downloads:</strong> PNG, SVG, and JPG image files are serialized and downloaded directly from browser memory via HTML5 Canvas or SVG XML blobs. No download files are generated or cached on a server.</li>
+          <li><strong>Session Storage Drafts:</strong> If you are not signed in and choose to click "Save QR to Account", the unsaved configuration is placed temporarily into your browser's <code class="text-xs">sessionStorage</code> (<code class="text-xs">pending_qr_save</code>) to persist across the sign-up redirect. It is cleared once saved or when the browser tab is closed.</li>
         </ul>
+        <p class="text-slate-500 italic">
+          Note: Because static QR codes embed the complete payload directly into the visual 2D matrix, we cannot modify, redirect, retrieve, or revoke a static QR code once you generate and print it.
+        </p>
       </section>
 
-      <!-- Section 2 -->
+      <!-- Section 2: Dynamic QR Codes & Scan Telemetry -->
       <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
         <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 2. Categories of Information We Collect
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 2. Dynamic QR Processing &amp; Scan Telemetry (Server-Side)
         </h2>
         <p>
-          We only collect personal information when strictly necessary to provide authenticated services, facilitate dynamic redirection, or comply with statutory legal obligations.
+          Dynamic QR codes utilize short redirection URLs (e.g., <code class="text-xs bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded">https://freeqrcode-generator.com/r/:shortCode</code>) that resolve to your chosen destination URL via Cloudflare Workers edge compute.
         </p>
-        <div class="space-y-3 pl-2">
+        <p>
+          When creating and hosting dynamic QR codes, the following data is processed and stored:
+        </p>
+        <div class="space-y-2 pl-2">
           <div>
-            <h3 class="font-bold text-slate-800 dark:text-slate-200">A. Account & Profile Data (Registered Users Only):</h3>
-            <p>When you register for a workspace account, we collect your email address, full name, encrypted password hash (derived via salted PBKDF2 with 100,000 iterations), account role, subscription plan tier, and account creation timestamp.</p>
+            <strong class="text-slate-800 dark:text-slate-200">A. Dynamic QR Configuration:</strong>
+            <p>We store the target destination URL, short code slug, campaign name, QR type, style configuration (colors, corner styles, error correction level), and your account ID in our Cloudflare D1 SQL database.</p>
           </div>
           <div>
-            <h3 class="font-bold text-slate-800 dark:text-slate-200">B. Dynamic QR Codes & Redirection Configuration:</h3>
-            <p>When you create Dynamic QR codes or custom mobile landing pages, we store the target destination URL, short code slug identifier, style configuration metadata (hex color codes, frame types, error correction levels), and user account association in our Cloudflare D1 relational database.</p>
-          </div>
-          <div>
-            <h3 class="font-bold text-slate-800 dark:text-slate-200">C. Aggregated Dynamic Scan Telemetry (Privacy-Preserving):</h3>
-            <p>When an end-user scans a dynamic QR code hosted via our edge router (<code class="text-xs bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded">/r/:shortCode</code>), our system processes edge metadata to update aggregate analytics for the QR code owner. To preserve end-user privacy:</p>
+            <strong class="text-slate-800 dark:text-slate-200">B. Scan Telemetry (Aggregate Analytics):</strong>
+            <p>When a smartphone camera scans a dynamic QR short URL, our edge router logs scan context to provide campaign analytics to the QR code owner:</p>
             <ul class="list-disc list-inside space-y-1 pl-4 mt-1">
-              <li><strong>Raw IP Addresses are NEVER permanently stored.</strong> IP addresses are processed in volatile memory solely to compute a one-way anonymized cryptographic hash concatenated with a daily salt to identify unique daily scans, after which the raw IP is immediately discarded.</li>
-              <li>Geographic data is captured at the country, administrative region, and city level as resolved by Cloudflare edge CDN headers; we do not access precise GPS coordinates.</li>
-              <li>Device and browser categories (e.g., iOS Safari, Android Chrome, Windows Desktop) are parsed from the User-Agent header and aggregated into statistical charts.</li>
+              <li><strong>Timestamp:</strong> Unix timestamp of the scan event.</li>
+              <li><strong>Geographic Location:</strong> Country, administrative region, and city as resolved by Cloudflare edge CDN network headers (<code class="text-xs">cf-ipcountry</code>, <code class="text-xs">cf-region</code>, <code class="text-xs">cf-ipcity</code>). We do NOT request or collect GPS coordinates.</li>
+              <li><strong>Device &amp; Browser Context:</strong> User-Agent string is parsed to extract device category (<code class="text-xs">mobile</code>, <code class="text-xs">desktop</code>, <code class="text-xs">tablet</code>, <code class="text-xs">bot</code>), operating system (iOS, Android, Windows, macOS, Linux), and browser name (Safari, Chrome, Firefox, Edge).</li>
+              <li><strong>Referrer Domain:</strong> Hostname parsed from the HTTP Referer header (defaulting to "Direct").</li>
+              <li><strong>IP Address Hashing:</strong> Raw IP addresses are <em>never</em> written to our database. When a scan request arrives, the client IP is combined with a daily rotating date salt and hashed via SHA-256 into a truncated 16-hex-character identifier (<code class="text-xs">ip_hash</code>). This enables unique daily visitor counts without persistent IP logging.</li>
             </ul>
           </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Registered User Accounts & Database Architecture -->
+      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 3. Registered User Accounts &amp; Database Architecture
+        </h2>
+        <p>
+          For users who create an account to manage saved QR codes, dynamic redirects, or subscriptions:
+        </p>
+        <ul class="list-disc list-inside space-y-1.5 pl-2">
+          <li><strong>Account Records:</strong> We store your email address, display name, account role (<code class="text-xs">user</code> | <code class="text-xs">admin</code>), plan tier, account status, and registration timestamp in our Cloudflare D1 relational database.</li>
+          <li><strong>Password Security:</strong> Passwords are cryptographically salted and hashed using PBKDF2 (100,000 iterations via Web Crypto API) prior to database insertion. We never store plain-text passwords.</li>
+          <li><strong>Cloudflare R2 Object Storage:</strong> For authenticated dynamic QR codes and custom landing pages, uploaded logo images are stored in Cloudflare R2 object storage with random UUID-based keys. Logo uploads are restricted to 2 MB, limited to PNG/JPG/WebP/SVG formats, and SVG files undergo automated script neutralization before storage.</li>
+          <li><strong>Billing Records:</strong> Subscription billing is managed by our Merchant of Record, Lemon Squeezy. We do not store credit card numbers, bank details, or CVVs. We store only provider references (<code class="text-xs">provider_customer_id</code>, <code class="text-xs">provider_subscription_id</code>), plan status, and active billing periods.</li>
+        </ul>
+      </section>
+
+      <!-- Section 4: Cookies & Browser Storage -->
+      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 4. Cookies &amp; Local Browser Storage Audit
+        </h2>
+        <p>
+          Below is a complete audit of all cookies and browser storage mechanisms utilized by FreeQRCode-Generator.com:
+        </p>
+        
+        <div class="overflow-x-auto pt-1">
+          <table class="w-full text-left text-xs border border-slate-200 dark:border-slate-800 rounded-xl">
+            <thead class="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold">
+              <tr>
+                <th class="p-3 border-b border-slate-200 dark:border-slate-800">Mechanism / Name</th>
+                <th class="p-3 border-b border-slate-200 dark:border-slate-800">Category</th>
+                <th class="p-3 border-b border-slate-200 dark:border-slate-800">Provider</th>
+                <th class="p-3 border-b border-slate-200 dark:border-slate-800">Purpose</th>
+                <th class="p-3 border-b border-slate-200 dark:border-slate-800">Duration</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-600 dark:text-slate-400">
+              <tr>
+                <td class="p-3 font-mono text-[11px] font-bold text-indigo-600 dark:text-indigo-400">qr_session</td>
+                <td class="p-3">Essential / Auth</td>
+                <td class="p-3">First-Party</td>
+                <td class="p-3">HTTP-only, SameSite=Lax JWT authentication token for registered user dashboard logins.</td>
+                <td class="p-3">30 Days (cleared on logout)</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-mono text-[11px]">_ga, _ga_*</td>
+                <td class="p-3">Analytics</td>
+                <td class="p-3">Google LLC</td>
+                <td class="p-3">Distinguishes unique anonymous website visitors for aggregate page-view traffic statistics.</td>
+                <td class="p-3">Up to 2 Years</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-mono text-[11px]">localStorage: theme</td>
+                <td class="p-3">Preference</td>
+                <td class="p-3">First-Party (Browser)</td>
+                <td class="p-3">Remembers your visual color mode ('light' vs. 'dark') to prevent UI flicker.</td>
+                <td class="p-3">Persistent until cleared</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-mono text-[11px]">sessionStorage: pending_qr_save</td>
+                <td class="p-3">Functional</td>
+                <td class="p-3">First-Party (Browser)</td>
+                <td class="p-3">Temporarily retains unsaved QR generator form inputs during sign-up redirect.</td>
+                <td class="p-3">Browser tab session only</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-[11px] text-slate-500 pt-1">
+          Anonymous visitors generating static QR codes without signing into a user account receive <strong>no authentication cookies</strong>.
+        </p>
+      </section>
+
+      <!-- Section 5: Third-Party Services Audit -->
+      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 5. Third-Party Services &amp; Sub-Processors
+        </h2>
+        <p>
+          We partner with select infrastructure and service providers to operate FreeQRCode-Generator.com. We do not sell or trade user data with advertising brokers.
+        </p>
+        <div class="space-y-2 pl-2">
           <div>
-            <h3 class="font-bold text-slate-800 dark:text-slate-200">D. Billing & Transaction Records:</h3>
-            <p>Payment processing for premium subscriptions is handled exclusively by our authorized Merchant of Record (Lemon Squeezy). We do not collect, store, or process raw credit card numbers or bank account credentials on our infrastructure. We retain only the transaction identifier, subscription renewal date, and active plan status.</p>
+            <strong class="text-slate-800 dark:text-slate-200">Cloudflare, Inc.:</strong>
+            <p>Provides global Content Delivery Network (CDN), DDoS mitigation, SSL/TLS certificate termination, serverless edge compute (Workers), relational SQL database (D1), and object storage (R2). <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer" class="text-indigo-600 dark:text-indigo-400 hover:underline">Cloudflare Privacy Policy</a>.</p>
+          </div>
+          <div>
+            <strong class="text-slate-800 dark:text-slate-200">Google LLC (Google Analytics &amp; Google Fonts):</strong>
+            <p>Google Analytics (Measurement ID G-60W44NFJNJ) processes anonymized web traffic metrics. Google Fonts serves web typography stylesheets. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" class="text-indigo-600 dark:text-indigo-400 hover:underline">Google Privacy Policy</a>.</p>
+          </div>
+          <div>
+            <strong class="text-slate-800 dark:text-slate-200">Lemon Squeezy, LLC:</strong>
+            <p>Acts as Merchant of Record for subscription billing, customer invoices, and payment checkout sessions. <a href="https://www.lemonsqueezy.com/privacy" target="_blank" rel="noopener noreferrer" class="text-indigo-600 dark:text-indigo-400 hover:underline">Lemon Squeezy Privacy Policy</a>.</p>
+          </div>
+          <div>
+            <strong class="text-slate-800 dark:text-slate-200">IndexNow (Microsoft Bing / Yandex):</strong>
+            <p>Submits newly published public URLs directly to participating search engine indexing APIs. No user data is transmitted.</p>
           </div>
         </div>
       </section>
 
-      <!-- Section 3 -->
+      <!-- Section 6: Payment QR & Social QR Disclosures -->
       <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
         <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 3. Legal Grounds for Processing (GDPR Article 6)
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 6. Payment &amp; Social QR Disclaimers
         </h2>
-        <p>Under the European Union General Data Protection Regulation, we process personal data under the following lawful bases:</p>
+        <div class="space-y-2 pl-2">
+          <div>
+            <strong class="text-slate-800 dark:text-slate-200">Payment-Related QR Tools (UPI, PayPal, Venmo, Cash App, Zelle):</strong>
+            <p>
+              FreeQRCode-Generator.com formats standard URI schemes and web hyperlinks (such as <code class="text-xs">upi://pay</code> or <code class="text-xs">https://paypal.me/</code>) into visual 2D barcodes. <strong>Our platform is NOT a payment gateway, payment processor, money transmitter, or escrow service.</strong> We do not verify transactions, process payments, debit bank accounts, or handle financial disputes. All payments occur directly between the payer and payee within their respective banking or financial applications.
+            </p>
+          </div>
+          <div>
+            <strong class="text-slate-800 dark:text-slate-200">Social Media &amp; App QR Tools:</strong>
+            <p>
+              Our generator formats standard web links to profiles across Instagram, Facebook, WhatsApp, LinkedIn, YouTube, TikTok, and mobile App Stores. FreeQRCode-Generator.com is an independent utility and is not affiliated with, sponsored by, or endorsed by Meta Platforms, WhatsApp, Google, Apple, Microsoft, LinkedIn, ByteDance, or any third-party brand.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 7: Data Retention & Account Deletion -->
+      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 7. Data Retention &amp; Self-Service Deletion
+        </h2>
+        <p>
+          We adhere to data minimization principles across all storage layers:
+        </p>
         <ul class="list-disc list-inside space-y-1.5 pl-2">
-          <li><strong>Performance of Contract (Art. 6(1)(b)):</strong> Providing registered workspace accounts, dynamic redirection endpoints, and asset storage requested by the user.</li>
-          <li><strong>Legitimate Interests (Art. 6(1)(f)):</strong> Monitoring service uptime, preventing automated spam and malicious phishing campaigns, enforcing our Acceptable Use Policy, and maintaining edge cybersecurity.</li>
-          <li><strong>Compliance with Legal Obligations (Art. 6(1)(c)):</strong> Retaining fiscal transaction receipts, fulfilling law enforcement subpoenas, and processing valid DMCA copyright takedown requests.</li>
-          <li><strong>Explicit Consent (Art. 6(1)(a)):</strong> Where you have voluntarily opted into direct communication or marketing notifications.</li>
+          <li><strong>Static QR Payload Data:</strong> Zero retention. Processed in browser RAM and discarded upon tab closure.</li>
+          <li><strong>Dynamic QR Codes:</strong> Retained in Cloudflare D1 until explicitly deleted by the user or upon account closure.</li>
+          <li><strong>Scan Analytics Telemetry:</strong> Retained alongside the parent QR code. When a user deletes a QR code in their dashboard, all associated scan analytics records (<code class="text-xs">qr_scans</code>) and R2 logo assets are permanently deleted from the database.</li>
+          <li><strong>Self-Service Account Deletion:</strong> Authenticated users can delete their entire account and all associated data at any time via <strong>Dashboard &gt; Account Settings &gt; Danger Zone</strong>. Triggering account deletion cascades through our database, removes all associated QR codes, analytics, and R2 assets, and clears the session cookie.</li>
+          <li><strong>Email Requests:</strong> Users can also request complete data deletion by emailing <a href="mailto:support@freeqrcode-generator.com" class="text-indigo-600 dark:text-indigo-400 underline font-semibold">support@freeqrcode-generator.com</a>.</li>
         </ul>
       </section>
 
-      <!-- Section 4 -->
+      <!-- Section 8: Security Practices & Vulnerability Reporting -->
       <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
         <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 4. Cookies, Tracking & Local Browser Storage
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 8. Security Practices &amp; Vulnerability Disclosure
         </h2>
         <p>
-          We employ a minimal, privacy-centric cookie policy:
+          All communications between your browser and our servers are encrypted using modern Transport Layer Security (TLS 1.3 / HTTPS). Database storage and object buckets are encrypted at rest using industry-standard AES-256 encryption provided by Cloudflare.
         </p>
-        <ul class="list-disc list-inside space-y-1.5 pl-2">
-          <li><strong>Essential Session Cookies (<code class="text-xs bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded">qr_session</code>):</strong> Strictly necessary HTTP-only, Secure, SameSite=Lax JWT tokens used to authenticate your session when you log into your workspace.</li>
-          <li><strong>Local Storage State:</strong> We store your client-side visual theme preference (<code class="text-xs bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded">theme: dark/light</code>) and language selection in your browser's <code class="text-xs">localStorage</code>.</li>
-          <li><strong>Zero Third-Party Advertising Trackers:</strong> We do NOT embed cross-site behavioral tracking beacons, ad network pixels, or third-party data broker scripts. We do NOT sell, rent, or trade your personal data.</li>
-        </ul>
-      </section>
-
-      <!-- Section 5 -->
-      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 5. Data Subject Rights (GDPR, UK-GDPR & CCPA/CPRA)
-        </h2>
-        <p>Depending on your geographic residency, you are entitled to exercise statutory data protection rights without financial discrimination:</p>
-        <ul class="list-disc list-inside space-y-1.5 pl-2">
-          <li><strong>Right of Access & Portability:</strong> Request a full copy of your account profile, generated QR code records, and scan telemetry in a machine-readable JSON/CSV export format.</li>
-          <li><strong>Right to Rectification:</strong> Update or correct erroneous account details directly in your Dashboard settings or via support.</li>
-          <li><strong>Right to Erasure ("Right to be Forgotten"):</strong> Permanently delete your account, saved QR codes, uploaded brand logos, and associated analytics from our database.</li>
-          <li><strong>Right to Restrict or Object to Processing:</strong> Object to specific data processing operations predicated on legitimate interest.</li>
-          <li><strong>California "Do Not Sell or Share My Personal Information":</strong> We do not sell personal information as defined by the CCPA/CPRA. California residents may submit statutory privacy requests at any time.</li>
-        </ul>
-        <p>To submit a verified data subject request, email our Data Protection Desk at <a href="mailto:privacy@freeqrcode-generator.com" class="text-indigo-600 dark:text-indigo-400 font-bold underline">privacy@freeqrcode-generator.com</a>. We respond to all verified statutory inquiries within thirty (30) days.</p>
-      </section>
-
-      <!-- Section 6 -->
-      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 6. Data Security, Cryptography & Cloudflare Infrastructure
-        </h2>
         <p>
-          Our application is deployed on Cloudflare’s enterprise serverless edge network (Cloudflare Workers, D1 Database, and R2 Object Storage). All data in transit is encrypted using mandatory Transport Layer Security (TLS 1.3 / HTTPS) with HTTP Strict Transport Security (HSTS) headers. Database records and asset buckets are encrypted at rest using AES-256 standards.
+          For detailed technical security documentation, visit our dedicated <a href="/security" class="text-indigo-600 dark:text-indigo-400 font-semibold underline">Security Overview</a>.
+        </p>
+        <p>
+          If you discover a potential security vulnerability or privacy flaw, please report it through our contact channels (<a href="/contact" class="text-indigo-600 dark:text-indigo-400 underline">Contact Form</a> or <a href="/report-problem" class="text-amber-600 dark:text-amber-400 underline">Report a Problem</a>) with sufficient technical details to reproduce the issue.
         </p>
       </section>
 
-      <!-- Section 7 -->
+      <!-- Section 9: Children's Privacy -->
       <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
         <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 7. Children's Online Privacy Protection (COPPA)
+          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 9. Children's Online Privacy
         </h2>
         <p>
-          Our Service is designed for general audiences and commercial business operators. We do not knowingly solicit, collect, or process personal data from children under the age of thirteen (13) (or sixteen (16) within the European Economic Area). If you believe a minor has established an account without parental consent, please contact us immediately for expedited account termination.
+          FreeQRCode-Generator.com is intended for general audiences and commercial business use. We do not knowingly solicit or collect personal information from individuals under the age of 13 (or under 16 where required by local law). If you believe a child has created an account, please contact us for prompt account removal.
         </p>
       </section>
 
-      <!-- Section 8 -->
-      <section class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-        <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-indigo-600"></span> 8. Modifications to this Privacy Policy
-        </h2>
-        <p>
-          We reserve the right to revise this Privacy Policy periodically to reflect technological advancements, regulatory amendments, or service enhancements. The current revision date will always be prominently displayed at the top of this document. Continued use of freeqrcode-generator.com subsequent to any update constitutes formal acknowledgment of the revised provisions.
-        </p>
-      </section>
-
-      <!-- Contact Box -->
+      <!-- Section 10: Legal Contact -->
       <div class="border-t border-slate-100 dark:border-slate-800 pt-6 space-y-2 text-xs sm:text-sm text-slate-500">
-        <p class="font-bold text-slate-800 dark:text-slate-200">Legal Contact & Data Protection Officer:</p>
-        <p>Free QR Code Generator • Powered by <strong>FK DIGITAL MEDIA</strong></p>
-        <p>Support Email: <a href="mailto:support@freeqrcode-generator.com" class="text-indigo-600 dark:text-indigo-400 underline font-semibold">support@freeqrcode-generator.com</a></p>
-        <p>Legal & Privacy: <a href="mailto:legal@freeqrcode-generator.com" class="text-indigo-600 dark:text-indigo-400 underline font-semibold">legal@freeqrcode-generator.com</a></p>
+        <p class="font-bold text-slate-800 dark:text-slate-200">Legal Contact &amp; Privacy Queries:</p>
+        <p>Free QR Code Generator • Maintained by <strong>FK Digital Media</strong> (Founder: Firoz Khan)</p>
+        <p>Support &amp; Privacy Inquiries: <a href="mailto:support@freeqrcode-generator.com" class="text-indigo-600 dark:text-indigo-400 underline font-semibold">support@freeqrcode-generator.com</a></p>
+        <p>Technical Problem Reporting: <a href="/report-problem" class="text-indigo-600 dark:text-indigo-400 underline">https://freeqrcode-generator.com/report-problem</a></p>
         <p>Website: <a href="https://freeqrcode-generator.com" class="text-indigo-600 dark:text-indigo-400 underline">https://freeqrcode-generator.com</a></p>
       </div>
 

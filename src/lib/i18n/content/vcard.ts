@@ -390,7 +390,7 @@ export function getVcardContent(locale: Locale): LocalizedPageContent {
           'International Phone Formatting: Always use international E.164 notation (e.g. +1 555 123 4567) with country codes so global contacts can dial seamlessly.',
           'Omit Unnecessary Fields: QR density increases with every character. Omit empty or non-essential fields to keep the code simpler and easier to scan from a distance.',
           'High Error Correction for Logos: If adding your company logo or profile icon in the center, ensure Level H (30%) error correction is enabled.',
-          'Minimum Physical Print Size: For physical business cards, ensure the printed QR code is at least 25 x 25 mm (1 x 1 inch) to guarantee fast smartphone autofocus.',
+          'Minimum Physical Print Size: For physical business cards, ensure the printed QR code is at least 25 x 25 mm (1 x 1 inch) to assist smartphone autofocus.',
           'Vector SVG for Offset Printing: Provide vector SVG format to your print shop to avoid raster pixelation or blurry module edges.'
         ],
         technicalNotes: 'Standards Compliance: Generates standard vCard 3.0 payloads natively parsed by iOS Contacts, Google Contacts, Android OS, and desktop email clients.',
@@ -399,7 +399,7 @@ export function getVcardContent(locale: Locale): LocalizedPageContent {
           { question: 'Is my personal contact information uploaded or saved on your server?', answer: 'No. Our vCard generator operates 100% client-side in your browser. All contact fields are embedded directly into the static QR code pattern in your device memory without remote database logging.' },
           { question: 'Does the scanner need a special app to read a vCard QR code?', answer: 'No special app is required. All modern iPhones running iOS 11+ and Android smartphones running Android 9+ have built-in vCard decoding inside their native camera apps.' },
           { question: 'Can I include social media profiles or multiple phone numbers in the vCard?', answer: 'Standard vCard 3.0 supports primary phone, email, website, and address fields. To share rich multi-link profiles and social media handles on a hosted page, use our Digital Business Card tool.' },
-          { question: 'What is the best way to format phone numbers for international clients?', answer: 'Always include the plus sign and international country code (for example, +1 for US/Canada, +44 for UK, +91 for India). This guarantees seamless one-tap dialing.' },
+          { question: 'What is the best way to format phone numbers for international clients?', answer: 'Always include the plus sign and international country code (for example, +1 for US/Canada, +44 for UK, +91 for India). This enables seamless one-tap dialing.' },
           { question: 'Can I edit my contact details after printing a static vCard QR code?', answer: 'Because static vCard codes store data directly in the pixel modules, details cannot be changed once printed. To update details in the future, use our Dynamic QR code or Digital Business Card.' }
         ],
         relatedTools: [

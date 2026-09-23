@@ -389,7 +389,7 @@ export function getWhatsappContent(locale: Locale): LocalizedPageContent {
         tips: [
           'Numbers Only Format: Enter the international country code followed by the number without spaces or special characters (e.g., 15551234567 for US, 447123456789 for UK).',
           'Conversational Starter Text: Use friendly, specific inquiry templates like "Hi! I would like to request a quote for...".',
-          'High Optical Contrast: Dark module patterns on a clean white background guarantee the fastest optical scanning at distance.',
+          'High Optical Contrast: Dark module patterns on a clean white background provide high optical contrast for camera scanning at distance.',
           'Integrate with WhatsApp Business: Take advantage of automated greeting messages, quick replies, and product catalogs on WhatsApp Business.',
           'Cross-Device Compatibility Test: Verify that the generated deep link opens properly on iOS, Android, and desktop WhatsApp Web.'
         ],

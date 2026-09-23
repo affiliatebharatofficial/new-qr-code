@@ -388,7 +388,7 @@ export function getDigitalBusinessCardContent(locale: Locale): LocalizedPageCont
         ],
         tips: [
           'International Phone Formatting: Always include country codes (e.g. +1 for US) on all phone numbers.',
-          'High Screen Contrast: Dark module patterns on a clean white background guarantee fast screen-to-screen scanning.',
+          'High Screen Contrast: Dark module patterns on a clean white background support fast screen-to-screen scanning.',
           'Minimum Physical Size: Ensure at least 25 x 25 mm on physical printed business cards.',
           'Vector SVG for Spot UV: Supply vector SVG format to printers for foil stamping or embossed finishes.',
           'Multi-Device Camera Test: Test scanning on both iOS and Android before finalizing print orders.'

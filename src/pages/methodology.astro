@@ -1,0 +1,426 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import MaintainerCard from '../components/ui/MaintainerCard.astro';
+
+const breadcrumbs = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://freeqrcode-generator.com/' },
+    { '@type': 'ListItem', position: 2, name: 'Methodology', item: 'https://freeqrcode-generator.com/methodology' },
+  ],
+};
+
+const techArticleJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'TechArticle',
+  headline: 'How FreeQRCode-Generator.com Generates QR Codes',
+  description: 'Technical methodology behind FreeQRCode-Generator.com: encoding algorithms, versions, Reed-Solomon error correction, quiet zones, WCAG contrast heuristics, and client-side rendering.',
+  author: {
+    '@type': 'Person',
+    name: 'Firoz Khan',
+    jobTitle: 'Full Stack Developer',
+    url: 'https://freeqrcode-generator.com/about/firoz-khan',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'FK Digital Media',
+    url: 'https://freeqrcode-generator.com',
+  },
+  datePublished: '2026-08-27',
+  dateModified: '2026-09-23',
+};
+---
+
+<BaseLayout
+  title="QR Code Generation Methodology — Free QR Code Generator"
+  description="Technical methodology of FreeQRCode-Generator.com: encoding modes, versions, Reed-Solomon error correction, quiet zone margins, contrast heuristics, and vector exports."
+  jsonLd={[breadcrumbs, techArticleJsonLd]}
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-12">
+    
+    <!-- Hero Header -->
+    <div class="text-center space-y-4 max-w-3xl mx-auto">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+        <span>📐</span> Technical Documentation
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+        How FreeQRCode-Generator.com Generates QR Codes
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        A transparent, factual breakdown of our barcode generation architecture, data encoding pipelines, error correction algorithms, optical contrast checks, and export mechanisms.
+      </p>
+    </div>
+
+    <!-- Quick Overview Banner -->
+    <div class="p-6 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed space-y-2">
+      <div class="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">
+        <span>⚙️</span> Architectural Summary
+      </div>
+      <p>
+        The platform uses the open-source <strong class="text-slate-800 dark:text-slate-200">qr-code-styling</strong> (v1.9.2) library and underlying <strong class="text-slate-800 dark:text-slate-200">qrcode-generator</strong> (v1.5.2) engine for barcode symbol calculation. The generator follows QR Code technical concepts implemented by the underlying libraries. Static QR generation runs 100% locally in the user's browser, while dynamic QR routing is handled on the Cloudflare Workers edge network with D1 database storage.
+      </p>
+      <div class="pt-1 flex flex-wrap gap-3 font-semibold text-indigo-600 dark:text-indigo-400 text-xs">
+        <a href="#encoding-modes" class="hover:underline">Encoding Modes &darr;</a>
+        <a href="#error-correction" class="hover:underline">Error Correction &darr;</a>
+        <a href="#static-vs-dynamic" class="hover:underline">Static vs. Dynamic &darr;</a>
+        <a href="#svg-vs-png" class="hover:underline">SVG vs. PNG &darr;</a>
+        <a href="/data-sources" class="text-slate-700 dark:text-slate-300 hover:underline">View All Data Sources &rarr;</a>
+      </div>
+    </div>
+
+    <!-- Section 1: Anatomy & Structure -->
+    <section class="space-y-4">
+      <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+        1. QR Code Anatomy &amp; Symbol Structure
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        A Quick Response (QR) Code is a two-dimensional matrix symbology originally created by Denso Wave in 1994 and standardized internationally under ISO/IEC 18004. Unlike one-dimensional linear barcodes that store data in variable-width parallel lines, a QR code stores data in a two-dimensional grid of black and white square units called <strong>modules</strong>.
+      </p>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5 shadow-sm">
+          <span class="font-bold text-slate-900 dark:text-white block text-sm">Position Detection Patterns</span>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            Three distinctive concentric square patterns located at the top-left, top-right, and bottom-left corners. These enable optical camera software to locate the symbol, detect its angle of rotation, and normalize skewed perspectives.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5 shadow-sm">
+          <span class="font-bold text-slate-900 dark:text-white block text-sm">Alignment &amp; Timing Patterns</span>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            Smaller square markers (in Version 2+) and alternating black/white coordinate tracks connecting the corner finders. These allow scanner software to calibrate module grid coordinates when physical surfaces are slightly curved or distorted.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5 shadow-sm">
+          <span class="font-bold text-slate-900 dark:text-white block text-sm">Format Information Area</span>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            Encodes the error correction level (L, M, Q, H) and the mask pattern index applied to the symbol, duplicated around the finder patterns for redundancy.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5 shadow-sm">
+          <span class="font-bold text-slate-900 dark:text-white block text-sm">Data &amp; Error Correction Codewords</span>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            The remaining matrix area contains the interleaved user data bits along with Reed-Solomon error correction codewords that reconstruct damaged or obscured modules.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Encoding Modes -->
+    <section id="encoding-modes" class="space-y-4">
+      <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+        2. Data Encoding Modes &amp; Character Support
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        QR codes support four standardized encoding modes that optimize storage density based on the input character set. The underlying engine automatically selects the appropriate mode:
+      </p>
+
+      <div class="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800">
+        <table class="w-full text-left text-xs text-slate-600 dark:text-slate-400">
+          <thead class="bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-white font-bold border-b border-slate-200 dark:border-slate-800">
+            <tr>
+              <th class="p-3">Encoding Mode</th>
+              <th class="p-3">Supported Character Set</th>
+              <th class="p-3">Bits per Character</th>
+              <th class="p-3">Primary Usage</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+            <tr>
+              <td class="p-3 font-semibold text-slate-900 dark:text-white">Numeric</td>
+              <td class="p-3">Digits 0 through 9</td>
+              <td class="p-3 font-mono">3.33 bits</td>
+              <td class="p-3">Phone numbers, numeric PINs, payment amounts</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-slate-900 dark:text-white">Alphanumeric</td>
+              <td class="p-3">0–9, A–Z, Space, $, %, *, +, -, ., /, :</td>
+              <td class="p-3 font-mono">5.5 bits</td>
+              <td class="p-3">Uppercase URLs, short codes, basic identifiers</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-slate-900 dark:text-white">Byte (8-bit)</td>
+              <td class="p-3">ISO-8859-1 / UTF-8 Unicode bytes</td>
+              <td class="p-3 font-mono">8.0 bits</td>
+              <td class="p-3">Standard web URLs, vCards, Wi-Fi passwords, accents, emoji</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-slate-900 dark:text-white">Kanji</td>
+              <td class="p-3">Shift JIS double-byte characters</td>
+              <td class="p-3 font-mono">13.0 bits</td>
+              <td class="p-3">Japanese script characters</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-xs text-slate-500">
+        <em>Note on Unicode:</em> When non-ASCII characters, accented letters, or international scripts are encoded, the generator serializes characters into 8-bit UTF-8 byte sequences. Because multi-byte UTF-8 sequences consume 2 to 4 bytes per character, international text produces denser QR matrices than equivalent-length English alphanumeric text.
+      </p>
+    </section>
+
+    <!-- Section 3: Versions & Capacity -->
+    <section class="space-y-4">
+      <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+        3. QR Versions &amp; Dynamic Capacity Scaling
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        QR codes scale in dimension across 40 standardized <strong>Versions</strong>:
+      </p>
+      <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-mono text-slate-800 dark:text-slate-200">
+        Dimension Formula: Modules per Side = (Version - 1) &times; 4 + 21
+      </div>
+      <ul class="space-y-1.5 text-xs sm:text-sm text-slate-600 dark:text-slate-400 list-disc list-inside">
+        <li><strong>Version 1:</strong> 21 &times; 21 modules (lowest density, suitable for short URLs and numbers).</li>
+        <li><strong>Version 10:</strong> 57 &times; 57 modules (typical for vCards with addresses or medium text).</li>
+        <li><strong>Version 40:</strong> 177 &times; 177 modules (maximum standardized matrix capacity).</li>
+      </ul>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        <strong>Automatic Version Calculation:</strong> Our generator does not force users to manually select a version number. Instead, the underlying library dynamically calculates the smallest viable version that can accommodate the exact payload byte length given the chosen error correction level.
+      </p>
+    </section>
+
+    <!-- Section 4: Error Correction -->
+    <section id="error-correction" class="space-y-4">
+      <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+        4. Reed-Solomon Error Correction (L, M, Q, H)
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        QR codes employ Reed-Solomon algebraic error correction to reconstruct data if the physical code is scratched, dirtied, torn, or partially obscured by an embedded center logo. Four discrete levels are supported:
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-900 dark:text-white text-sm">Level L (Low)</span>
+            <span class="font-mono text-indigo-600 dark:text-indigo-400 font-bold">~7% recovery</span>
+          </div>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            Produces the simplest, least dense matrix. Recommended for clean digital screens or large billboards where the symbol will remain completely unblemished and contains no logo.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-900 dark:text-white text-sm">Level M (Medium — Default)</span>
+            <span class="font-mono text-indigo-600 dark:text-indigo-400 font-bold">~15% recovery</span>
+          </div>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            The standard default balance for general-purpose marketing, packaging, menus, and receipts. Provides modest damage tolerance without excessively increasing module density.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-900 dark:text-white text-sm">Level Q (Quartile)</span>
+            <span class="font-mono text-indigo-600 dark:text-indigo-400 font-bold">~25% recovery</span>
+          </div>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            Higher protection suitable for industrial labeling, outdoor stickers, or badges exposed to weather, handling, and abrasion.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-900 dark:text-white text-sm">Level H (High)</span>
+            <span class="font-mono text-indigo-600 dark:text-indigo-400 font-bold">~30% recovery</span>
+          </div>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            Highest damage resilience. When a central brand logo or image is uploaded in our generator, the system automatically elevates error correction to Level H so the occluded central modules can be reconstructed.
+          </p>
+        </div>
+      </div>
+      <p class="text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 p-3 rounded-xl border border-amber-200 dark:border-amber-900/40">
+        <strong>Technical Caveat:</strong> The percentage figures (7%, 15%, 25%, 30%) represent mathematical bounds based on random codeword loss. If key structural elements (such as all three finder patterns) are covered or damaged, the code will fail to scan regardless of the error correction percentage.
+      </p>
+    </section>
+
+    <!-- Section 5: Quiet Zone -->
+    <section class="space-y-4">
+      <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+        5. The Quiet Zone (Margin)
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        The <strong>quiet zone</strong> is the uninterrupted clear border surrounding the outer perimeter of the QR symbol.
+      </p>
+      <ul class="space-y-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400 list-disc list-inside">
+        <li><strong>Specification Requirement:</strong> International standards recommend a quiet zone of at least 4 modules wide on all four sides.</li>
+        <li><strong>Implementation in FreeQRCode-Generator.com:</strong> Our generator provides a configurable margin slider (0 to 40 pixels, with a default of 10 pixels).</li>
+        <li><strong>Export Inclusion:</strong> The margin is directly included in both exported SVG files (as surrounding viewbox padding) and PNG files (as canvas border pixels).</li>
+        <li><strong>Warning Heuristic:</strong> If the margin is reduced to 0, our real-time contrast and scannability analyzer flags a warning alerting the user that optical cameras may fail to isolate the symbol when placed against textured or colored backgrounds.</li>
+      </ul>
+    </section>
+
+    <!-- Section 6: Contrast & Scannability -->
+    <section class="space-y-4">
+      <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+        6. Optical Contrast Analysis (WCAG Formula)
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        To help users prevent unreadable color combinations, our platform implements a real-time contrast verification heuristic in <code class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">checkScannability()</code> based on W3C Web Content Accessibility Guidelines (WCAG 2.1):
+      </p>
+
+      <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
+        <div class="font-bold text-slate-900 dark:text-white">Contrast Threshold Rules:</div>
+        <ul class="space-y-1 list-disc list-inside text-slate-600 dark:text-slate-400">
+          <li><strong>Contrast Ratio &lt; 3.0:1:</strong> Flagged as an <em>Error</em>. Optical sensors will struggle to distinguish dark from light modules.</li>
+          <li><strong>Contrast Ratio 3.0:1 to 4.5:1:</strong> Flagged as a <em>Warning</em>. Acceptable for high-resolution screens, but risky for outdoor or dimly lit physical prints.</li>
+          <li><strong>Inverted Colors (Light foreground on dark background):</strong> Flagged as a <em>Warning</em>. Although modern smartphone camera apps decode inverted codes, many legacy industrial laser/CCD scanners only support dark-on-light symbology.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Section 7: Static vs Dynamic -->
+    <section id="static-vs-dynamic" class="space-y-4">
+      <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+        7. Static vs. Dynamic QR Code Mechanics
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        Understanding the exact technical differences between static and dynamic codes is critical for print planning:
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2.5 shadow-sm">
+          <div class="font-bold text-emerald-600 dark:text-emerald-400 text-sm flex items-center gap-1.5">
+            <span>🔒</span> Static QR Codes
+          </div>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            <strong>Payload Placement:</strong> The target data (e.g. Wi-Fi string, vCard record, or full URL) is encoded directly into the black and white module pattern.
+          </p>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            <strong>Privacy &amp; Independence:</strong> Static QR generation is performed entirely in the browser and does not require the QR payload to be uploaded to our server for generation. The generated code does not rely on our website or servers to remain online; it will function indefinitely as a self-contained barcode.
+          </p>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            <strong>Immutability:</strong> Because the data is physically represented by the module geometry, the destination cannot be changed after printing.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2.5 shadow-sm">
+          <div class="font-bold text-indigo-600 dark:text-indigo-400 text-sm flex items-center gap-1.5">
+            <span>⚡</span> Dynamic QR Codes
+          </div>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            <strong>Payload Placement:</strong> The barcode encodes a short redirect link in the format <code class="font-mono text-xs">https://freeqrcode-generator.com/r/[shortCode]</code>.
+          </p>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            <strong>Edge Routing &amp; Analytics:</strong> When scanned, Cloudflare Workers edge nodes resolve the short code via our Cloudflare D1 database and return an HTTP 302 redirect to the destination URL while recording aggregate scan counts (country, device type, timestamp).
+          </p>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            <strong>Platform Reliance:</strong> Dynamic QR codes allow destination editing without reprinting, but they require the platform's infrastructure and routing database to remain operational.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 8: SVG vs PNG -->
+    <section id="svg-vs-png" class="space-y-4">
+      <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+        8. SVG vs. PNG Export Considerations
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+          <h3 class="font-bold text-slate-900 dark:text-white text-sm">Scalable Vector Graphics (SVG)</h3>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            SVG outputs describe modules using mathematical vector paths. Because vectors are resolution-independent, SVG files can be enlarged to any dimension (from business cards to outdoor highway billboards) with zero pixelation or edge blurring. Recommended for Adobe Illustrator, prepress dielines, and commercial offset printing.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+          <h3 class="font-bold text-slate-900 dark:text-white text-sm">Portable Network Graphics (PNG)</h3>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            PNG outputs export raster bitmap pixels. Ideal for websites, email templates, slide presentations, and social media graphics. Our generator supports configurable export dimensions up to 4000&times;4000 pixels.
+          </p>
+        </div>
+      </div>
+      <p class="text-xs text-slate-500">
+        <em>Note:</em> Neither format is universally superior. Physical scan reliability ultimately depends on physical print size, viewing distance, module contrast, and environmental lighting rather than file format alone.
+      </p>
+    </section>
+
+    <!-- Section 9: Payment Protocols -->
+    <section class="space-y-4">
+      <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+        9. Payment QR Code Methodology
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        For payment tools (PayPal, Venmo, Cash App, Zelle, and UPI):
+      </p>
+      <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 space-y-2">
+        <p>
+          <strong>What We Generate:</strong> Our generator strictly formats recipient handles, phone numbers, or UPI IDs into standardized URLs or URI strings (e.g. <code class="font-mono text-indigo-600 dark:text-indigo-400">upi://pay?pa=...</code>, <code class="font-mono text-indigo-600 dark:text-indigo-400">https://venmo.com/u/...</code>, or <code class="font-mono text-indigo-600 dark:text-indigo-400">https://paypal.me/...</code>).
+        </p>
+        <p>
+          <strong>What We Do NOT Do:</strong> We are strictly an information formatting utility. We do not process, touch, hold, or transmit funds, nor do we verify account balances or confirm payment completions. All financial transactions take place exclusively inside the user's native banking or wallet application.
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 10: Technical FAQs -->
+    <section class="space-y-4">
+      <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+        10. Technical Frequently Asked Questions
+      </h2>
+
+      <div class="space-y-3 text-xs sm:text-sm">
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5">
+          <h3 class="font-bold text-slate-900 dark:text-white">Is QR generation performed in my browser?</h3>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            Yes. Static QR code generation is performed entirely in your browser using HTML5 Canvas and SVG DOM serialization. Your raw text, passwords, and contact entries are never uploaded to our servers for static codes.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5">
+          <h3 class="font-bold text-slate-900 dark:text-white">Can a static QR code expire?</h3>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            No. Static QR codes encode data permanently in the physical module matrix. They do not have an expiration date and do not depend on our website remaining operational.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5">
+          <h3 class="font-bold text-slate-900 dark:text-white">Can I change the destination of a static QR code after printing?</h3>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            No. Because static data is etched directly into the module geometry, changing the destination requires generating and printing a new QR code. For editable destinations, use a Dynamic QR code.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5">
+          <h3 class="font-bold text-slate-900 dark:text-white">Does adding a center logo reduce scan reliability?</h3>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            Yes, adding a logo obscures central modules. Our generator automatically elevates error correction to Level H (30%) to compensate. However, logos larger than 30–35% of the symbol width or designs with low contrast may still cause scanning failures.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5">
+          <h3 class="font-bold text-slate-900 dark:text-white">Why might a printed QR code fail to scan?</h3>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            Common causes include: insufficient optical contrast, zero quiet zone margin, excessive data density for physical size, curved or reflective print substrates, poor lighting, or camera lens smudges. We strongly recommend scanning physical test proofs before mass printing.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Maintainer Attribution Card -->
+    <MaintainerCard variant="compact" />
+
+    <!-- Related Navigation Links -->
+    <div class="p-6 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4 text-xs font-semibold">
+      <div class="flex flex-wrap gap-4">
+        <a href="/data-sources" class="text-indigo-600 dark:text-indigo-400 hover:underline">
+          &rarr; View Data Sources &amp; Technical References
+        </a>
+        <a href="/about" class="text-slate-700 dark:text-slate-300 hover:underline">
+          About Us
+        </a>
+        <a href="/report-problem" class="text-amber-700 dark:text-amber-400 hover:underline">
+          Report a Technical Bug
+        </a>
+      </div>
+      <a href="/" class="text-indigo-600 dark:text-indigo-400 hover:underline">
+        Back to Generator &rarr;
+      </a>
+    </div>
+
+  </div>
+</BaseLayout>

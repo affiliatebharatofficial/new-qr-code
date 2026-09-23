@@ -390,7 +390,7 @@ export function getPayPalContent(locale: Locale): LocalizedPageContent {
           'Verify PayPal.Me Link Activation: Ensure your PayPal.Me profile is active and configured to receive payments.',
           'Specify the Correct Currency: Match the currency code (USD, EUR, GBP, etc.) to your primary customer base.',
           'High Optical Contrast: Maintain dark modules against a clean white background for rapid scanning.',
-          'Vector SVG for Commercial Signage: Use Vector SVG to guarantee razor-sharp rendering on print signage.',
+          'Vector SVG for Commercial Signage: Use Vector SVG to achieve crisp, scalable rendering on print signage.',
           'Pre-Event Field Test: Scan the printed physical proof with a smartphone camera before public deployment.'
         ],
         technicalNotes: 'Disclaimer: This tool generates QR codes for the destination you provide. Payments are processed by the respective payment service (PayPal).',

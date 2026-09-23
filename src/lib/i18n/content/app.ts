@@ -390,7 +390,7 @@ export function getAppContent(locale: Locale): LocalizedPageContent {
           'Verify Published URLs: Ensure both App Store and Google Play links point to live, published listings.',
           'Clear Call-to-Action: Always pair with copy like "Scan to download on iOS or Android".',
           'High Optical Contrast: Maintain dark modules against a clean white background for rapid scanning.',
-          'Vector SVG for Packaging: Use Vector SVG to guarantee razor-sharp rendering on printed cardboard packaging.',
+          'Vector SVG for Packaging: Use Vector SVG to achieve crisp, scalable rendering on printed cardboard packaging.',
           'Cross-Device Field Test: Test scanning on both an iPhone and an Android phone before running print batches.'
         ],
         technicalNotes: 'Standards Compliance: Automatic client User-Agent parsing fully compatible with iOS, iPadOS, and Android.',

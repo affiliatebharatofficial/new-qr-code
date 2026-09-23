@@ -395,7 +395,7 @@ export function getZelleContent(locale: Locale): LocalizedPageContent {
           'Verify Active Enrollment: Ensure your email or phone number is actively linked to Zelle inside your bank app.',
           'Provide Full Verified Name: Helps buyers verify the payee identity inside their mobile banking app.',
           'High Optical Contrast: Maintain dark modules against a clean white background for rapid scanning.',
-          'Vector SVG for Commercial Signage: Use Vector SVG to guarantee razor-sharp rendering on print signage.',
+          'Vector SVG for Commercial Signage: Use Vector SVG to achieve crisp, scalable rendering on print signage.',
           'Pre-Event Field Test: Scan the printed physical proof with a smartphone camera before public deployment.'
         ],
         technicalNotes: 'Disclaimer: This tool generates QR codes for the destination you provide. Payments are processed by the respective payment service (Zelle and your bank).',

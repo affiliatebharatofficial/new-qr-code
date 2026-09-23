@@ -1,0 +1,260 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import MaintainerCard from '../components/ui/MaintainerCard.astro';
+
+const breadcrumbs = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://freeqrcode-generator.com/' },
+    { '@type': 'ListItem', position: 2, name: 'Methodology', item: 'https://freeqrcode-generator.com/methodology' },
+    { '@type': 'ListItem', position: 3, name: 'Data Sources', item: 'https://freeqrcode-generator.com/data-sources' },
+  ],
+};
+
+const sourcesJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'TechArticle',
+  headline: 'QR Code Data Sources & Technical References',
+  description: 'Verified catalog of open-source software libraries, barcode specifications, accessibility standards, and cloud infrastructure powering FreeQRCode-Generator.com.',
+  author: {
+    '@type': 'Person',
+    name: 'Firoz Khan',
+    jobTitle: 'Full Stack Developer',
+    url: 'https://freeqrcode-generator.com/about/firoz-khan',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'FK Digital Media',
+    url: 'https://freeqrcode-generator.com',
+  },
+  datePublished: '2026-08-27',
+  dateModified: '2026-09-23',
+};
+---
+
+<BaseLayout
+  title="QR Code Data Sources & Technical References"
+  description="Verified catalog of open-source libraries, versions, licenses, barcode specifications, and infrastructure powering FreeQRCode-Generator.com."
+  jsonLd={[breadcrumbs, sourcesJsonLd]}
+>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-12">
+    
+    <!-- Hero Header -->
+    <div class="text-center space-y-4 max-w-3xl mx-auto">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+        <span>📚</span> Reference Index
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+        QR Code Data Sources &amp; Technical References
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        A documented audit of all open-source libraries, software dependencies, international specifications, and cloud services utilized in the architecture of FreeQRCode-Generator.com.
+      </p>
+    </div>
+
+    <!-- Category 1: Core QR Engines -->
+    <section class="space-y-4">
+      <div class="space-y-1">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+          1. QR Code Generation Engines &amp; Libraries
+        </h2>
+        <p class="text-xs text-slate-500">
+          The verified client-side software packages responsible for 2D matrix calculation and visual styling.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- qr-code-styling -->
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-slate-900 dark:text-white">qr-code-styling</span>
+            <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-semibold">v1.9.2</span>
+          </div>
+          <div class="text-xs text-slate-600 dark:text-slate-400 space-y-1.5 leading-relaxed">
+            <p><strong>Author:</strong> Denys Kozak</p>
+            <p><strong>License:</strong> MIT License</p>
+            <p><strong>Purpose:</strong> Client-side barcode styling, module shape variations (dots, rounded, classy), eye frame customizations, canvas rendering, and resolution-independent SVG export.</p>
+            <p><strong>Repository:</strong> <a href="https://github.com/kozakdenys/qr-code-styling" target="_blank" rel="noopener noreferrer" class="text-indigo-600 dark:text-indigo-400 underline break-all">github.com/kozakdenys/qr-code-styling</a></p>
+          </div>
+        </div>
+
+        <!-- qrcode-generator -->
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-slate-900 dark:text-white">qrcode-generator</span>
+            <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-semibold">v1.5.2</span>
+          </div>
+          <div class="text-xs text-slate-600 dark:text-slate-400 space-y-1.5 leading-relaxed">
+            <p><strong>Author:</strong> Kazuhiko Arase</p>
+            <p><strong>License:</strong> MIT License</p>
+            <p><strong>Purpose:</strong> Underlying mathematical core used by qr-code-styling for matrix bit generation, Reed-Solomon polynomial division, mask pattern selection (Patterns 0–7), and version capacity calculation.</p>
+            <p><strong>Repository:</strong> <a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener noreferrer" class="text-indigo-600 dark:text-indigo-400 underline break-all">github.com/kazuhikoarase/qrcode-generator</a></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Category 2: Technical Specifications & Standards -->
+    <section class="space-y-4">
+      <div class="space-y-1">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+          2. Standards, Specifications &amp; Protocols
+        </h2>
+        <p class="text-xs text-slate-500">
+          Open technical specifications referenced for barcode structure, contrast calculations, and URI formatting.
+        </p>
+      </div>
+
+      <div class="space-y-3 text-xs sm:text-sm">
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5 shadow-sm">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <span class="font-bold text-slate-900 dark:text-white">ISO/IEC 18004 (QR Code Symbology Specification)</span>
+            <span class="text-[11px] text-slate-500 font-mono">Reference Specification</span>
+          </div>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed text-xs">
+            The published international standard defining QR Code requirements: module alignment, version sizing (Versions 1–40), Reed-Solomon error correction polynomials, and 4-module quiet zone guidelines.
+            <em class="block text-slate-500 mt-1">Disclaimer: FreeQRCode-Generator.com follows QR Code technical concepts implemented by the underlying open-source libraries. The website does not claim ISO certification or official audit accreditation.</em>
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5 shadow-sm">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <span class="font-bold text-slate-900 dark:text-white">W3C Web Content Accessibility Guidelines (WCAG 2.1)</span>
+            <span class="text-[11px] text-slate-500 font-mono">Contrast Calculation</span>
+          </div>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed text-xs">
+            Relative luminance formula and color contrast ratio calculations implemented in <code class="font-mono bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded">checkScannability()</code> to evaluate foreground vs. background contrast before physical printing.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5 shadow-sm">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <span class="font-bold text-slate-900 dark:text-white">IETF RFC 6350 &amp; RFC 5322</span>
+            <span class="text-[11px] text-slate-500 font-mono">vCard &amp; Mailto Formats</span>
+          </div>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed text-xs">
+            Standard format specifications used to structure contact address book cards (vCard 3.0/4.0) and pre-composed email links (<code class="font-mono">mailto:</code>) with proper escaping of commas, semicolons, and special characters.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5 shadow-sm">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <span class="font-bold text-slate-900 dark:text-white">NPCI UPI Linking Specification</span>
+            <span class="text-[11px] text-slate-500 font-mono">UPI Payment URI</span>
+          </div>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed text-xs">
+            National Payments Corporation of India (NPCI) standardized URI parameter format (<code class="font-mono">upi://pay?pa=...&amp;pn=...</code>) used to format interoperable Indian mobile payment barcodes.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Category 3: Platform & Infrastructure Dependencies -->
+    <section class="space-y-4">
+      <div class="space-y-1">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+          3. Platform Framework &amp; Infrastructure
+        </h2>
+        <p class="text-xs text-slate-500">
+          The verified runtime dependencies declared in <code class="font-mono">package.json</code>.
+        </p>
+      </div>
+
+      <div class="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800">
+        <table class="w-full text-left text-xs text-slate-600 dark:text-slate-400">
+          <thead class="bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-white font-bold border-b border-slate-200 dark:border-slate-800">
+            <tr>
+              <th class="p-3">Package</th>
+              <th class="p-3">Version</th>
+              <th class="p-3">License</th>
+              <th class="p-3">Role in Platform</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+            <tr>
+              <td class="p-3 font-semibold text-slate-900 dark:text-white">astro</td>
+              <td class="p-3 font-mono">^5.4.1</td>
+              <td class="p-3">MIT</td>
+              <td class="p-3">Component rendering and serverless routing framework</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-slate-900 dark:text-white">@astrojs/cloudflare</td>
+              <td class="p-3 font-mono">^12.2.0</td>
+              <td class="p-3">MIT</td>
+              <td class="p-3">Cloudflare Workers SSR adapter and edge runtime integration</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-slate-900 dark:text-white">Cloudflare D1</td>
+              <td class="p-3 font-mono">Edge SQLite</td>
+              <td class="p-3">Cloudflare</td>
+              <td class="p-3">Serverless relational database for dynamic QR redirects and analytics</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-slate-900 dark:text-white">tailwindcss</td>
+              <td class="p-3 font-mono">^3.4.17</td>
+              <td class="p-3">MIT</td>
+              <td class="p-3">Utility-first responsive CSS styling</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-slate-900 dark:text-white">zod</td>
+              <td class="p-3 font-mono">^3.24.2</td>
+              <td class="p-3">MIT</td>
+              <td class="p-3">Runtime input validation schema for generator options and APIs</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-slate-900 dark:text-white">jszip</td>
+              <td class="p-3 font-mono">^3.10.1</td>
+              <td class="p-3">MIT</td>
+              <td class="p-3">In-browser ZIP archive creation for batch QR code downloads</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-slate-900 dark:text-white">jose</td>
+              <td class="p-3 font-mono">^6.0.8</td>
+              <td class="p-3">MIT</td>
+              <td class="p-3">JSON Web Token signing and authentication verification</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Category 4: Trademark Statement -->
+    <section class="p-6 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+      <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+        4. Trademark &amp; Nominative Fair Use Statement
+      </h2>
+      <p>
+        <strong>"QR Code"</strong> is a registered trademark of <strong>DENSO WAVE INCORPORATED</strong>.
+      </p>
+      <p>
+        FreeQRCode-Generator.com is an independent QR code generation service and is not affiliated with, endorsed by, or sponsored by DENSO WAVE or other QR-related trademark owners unless explicitly stated.
+      </p>
+      <p>
+        All third-party brand names, logos, and trademarks (including PayPal, Venmo, Cash App, Zelle, WhatsApp, Apple, Google, and Meta) displayed on this platform are used solely for nominative identification purposes to indicate compatibility. Display of these marks does not imply any partnership or endorsement.
+      </p>
+    </section>
+
+    <!-- Maintainer Attribution Card -->
+    <MaintainerCard variant="compact" />
+
+    <!-- Related Navigation Links -->
+    <div class="p-6 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4 text-xs font-semibold">
+      <div class="flex flex-wrap gap-4">
+        <a href="/methodology" class="text-indigo-600 dark:text-indigo-400 hover:underline">
+          &larr; Read Full QR Code Methodology
+        </a>
+        <a href="/about" class="text-slate-700 dark:text-slate-300 hover:underline">
+          About Us
+        </a>
+        <a href="/report-problem" class="text-amber-700 dark:text-amber-400 hover:underline">
+          Report a Problem
+        </a>
+      </div>
+      <a href="/" class="text-indigo-600 dark:text-indigo-400 hover:underline">
+        Back to Generator &rarr;
+      </a>
+    </div>
+
+  </div>
+</BaseLayout>
