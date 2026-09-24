@@ -168,4 +168,27 @@ describe('Privacy, Security, and Trust Transparency Audit (Step 3)', () => {
     expect(sitemapContent).toContain("{ path: 'data-sources'");
     expect(sitemapContent).toContain("{ path: 'security'");
   });
+
+  it('verifies Google Analytics tag and Content Security Policy compatibility', () => {
+    const middlewareContent = fs.readFileSync(
+      path.join(rootDir, 'src/middleware.ts'),
+      'utf-8'
+    );
+    // CSP must explicitly permit Google Tag Manager and Google Analytics
+    expect(middlewareContent).toContain('https://www.googletagmanager.com');
+    expect(middlewareContent).toContain('https://*.googletagmanager.com');
+    expect(middlewareContent).toContain('https://www.google-analytics.com');
+    expect(middlewareContent).toContain('https://*.google-analytics.com');
+
+    const baseLayoutContent = fs.readFileSync(
+      path.join(rootDir, 'src/layouts/BaseLayout.astro'),
+      'utf-8'
+    );
+    // Script tag must have is:inline to avoid Vite/Astro bundling corruption
+    expect(baseLayoutContent).toContain(
+      '<script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-60W44NFJNJ"></script>'
+    );
+    expect(baseLayoutContent).toContain("gtag('config', 'G-60W44NFJNJ');");
+  });
 });
+

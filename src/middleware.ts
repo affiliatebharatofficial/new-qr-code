@@ -10,14 +10,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), payment=()');
 
-  // 2. Strict Content Security Policy (Compatible with Inline QR Styling / SVGs)
+  // 2. Strict Content Security Policy (Compatible with Inline QR Styling / SVGs / Google Analytics)
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com https://www.googletagmanager.com https://*.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com data:",
-    "img-src 'self' data: blob: https://* http://*",
-    "connect-src 'self' https://* http://*",
+    "img-src 'self' data: blob: https://* http://* https://*.google-analytics.com https://*.googletagmanager.com",
+    "connect-src 'self' https://* http://* https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
     "frame-ancestors 'self'",
     "base-uri 'self'",
     "form-action 'self'",
