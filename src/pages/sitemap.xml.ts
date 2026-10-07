@@ -57,7 +57,8 @@ export const GET: APIRoute = async () => {
   ];
 
   // Generate URLs across all 7 supported languages
-  const allEntries: { loc: string; priority: string; changefreq: string }[] = [];
+  const allEntries: { loc: string; priority: string; changefreq: string; lastmod: string }[] = [];
+  const today = new Date().toISOString().split('T')[0];
 
   for (const locale of SUPPORTED_LOCALES) {
     for (const r of publicRoutes) {
@@ -67,6 +68,7 @@ export const GET: APIRoute = async () => {
         loc: fullUrl,
         priority: locale === DEFAULT_LOCALE ? r.priority : (parseFloat(r.priority) * 0.9).toFixed(1),
         changefreq: r.changefreq,
+        lastmod: today,
       });
     }
   }
@@ -77,6 +79,7 @@ ${allEntries
   .map(
     (e) => `  <url>
     <loc>${e.loc}</loc>
+    <lastmod>${e.lastmod}</lastmod>
     <changefreq>${e.changefreq}</changefreq>
     <priority>${e.priority}</priority>
   </url>`

@@ -7,24 +7,40 @@ const qrTypes = Object.values(QR_TYPE_METADATA);
 
 const faqs = [
   {
-    q: 'Is this QR Code Generator free to use?',
-    a: 'Yes. You can generate, customize, and download unlimited high-resolution static QR codes in PNG and SVG formats without creating an account or paying fees.',
+    q: 'Is this QR Code Generator really 100% free?',
+    a: 'Yes — every feature is free forever. No account, no free trial, no watermark, and no download limits. Custom colors, dot styles, logo uploads, and high-resolution PNG and vector SVG downloads are all included at no cost.',
+  },
+  {
+    q: 'Do I need to create an account to download my QR code?',
+    a: 'No. Generate, customize, and download your QR code instantly — no email, no password, and no sign-up of any kind.',
+  },
+  {
+    q: 'Can I use the QR codes for commercial purposes?',
+    a: 'Absolutely. Use them on business cards, packaging, restaurant menus, advertisements, or products — for personal or commercial use, with no attribution required.',
+  },
+  {
+    q: 'Will my QR code expire or stop working?',
+    a: 'Never. Static QR codes encode your data directly into the pattern, so they work offline and last forever with no subscription needed to keep them active.',
   },
   {
     q: 'Do generated static QR codes expire?',
     a: 'Static QR codes (URLs, Wi-Fi, vCard, SMS, Email, UPI) encode data directly into the pixel pattern. They never expire and function offline indefinitely without external dependencies.',
   },
   {
-    q: 'How does client-side QR generation protect privacy?',
-    a: 'Rendering is performed directly in your web browser using HTML5 Canvas and Vector SVG generation. Your sensitive inputs (like Wi-Fi passwords, contact cards, or private notes) are never sent to external servers.',
+    q: 'How does client-side QR generation protect my privacy?',
+    a: 'Your QR code is rendered directly in your web browser using HTML5 Canvas and vector SVG generation. Sensitive inputs like Wi-Fi passwords, contact cards, or payment details are never sent to external servers.',
   },
   {
     q: 'What is the difference between Static and Dynamic QR codes?',
     a: 'Static QR codes contain hardcoded data and cannot be altered once printed. Dynamic QR codes route through a short redirection URL, enabling you to update destination links at any time and inspect scan telemetry.',
   },
   {
-    q: 'Can I add a custom brand logo to my QR code?',
-    a: 'Yes. Upload your PNG, JPG, WebP, or SVG logo. The generator centers the logo, clears interfering background dots, and optimizes Reed-Solomon error correction to preserve scan reliability.',
+    q: 'Can I add my custom brand logo to the QR code?',
+    a: 'Yes. Upload your PNG, JPG, WebP, or SVG logo. The generator centers the logo, clears interfering background dots, and automatically boosts error correction to preserve scan reliability.',
+  },
+  {
+    q: 'Will my QR code have a watermark?',
+    a: 'No. Every download is clean — no watermark, no branding, no attribution. Your QR code is 100% yours.',
   },
   {
     q: 'What is the recommended minimum print size for a QR code?',
@@ -44,11 +60,36 @@ const faqJsonLd = {
     },
   })),
 };
+
+const trustBadges = [
+  '100% free forever',
+  'No sign-up needed',
+  'No watermarks',
+  'Private — runs in your browser',
+];
+
+const steps = [
+  {
+    n: '1',
+    title: 'Add your content',
+    text: 'Pick a QR type — URL, Wi-Fi, vCard, WhatsApp, UPI, and 13 more — then enter your link, text, or details in the optimized form.',
+  },
+  {
+    n: '2',
+    title: 'Customize the design',
+    text: 'Change colors, dot styles, and corner shapes. Upload your logo — it is placed automatically while error correction is boosted to keep every code scannable.',
+  },
+  {
+    n: '3',
+    title: 'Download & share',
+    text: 'Export a high-resolution PNG or a vector SVG. Print it, post it, or stick it anywhere — your QR code never expires.',
+  },
+];
 ---
 
 <BaseLayout
   title="Free QR Code Generator with Logo — Vector SVG & PNG"
-  description="Free QR code generator with logo, custom colors, and frames. Create high-resolution static and dynamic QR codes for URLs, Wi-Fi, vCard, WhatsApp, and UPI with instant SVG & PNG downloads."
+  description="Create free QR codes with your logo in seconds. Custom colors, high-res PNG & SVG downloads. No sign-up, no watermark — free forever."
   jsonLd={faqJsonLd}
 >
   <!-- Hero & Generator Workspace (Above the fold) -->
@@ -56,19 +97,57 @@ const faqJsonLd = {
     <Generator
       initialType="url"
       headline="Free QR Code Generator"
-      subheadline="Create custom, high-resolution QR codes with your logo in seconds. 100% free with instant vector SVG & PNG downloads."
+      subheadline="Design custom QR codes with your logo, brand colors, and frames in seconds. Download high-resolution PNG or print-ready vector SVG — free forever, no sign-up required."
     />
+    <!-- Trust badges -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-5">
+      <div class="flex flex-wrap items-center justify-center gap-2">
+        {trustBadges.map((badge) => (
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+            {badge}
+          </span>
+        ))}
+      </div>
+    </div>
   </div>
 
-  <!-- QR Types Section -->
+  <!-- How it works -->
   <section class="py-12 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 transition-colors">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="max-w-3xl mx-auto mb-8 text-center">
         <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-          Supported QR Payload Formats
+          Create a QR Code in 3 Steps
         </h2>
         <p class="mt-1 text-xs sm:text-sm text-slate-500">
-          Standards-compliant encoding for consumer smartphones, industrial scanners, and point-of-sale systems.
+          From blank page to print-ready QR code in under a minute.
+        </p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto">
+        {steps.map((step) => (
+          <div class="relative p-5 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 space-y-2">
+            <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-sm font-extrabold shadow-sm">
+              {step.n}
+            </div>
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white">{step.title}</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">{step.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- QR Types Section -->
+  <section class="py-12 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl mx-auto mb-8 text-center">
+        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          One Generator, 18 QR Code Types
+        </h2>
+        <p class="mt-1 text-xs sm:text-sm text-slate-500">
+          Make QR codes for websites, Wi-Fi networks, digital business cards, WhatsApp chats, UPI payments, app downloads, events, locations, and more — each with its own optimized input form.
         </p>
       </div>
 
@@ -76,7 +155,7 @@ const faqJsonLd = {
         {qrTypes.map((type) => (
           <a
             href={`/${type.slug}`}
-            class="group p-4 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 hover:border-slate-900 dark:hover:border-white transition-colors"
+            class="group p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-500 dark:hover:border-indigo-400 transition-colors"
           >
             <div class="flex items-center justify-between mb-2">
               <span class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
@@ -89,6 +168,23 @@ const faqJsonLd = {
             </p>
           </a>
         ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Why free / SEO content section -->
+  <section class="py-12 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 transition-colors">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight text-center mb-6">
+        A Free QR Code Maker That Doesn't Gatekeep
+      </h2>
+      <div class="space-y-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <p>
+          Most "free" QR code generators show you a paywall the moment you try to add a logo, change a color, or download in high resolution. This one doesn't. Every feature — custom colors, dot styles, eye shapes, logo upload, transparent backgrounds, and high-resolution PNG and vector SVG downloads — is free, with no account and no watermarks.
+        </p>
+        <p>
+          Everything runs 100% in your browser. Your Wi-Fi passwords, contact details, and payment info never leave your device, and the QR codes you create are yours to use anywhere — business cards, menus, packaging, posters, or product labels — for personal or commercial use, forever.
+        </p>
       </div>
     </div>
   </section>
@@ -139,7 +235,7 @@ const faqJsonLd = {
         <!-- Tool 2: Print Size Calculator -->
         <a
           href="/qr-code-print-size-calculator"
-          class="group p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-500 shadow-sm transition-all flex flex-col justify-between space-y-4"
+          class="group p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-purple-500 shadow-sm transition-all flex flex-col justify-between space-y-4"
         >
           <div class="space-y-2.5">
             <div class="w-10 h-10 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold text-lg">
@@ -167,45 +263,51 @@ const faqJsonLd = {
   </section>
 
   <!-- Technical Features Section -->
-  <section id="features" class="py-12 bg-slate-50 dark:bg-slate-950 transition-colors">
+  <section id="features" class="py-12 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 transition-colors">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="max-w-3xl mx-auto mb-8 text-center">
         <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-          Engineered for Print &amp; Digital Production
+          Why Use Our Free QR Code Generator?
         </h2>
         <p class="mt-1 text-xs sm:text-sm text-slate-500">
-          Built on open web standards for maximum optical contrast and scan resilience.
+          Everything you need to make professional QR codes — without the paywall.
         </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-2">
-          <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-800 dark:text-slate-200 text-xs font-mono font-bold">
-            01
+        <div class="p-5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 shadow-card space-y-2">
+          <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 flex items-center justify-center text-emerald-700 dark:text-emerald-300">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
           </div>
-          <h3 class="text-sm font-bold text-slate-900 dark:text-white">Zero Server Data Leakage</h3>
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white">Free Forever, No Catch</h3>
           <p class="text-xs text-slate-500 leading-relaxed">
-            All static QR calculations and rasterizations occur in browser memory. Sensitive passwords and contact vCards remain local.
+            No accounts, no trials, no watermarks, no download limits. The features other tools put behind a paywall — logos, colors, vector SVG — are free here.
           </p>
         </div>
 
-        <div class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-2">
-          <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-800 dark:text-slate-200 text-xs font-mono font-bold">
-            02
+        <div class="p-5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 shadow-card space-y-2">
+          <div class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-700 dark:text-indigo-300">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
           </div>
-          <h3 class="text-sm font-bold text-slate-900 dark:text-white">Precision Vector SVG</h3>
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white">Private by Design</h3>
           <p class="text-xs text-slate-500 leading-relaxed">
-            Clean SVG paths without raster artifacts, ready for Adobe Illustrator, Figma, vinyl cutters, packaging, and commercial printing.
+            Your QR codes are generated entirely in your browser. Wi-Fi passwords, contacts, and payment details are never uploaded to any server.
           </p>
         </div>
 
-        <div class="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card space-y-2">
-          <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-800 dark:text-slate-200 text-xs font-mono font-bold">
-            03
+        <div class="p-5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 shadow-card space-y-2">
+          <div class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-950/60 flex items-center justify-center text-purple-700 dark:text-purple-300">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
           </div>
-          <h3 class="text-sm font-bold text-slate-900 dark:text-white">Automated Error Correction</h3>
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white">Print-Ready Quality</h3>
           <p class="text-xs text-slate-500 leading-relaxed">
-            Intelligent Reed-Solomon tuning up to Level H (30% recovery) when embedding brand logos, preventing scan degradation.
+            Download crisp vector SVGs for professional printing or high-resolution PNGs for the web. Built-in error correction keeps codes scannable even with a logo.
           </p>
         </div>
       </div>
@@ -213,20 +315,20 @@ const faqJsonLd = {
   </section>
 
   <!-- Static vs Dynamic Comparison -->
-  <section class="py-12 bg-white dark:bg-slate-900 border-y border-slate-200 dark:border-slate-800 transition-colors">
+  <section class="py-12 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 transition-colors">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="max-w-2xl mx-auto mb-8 text-center">
         <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-          Static vs Dynamic QR Architecture
+          Static vs. Dynamic QR Codes — What's the Difference?
         </h2>
         <p class="mt-1 text-xs sm:text-sm text-slate-500">
-          Comparing payload mechanics between standalone static codes and cloud-routed dynamic links.
+          Not sure which one you need? Here's the quick version.
         </p>
       </div>
 
       <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
         <table class="w-full text-left text-xs">
-          <thead class="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-slate-500 font-bold uppercase tracking-wider">
+          <thead class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-slate-500 font-bold uppercase tracking-wider">
             <tr>
               <th class="py-3 px-4">Capability</th>
               <th class="py-3 px-4 text-slate-900 dark:text-white">Static QR</th>
@@ -261,20 +363,20 @@ const faqJsonLd = {
   </section>
 
   <!-- FAQ Section -->
-  <section id="faq" class="py-12 bg-slate-50 dark:bg-slate-950 transition-colors">
+  <section id="faq" class="py-12 bg-white dark:bg-slate-900 transition-colors">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="max-w-2xl mx-auto mb-8 text-center">
         <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-          Frequently Asked Questions
+          Free QR Code Generator FAQs
         </h2>
         <p class="mt-1 text-xs sm:text-sm text-slate-500">
-          Core technical and usage details regarding QR code standards.
+          Answers to the most common questions about our free QR code maker.
         </p>
       </div>
 
       <div class="space-y-2.5">
         {faqs.map((faq) => (
-          <details class="group bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 [&_summary::-webkit-details-marker]:hidden">
+          <details class="group bg-slate-50 dark:bg-slate-950/60 rounded-xl border border-slate-200 dark:border-slate-800 p-4 [&_summary::-webkit-details-marker]:hidden">
             <summary class="flex items-center justify-between cursor-pointer font-bold text-slate-900 dark:text-white text-xs sm:text-sm">
               <span>{faq.q}</span>
               <span class="ml-3 text-slate-400 group-open:rotate-180 transition-transform duration-150">
