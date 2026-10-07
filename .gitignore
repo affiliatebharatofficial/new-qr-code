@@ -21,3 +21,8 @@ scratch/
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Python artifacts (never commit bytecode or generator scratch files)
+__pycache__/
+*.py[cod]
+*$py.class

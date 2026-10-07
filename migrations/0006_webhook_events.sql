@@ -1,4 +1,4 @@
--- Migration: 0002_webhook_events.sql
+-- Migration: 0006_webhook_events.sql
 -- Purpose: Webhook idempotency tracking to prevent duplicate subscription events
 
 CREATE TABLE IF NOT EXISTS webhook_events (

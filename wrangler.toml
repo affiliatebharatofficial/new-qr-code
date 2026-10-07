@@ -21,5 +21,6 @@ bucket_name = "qr-assets"
 
 [vars]
 ENVIRONMENT = "production"
-JWT_SECRET = "production-secret-min-32-chars-long-qr-super-key"
+# SECURITY: JWT_SECRET was removed from this repo. Set it via Cloudflare dashboard
+# (Workers and Pages > Settings > Variables) or run: wrangler secret put JWT_SECRET
 APP_URL = "https://freeqrcode-generator.com"
