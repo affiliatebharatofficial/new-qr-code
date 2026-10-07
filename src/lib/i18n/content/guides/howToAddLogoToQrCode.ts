@@ -87,6 +87,23 @@ const enData: GuideArticleData = {
           text: 'Export as vector SVG for print (it scales infinitely) or high-resolution PNG for digital use. Both are free with no watermark.',
         },
       ],
+      figures: [
+        {
+          src: '/guides/screenshots/qr-type-selector.png',
+          alt: 'Choose a QR code type like Website URL, Wi-Fi or vCard in the free QR generator',
+          caption: 'Step 1 — Pick your QR code type. Website URL works for most logo QR codes.',
+        },
+        {
+          src: '/guides/screenshots/logo-upload.png',
+          alt: 'Upload Brand Logo tab in the QR code customization panel',
+          caption: 'Step 3 — Open the Logo tab and upload your PNG or SVG. It is centered automatically.',
+        },
+        {
+          src: '/guides/screenshots/download-buttons.png',
+          alt: 'Download the finished QR code with logo as PNG or vector SVG',
+          caption: 'Step 6 — Export as print-ready SVG or high-resolution PNG, free with no watermark.',
+        },
+      ],
     },
     {
       id: 'logo-size-rules',

@@ -161,6 +161,20 @@ const faqJsonLd = {
               ))}
             </ul>
           )}
+          {sec.figures && (
+            <div class="grid gap-4 pt-2">
+              {sec.figures.map((fig) => (
+                <figure class="rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                  <img src={fig.src} alt={fig.alt} class="w-full" loading="lazy" />
+                  {fig.caption && (
+                    <figcaption class="px-4 py-2.5 text-[11px] text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800">
+                      {fig.caption}
+                    </figcaption>
+                  )}
+                </figure>
+              ))}
+            </div>
+          )}
         </section>
       ))}
 

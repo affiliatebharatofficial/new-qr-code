@@ -5,6 +5,12 @@ export interface GuideFaq {
   answer: string;
 }
 
+export interface GuideFigure {
+  src: string;
+  alt: string;
+  caption?: string;
+}
+
 export interface GuideSection {
   id: string;
   heading: string;
@@ -14,6 +20,7 @@ export interface GuideSection {
     text: string;
   }[];
   bullets?: string[];
+  figures?: GuideFigure[];
   callout?: {
     title: string;
     text: string;
