@@ -323,6 +323,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '8 min read',
             icon: '🍽️',
           },
+          {
+            slug: 'how-to-add-logo-to-qr-code',
+            title: 'How to Add a Logo to a QR Code (Free, No Sign-Up)',
+            desc: 'Put your brand in the center of your QR code without breaking scannability — sizing rules, error correction, and free tools.',
+            readTime: '8 min read',
+            icon: '🎨',
+          },
         ],
       };
   }
