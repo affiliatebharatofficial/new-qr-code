@@ -1,6 +1,18 @@
 import { defineMiddleware } from 'astro:middleware';
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  // 0. Redirect the workers.dev preview hostname to the canonical domain.
+  // The same worker serves freeqrcode-generator.com, www.freeqrcode-generator.com
+  // and qr-code-generator.affiliatebharatofficial.workers.dev — only the last
+  // one should redirect.
+  if (context.url.hostname.endsWith('.workers.dev')) {
+    const target = 'https://freeqrcode-generator.com' + context.url.pathname + context.url.search;
+    return new Response(null, {
+      status: 301,
+      headers: { Location: target, 'Cache-Control': 'public, max-age=86400' },
+    });
+  }
+
   const response = await next();
   const pathname = context.url.pathname;
 
