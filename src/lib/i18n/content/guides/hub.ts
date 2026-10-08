@@ -330,6 +330,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '8 min read',
             icon: '🎨',
           },
+          {
+            slug: 'how-to-scan-qr-code-android',
+            title: 'How to Scan a QR Code on Android (Camera, Lens & Tips)',
+            desc: 'No app needed — scan with the camera app, Google Lens, or quick settings, plus fixes for failed scans and safety tips.',
+            readTime: '8 min read',
+            icon: '📱',
+          },
         ],
       };
   }

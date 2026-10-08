@@ -16,6 +16,7 @@ import ArticleWiFiQRCode from '../../components/guides/ArticleWiFiQRCode.astro';
 import ArticleVCardQRCode from '../../components/guides/ArticleVCardQRCode.astro';
 import ArticleRestaurantQRCode from '../../components/guides/ArticleRestaurantQRCode.astro';
 import ArticleHowToAddLogoToQrCode from '../../components/guides/ArticleHowToAddLogoToQrCode.astro';
+import ArticleHowToScanQrCodeAndroid from '../../components/guides/ArticleHowToScanQrCodeAndroid.astro';
 import GuidesHub from '../../components/guides/GuidesHub.astro';
 
 const { lang, slug } = Astro.params;
@@ -88,8 +89,9 @@ const isGuideWiFi = normalizedGuideSlug === 'how-to-create-a-wifi-qr-code';
 const isGuideVCard = normalizedGuideSlug === 'how-to-create-a-vcard-qr-code';
 const isGuideRestaurant = normalizedGuideSlug === 'how-to-use-qr-codes-for-restaurants';
 const isGuideLogo = normalizedGuideSlug === 'how-to-add-logo-to-qr-code';
+const isGuideScanAndroid = normalizedGuideSlug === 'how-to-scan-qr-code-android';
 const isGuidesIndex = currentSlug === 'guides';
-const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuidesIndex;
+const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuidesIndex;
 
 // Standard page content
 let content: ReturnType<typeof getLocalizedPageContent> = null;
@@ -317,5 +319,6 @@ if (!isSizeCalculator && !isPrintCalculator && !isGuide) {
 {isGuideVCard && <ArticleVCardQRCode locale={currentLocale} />}
 {isGuideRestaurant && <ArticleRestaurantQRCode locale={currentLocale} />}
 {isGuideLogo && <ArticleHowToAddLogoToQrCode locale={currentLocale} />}
+{isGuideScanAndroid && <ArticleHowToScanQrCodeAndroid locale={currentLocale} />}
 
 
