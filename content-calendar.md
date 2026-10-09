@@ -10,7 +10,7 @@ table of contents, 4-6 FAQs, Article + FAQ JSON-LD (automatic via template).
 
 - [x] `how-to-add-logo-to-qr-code` — "how to add logo to qr code" — 🎨 (published 2026-10-07)
 - [x] `how-to-scan-qr-code-android` — "how to scan qr code on android" — 📱
-- [ ] `how-to-make-qr-code-for-google-form` — "qr code for google form" — 📝
+- [x] `how-to-make-qr-code-for-google-form` — "qr code for google form" — 📝 (published 2026-10-09)
 - [ ] `upi-qr-code-for-merchants` — "upi qr code for shop" — 💳
 - [ ] `do-qr-codes-expire` — "do qr codes expire" — ⏳
 - [ ] `how-to-create-qr-code-for-pdf` — "qr code for pdf file" — 📄

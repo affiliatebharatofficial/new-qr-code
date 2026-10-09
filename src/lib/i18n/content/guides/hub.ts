@@ -337,6 +337,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '8 min read',
             icon: '📱',
           },
+          {
+            slug: 'how-to-make-qr-code-for-google-form',
+            title: 'QR Code for Google Form: Make a Free Scannable Link',
+            desc: 'Turn any Google Form into a scannable QR code in under a minute — plus sizing rules, placement ideas, and tracking tips.',
+            readTime: '8 min read',
+            icon: '📝',
+          },
         ],
       };
   }
