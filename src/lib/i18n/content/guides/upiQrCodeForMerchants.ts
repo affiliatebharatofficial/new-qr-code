@@ -23,7 +23,7 @@ const enData: GuideArticleData = {
     },
     {
       label: 'Watch the new MDR rules',
-      text: 'From 15 October 2026, UPI merchant payments above ₹2,000 attract a 0.4% MDR (capped at ₹300); small merchants under ₹1 lakh/month through QR keep zero MDR.',
+      text: 'NPCI announced that from 15 October 2026, UPI merchant payments above ₹2,000 would attract a 0.4% MDR (capped at ₹300) — but as of October 2026 a deferral to January 2027 is reportedly under consideration, so check the latest status; small merchants under ₹1 lakh/month through QR keep zero MDR either way.',
     },
     {
       label: 'Tampering is the #1 risk',
@@ -107,7 +107,7 @@ const enData: GuideArticleData = {
       id: 'upi-charges-merchants-2026',
       heading: 'UPI Charges for Merchants in 2026: What Changed',
       paragraphs: [
-        'For years, UPI merchant payments carried no charge at all. That is changing. NPCI has announced a Merchant Discount Rate (MDR) framework for UPI person-to-merchant (P2M) payments that takes effect from 15 October 2026 — and as a merchant with a QR code at your counter, you should know exactly where you stand.',
+        'For years, UPI merchant payments carried no charge at all. That is changing. NPCI has announced a Merchant Discount Rate (MDR) framework for UPI person-to-merchant (P2M) payments originally scheduled to take effect from 15 October 2026 — but as of October 2026, following pushback from merchant associations, NPCI is reportedly considering deferring the rollout to 1 January 2027, with a final decision expected in the coming days. An expanded exemption for businesses with annual turnover up to ₹40 lakh is also reportedly under consideration. Either way, as a merchant with a QR code at your counter, you should know exactly where you stand.',
         'The core rule: UPI payments up to ₹2,000 remain completely free of MDR. Above ₹2,000, a 0.4% MDR applies, capped at ₹300 per transaction — so a ₹3,000 payment costs ₹12 and anything ₹75,000 or above costs exactly ₹300. Person-to-person transfers (friends, family) stay free regardless of amount, and customers never pay the MDR themselves.',
         'Crucially, small merchants are protected: shops and vendors receiving up to ₹1 lakh per month through UPI QR codes under the person-to-person-merchant (P2PM) category continue to enjoy zero MDR. For the vast majority of kirana shops, street vendors, and small outlets, daily UPI income will keep arriving free of charge — the government has stated roughly 96% of merchant UPI transactions will remain unaffected.',
       ],
@@ -158,7 +158,7 @@ const enData: GuideArticleData = {
     {
       question: 'Will I be charged for UPI payments I receive?',
       answer:
-        'Under the MDR framework effective 15 October 2026, UPI payments up to ₹2,000 carry zero MDR, and small merchants receiving up to ₹1 lakh per month through QR codes under the P2PM category continue to pay nothing. Above ₹2,000, a 0.4% MDR applies (capped at ₹300) for larger merchants. Customers always pay free — the charge never falls on the payer.',
+        'Under the MDR framework announced for 15 October 2026 (a deferral to January 2027 was reportedly under consideration as of October 2026 — check the latest status), UPI payments up to ₹2,000 carry zero MDR, and small merchants receiving up to ₹1 lakh per month through QR codes under the P2PM category continue to pay nothing. Above ₹2,000, a 0.4% MDR applies (capped at ₹300) for larger merchants. Customers always pay free — the charge never falls on the payer.',
     },
     {
       question: 'How do I add a fixed amount to my UPI QR code?',
