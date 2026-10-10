@@ -344,6 +344,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '8 min read',
             icon: '📝',
           },
+          {
+            slug: 'upi-qr-code-for-merchants',
+            title: 'UPI QR Code for Shop: Free Setup Guide for Merchants',
+            desc: 'Build a free UPI QR code for your shop — fixed amounts, 2026 MDR charges explained, and how to stop QR sticker swap scams.',
+            readTime: '8 min read',
+            icon: '💳',
+          },
         ],
       };
   }

@@ -18,6 +18,7 @@ import ArticleRestaurantQRCode from '../../components/guides/ArticleRestaurantQR
 import ArticleHowToAddLogoToQrCode from '../../components/guides/ArticleHowToAddLogoToQrCode.astro';
 import ArticleHowToScanQrCodeAndroid from '../../components/guides/ArticleHowToScanQrCodeAndroid.astro';
 import ArticleHowToMakeQrCodeForGoogleForm from '../../components/guides/ArticleHowToMakeQrCodeForGoogleForm.astro';
+import ArticleUpiQrCodeForMerchants from '../../components/guides/ArticleUpiQrCodeForMerchants.astro';
 import GuidesHub from '../../components/guides/GuidesHub.astro';
 
 const { lang, slug } = Astro.params;
@@ -92,8 +93,9 @@ const isGuideRestaurant = normalizedGuideSlug === 'how-to-use-qr-codes-for-resta
 const isGuideLogo = normalizedGuideSlug === 'how-to-add-logo-to-qr-code';
 const isGuideScanAndroid = normalizedGuideSlug === 'how-to-scan-qr-code-android';
 const isGuideGoogleForm = normalizedGuideSlug === 'how-to-make-qr-code-for-google-form';
+const isGuideUpiMerchant = normalizedGuideSlug === 'upi-qr-code-for-merchants';
 const isGuidesIndex = currentSlug === 'guides';
-const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuidesIndex;
+const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuidesIndex;
 
 // Standard page content
 let content: ReturnType<typeof getLocalizedPageContent> = null;
@@ -323,5 +325,6 @@ if (!isSizeCalculator && !isPrintCalculator && !isGuide) {
 {isGuideLogo && <ArticleHowToAddLogoToQrCode locale={currentLocale} />}
 {isGuideScanAndroid && <ArticleHowToScanQrCodeAndroid locale={currentLocale} />}
 {isGuideGoogleForm && <ArticleHowToMakeQrCodeForGoogleForm locale={currentLocale} />}
+{isGuideUpiMerchant && <ArticleUpiQrCodeForMerchants locale={currentLocale} />}
 
 
