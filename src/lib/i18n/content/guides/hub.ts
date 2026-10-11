@@ -351,6 +351,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '8 min read',
             icon: '💳',
           },
+          {
+            slug: 'do-qr-codes-expire',
+            title: 'Do QR Codes Expire? Static vs Dynamic QR Codes',
+            desc: 'Static QR codes never expire — dynamic ones can stop working when a subscription lapses. Learn the four-layer lifetime model and fixes.',
+            readTime: '9 min read',
+            icon: '⏳',
+          },
         ],
       };
   }
