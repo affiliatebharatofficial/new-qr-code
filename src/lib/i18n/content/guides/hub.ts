@@ -358,6 +358,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '⏳',
           },
+          {
+            slug: 'how-to-create-qr-code-for-pdf',
+            title: 'How to Create a QR Code for a PDF File (Free, No Sign-Up)',
+            desc: 'Host the PDF on Google Drive or your site, turn the public link into a free QR code, and print it — plus the static vs dynamic choice and 5 mistakes to avoid.',
+            readTime: '8 min read',
+            icon: '📄',
+          },
         ],
       };
   }

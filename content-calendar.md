@@ -13,7 +13,7 @@ table of contents, 4-6 FAQs, Article + FAQ JSON-LD (automatic via template).
 - [x] `how-to-make-qr-code-for-google-form` — "qr code for google form" — 📝 (published 2026-10-09)
 - [x] `upi-qr-code-for-merchants` — "upi qr code for shop" — 💳 (published 2026-10-10)
 - [x] `do-qr-codes-expire` — "do qr codes expire" — ⏳ (published 2026-10-11)
-- [ ] `how-to-create-qr-code-for-pdf` — "qr code for pdf file" — 📄
+- [x] `how-to-create-qr-code-for-pdf` — "qr code for pdf file" — 📄 (published 2026-10-12)
 - [ ] `qr-code-print-size-guide` — "qr code print size" — 📏
 - [ ] `how-to-make-youtube-qr-code` — "qr code for youtube video" — ▶️
 - [ ] `instagram-profile-qr-code` — "instagram qr code" — 📸
