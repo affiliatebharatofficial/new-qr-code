@@ -66,3 +66,18 @@ Topic for the 2026-10-11 ~09:19 IST run.
   where the destination changes. The risk is only in long-lived print without
   a paid plan.
 - Attribution: Uniqode's 188M+ scans figure is THEIR claim — cite as such.
+
+---
+
+## 2026-10-11 — `how-to-create-qr-code-for-pdf` (target keyword: "qr code for pdf file")
+
+Topic for the 2026-10-12 ~09:19 IST run (first unchecked in content-calendar.md).
+
+### Key facts (established QR/product behavior — no disputed claims)
+
+- **A QR code cannot embed a PDF file itself.** It encodes a URL; the PDF must live at a public link first (your website, Google Drive, Dropbox, OneDrive). The guide's core job is teaching this two-step: host the PDF → make a URL QR code pointing at it. This is the #1 misconception to kill in the intro.
+- **Google Drive flow (standard, stable):** upload PDF → right-click → Share → "Anyone with the link" → Copy link → paste into a URL QR generator. Drive share links (/view) redirect fine from QR scanners. Same pattern works for Dropbox ("Copy link") and OneDrive.
+- **Static vs dynamic for PDFs:** static URL QR = free, permanent, but the destination is frozen. If the PDF link might change (new menu, new brochure version), either (a) replace the file at the SAME URL/hosting path so the old code keeps working, or (b) use a dynamic QR (editable destination + scan tracking, needs a provider account — and dies if the subscription lapses; cross-link tomorrow's "do qr codes expire" guide which is already live).
+- **Practical rules:** keep PDFs mobile-friendly (under ~10 MB so they open fast on phones); use a descriptive filename since the URL slug is often visible; test the scan with the phone camera before printing; for print, size guidance cross-links the upcoming `qr-code-print-size-guide`.
+- **freeqrcode-generator.com angle:** the site's generator has a URL QR type — step-by-step screenshots already in the library: `public/guides/screenshots/generator-hero.png`, `qr-type-selector.png`, `download-buttons.png`. Reuse them (no new captures needed for this guide).
+- **FAQs to cover:** Can I make a QR code for a PDF for free? (yes — static URL QR, free); Will it expire? (static never, as long as the link stays alive); Can I track scans? (dynamic only); What if I update the PDF later? (replace at same URL or use dynamic); Why does my Drive link show "access denied"? (sharing still "Restricted" — flip to "Anyone with the link").
