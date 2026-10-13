@@ -365,6 +365,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '8 min read',
             icon: '📄',
           },
+          {
+            slug: 'qr-code-print-size-guide',
+            title: 'QR Code Print Size Guide (Exact Sizes for Print)',
+            desc: 'The 10% distance rule, exact minimums for cards, flyers, posters and billboards, plus SVG vs PNG and DPI settings for crisp, scannable print.',
+            readTime: '8 min read',
+            icon: '📏',
+          },
         ],
       };
   }

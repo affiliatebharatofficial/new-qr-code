@@ -21,6 +21,7 @@ import ArticleHowToMakeQrCodeForGoogleForm from '../../components/guides/Article
 import ArticleUpiQrCodeForMerchants from '../../components/guides/ArticleUpiQrCodeForMerchants.astro';
 import ArticleDoQrCodesExpire from '../../components/guides/ArticleDoQrCodesExpire.astro';
 import ArticleHowToCreateQrCodeForPdf from '../../components/guides/ArticleHowToCreateQrCodeForPdf.astro';
+import ArticleQrCodePrintSizeGuide from '../../components/guides/ArticleQrCodePrintSizeGuide.astro';
 import GuidesHub from '../../components/guides/GuidesHub.astro';
 
 const { lang, slug } = Astro.params;
@@ -98,8 +99,9 @@ const isGuideGoogleForm = normalizedGuideSlug === 'how-to-make-qr-code-for-googl
 const isGuideUpiMerchant = normalizedGuideSlug === 'upi-qr-code-for-merchants';
 const isGuideDoQrCodesExpire = normalizedGuideSlug === 'do-qr-codes-expire';
 const isGuidePdf = normalizedGuideSlug === 'how-to-create-qr-code-for-pdf';
+const isGuidePrintSize = normalizedGuideSlug === 'qr-code-print-size-guide';
 const isGuidesIndex = currentSlug === 'guides';
-const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuideDoQrCodesExpire || isGuidePdf || isGuidesIndex;
+const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuideDoQrCodesExpire || isGuidePdf || isGuidePrintSize || isGuidesIndex;
 
 // Standard page content
 let content: ReturnType<typeof getLocalizedPageContent> = null;
@@ -332,5 +334,6 @@ if (!isSizeCalculator && !isPrintCalculator && !isGuide) {
 {isGuideUpiMerchant && <ArticleUpiQrCodeForMerchants locale={currentLocale} />}
 {isGuideDoQrCodesExpire && <ArticleDoQrCodesExpire locale={currentLocale} />}
 {isGuidePdf && <ArticleHowToCreateQrCodeForPdf locale={currentLocale} />}
+{isGuidePrintSize && <ArticleQrCodePrintSizeGuide locale={currentLocale} />}
 
 
