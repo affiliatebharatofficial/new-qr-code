@@ -372,6 +372,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '8 min read',
             icon: '📏',
           },
+          {
+            slug: 'how-to-make-youtube-qr-code',
+            title: 'How to Make a QR Code for a YouTube Video (Free)',
+            desc: 'Copy the video link from the Share button, paste it into a free QR generator, customize and download — plus Shorts, playlists, timestamps, and mistakes to avoid.',
+            readTime: '8 min read',
+            icon: '▶️',
+          },
         ],
       };
   }

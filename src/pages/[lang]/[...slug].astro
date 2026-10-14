@@ -22,6 +22,7 @@ import ArticleUpiQrCodeForMerchants from '../../components/guides/ArticleUpiQrCo
 import ArticleDoQrCodesExpire from '../../components/guides/ArticleDoQrCodesExpire.astro';
 import ArticleHowToCreateQrCodeForPdf from '../../components/guides/ArticleHowToCreateQrCodeForPdf.astro';
 import ArticleQrCodePrintSizeGuide from '../../components/guides/ArticleQrCodePrintSizeGuide.astro';
+import ArticleHowToMakeYoutubeQrCode from '../../components/guides/ArticleHowToMakeYoutubeQrCode.astro';
 import GuidesHub from '../../components/guides/GuidesHub.astro';
 
 const { lang, slug } = Astro.params;
@@ -100,8 +101,9 @@ const isGuideUpiMerchant = normalizedGuideSlug === 'upi-qr-code-for-merchants';
 const isGuideDoQrCodesExpire = normalizedGuideSlug === 'do-qr-codes-expire';
 const isGuidePdf = normalizedGuideSlug === 'how-to-create-qr-code-for-pdf';
 const isGuidePrintSize = normalizedGuideSlug === 'qr-code-print-size-guide';
+const isGuideYoutube = normalizedGuideSlug === 'how-to-make-youtube-qr-code';
 const isGuidesIndex = currentSlug === 'guides';
-const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuideDoQrCodesExpire || isGuidePdf || isGuidePrintSize || isGuidesIndex;
+const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuideDoQrCodesExpire || isGuidePdf || isGuidePrintSize || isGuideYoutube || isGuidesIndex;
 
 // Standard page content
 let content: ReturnType<typeof getLocalizedPageContent> = null;
@@ -335,5 +337,6 @@ if (!isSizeCalculator && !isPrintCalculator && !isGuide) {
 {isGuideDoQrCodesExpire && <ArticleDoQrCodesExpire locale={currentLocale} />}
 {isGuidePdf && <ArticleHowToCreateQrCodeForPdf locale={currentLocale} />}
 {isGuidePrintSize && <ArticleQrCodePrintSizeGuide locale={currentLocale} />}
+{isGuideYoutube && <ArticleHowToMakeYoutubeQrCode locale={currentLocale} />}
 
 
