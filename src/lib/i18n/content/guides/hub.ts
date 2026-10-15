@@ -379,6 +379,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '8 min read',
             icon: '▶️',
           },
+          {
+            slug: 'instagram-profile-qr-code',
+            title: 'How to Make an Instagram QR Code (Free, No Sign-Up)',
+            desc: 'Get Instagram\'s built-in profile QR code or make a branded custom one from your profile link — plus where to place it and what breaks it.',
+            readTime: '8 min read',
+            icon: '📸',
+          },
         ],
       };
   }
