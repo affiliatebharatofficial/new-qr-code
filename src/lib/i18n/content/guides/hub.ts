@@ -386,6 +386,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '8 min read',
             icon: '📸',
           },
+          {
+            slug: 'whatsapp-business-qr-code',
+            title: 'WhatsApp QR Code: Create One Free for Your Business',
+            desc: 'Build a free WhatsApp QR code with a wa.me chat link — in-app business QR, prefilled messages, and print-ready branded codes.',
+            readTime: '8 min read',
+            icon: '💬',
+          },
         ],
       };
   }
