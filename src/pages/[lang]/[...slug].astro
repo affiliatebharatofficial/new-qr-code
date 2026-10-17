@@ -25,6 +25,7 @@ import ArticleQrCodePrintSizeGuide from '../../components/guides/ArticleQrCodePr
 import ArticleHowToMakeYoutubeQrCode from '../../components/guides/ArticleHowToMakeYoutubeQrCode.astro';
 import ArticleInstagramProfileQrCode from '../../components/guides/ArticleInstagramProfileQrCode.astro';
 import ArticleWhatsappBusinessQrCode from '../../components/guides/ArticleWhatsappBusinessQrCode.astro';
+import ArticleQrCodeErrorCorrectionExplained from '../../components/guides/ArticleQrCodeErrorCorrectionExplained.astro';
 import GuidesHub from '../../components/guides/GuidesHub.astro';
 
 const { lang, slug } = Astro.params;
@@ -106,8 +107,9 @@ const isGuidePrintSize = normalizedGuideSlug === 'qr-code-print-size-guide';
 const isGuideYoutube = normalizedGuideSlug === 'how-to-make-youtube-qr-code';
 const isGuideInstagram = normalizedGuideSlug === 'instagram-profile-qr-code';
 const isGuideWhatsappBusiness = normalizedGuideSlug === 'whatsapp-business-qr-code';
+const isGuideErrorCorrection = normalizedGuideSlug === 'qr-code-error-correction-explained';
 const isGuidesIndex = currentSlug === 'guides';
-const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuideDoQrCodesExpire || isGuidePdf || isGuidePrintSize || isGuideYoutube || isGuideInstagram || isGuideWhatsappBusiness || isGuidesIndex;
+const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuideDoQrCodesExpire || isGuidePdf || isGuidePrintSize || isGuideYoutube || isGuideInstagram || isGuideWhatsappBusiness || isGuideErrorCorrection || isGuidesIndex;
 
 // Standard page content
 let content: ReturnType<typeof getLocalizedPageContent> = null;
@@ -344,5 +346,6 @@ if (!isSizeCalculator && !isPrintCalculator && !isGuide) {
 {isGuideYoutube && <ArticleHowToMakeYoutubeQrCode locale={currentLocale} />}
 {isGuideInstagram && <ArticleInstagramProfileQrCode locale={currentLocale} />}
 {isGuideWhatsappBusiness && <ArticleWhatsappBusinessQrCode locale={currentLocale} />}
+{isGuideErrorCorrection && <ArticleQrCodeErrorCorrectionExplained locale={currentLocale} />}
 
 

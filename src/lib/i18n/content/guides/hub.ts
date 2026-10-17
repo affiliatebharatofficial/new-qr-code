@@ -393,6 +393,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '8 min read',
             icon: '💬',
           },
+          {
+            slug: 'qr-code-error-correction-explained',
+            title: 'QR Code Error Correction Levels: L, M, Q, H Explained',
+            desc: 'What the L, M, Q and H error correction levels mean, how Reed-Solomon recovery works, and which level to use for logos and print.',
+            readTime: '9 min read',
+            icon: '🛡️',
+          },
         ],
       };
   }

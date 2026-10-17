@@ -18,7 +18,7 @@ table of contents, 4-6 FAQs, Article + FAQ JSON-LD (automatic via template).
 - [x] `how-to-make-youtube-qr-code` — "qr code for youtube video" — ▶️ (published 2026-10-14)
 - [x] `instagram-profile-qr-code` — "instagram qr code" — 📸 (published 2026-10-15)
 - [x] `whatsapp-business-qr-code` — "whatsapp qr code" — 💬 (published 2026-10-16)
-- [ ] `qr-code-error-correction-explained` — "qr code error correction levels" — 🛡️
+- [x] `qr-code-error-correction-explained` — "qr code error correction levels" — 🛡️ (published 2026-10-17)
 - [ ] `qr-code-for-event-tickets` — "qr code for event tickets" — 🎟️
 - [ ] `wedding-qr-code-ideas` — "qr code ideas for wedding" — 💒
 - [ ] `qr-code-for-real-estate` — "qr code for real estate" — 🏠
