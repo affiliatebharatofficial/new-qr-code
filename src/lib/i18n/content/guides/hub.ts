@@ -400,6 +400,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '🛡️',
           },
+          {
+            slug: 'qr-code-for-event-tickets',
+            title: 'QR Code for Event Tickets: Free Generator & Setup Guide',
+            desc: 'Make QR code event tickets free: what to encode, unique IDs vs shared codes, print sizes, and gate scanning setup that stops fraud.',
+            readTime: '8 min read',
+            icon: '🎟️',
+          },
         ],
       };
   }
