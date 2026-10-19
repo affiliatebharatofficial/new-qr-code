@@ -407,6 +407,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '8 min read',
             icon: '🎟️',
           },
+          {
+            slug: 'wedding-qr-code-ideas',
+            title: 'Wedding QR Code Ideas: 12 Creative Uses (Free Guide)',
+            desc: '12 wedding QR code ideas guests actually scan: RSVP forms, digital invites, photo albums, menus, seating charts, and gift links — free, no sign-up.',
+            readTime: '9 min read',
+            icon: '💒',
+          },
         ],
       };
   }

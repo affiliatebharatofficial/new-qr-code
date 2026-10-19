@@ -20,7 +20,7 @@ table of contents, 4-6 FAQs, Article + FAQ JSON-LD (automatic via template).
 - [x] `whatsapp-business-qr-code` — "whatsapp qr code" — 💬 (published 2026-10-16)
 - [x] `qr-code-error-correction-explained` — "qr code error correction levels" — 🛡️ (published 2026-10-17)
 - [x] `qr-code-for-event-tickets` — "qr code for event tickets" — 🎟️ (published 2026-10-18)
-- [ ] `wedding-qr-code-ideas` — "qr code ideas for wedding" — 💒
+- [x] `wedding-qr-code-ideas` — "qr code ideas for wedding" — 💒 (published 2026-10-19)
 - [ ] `qr-code-for-real-estate` — "qr code for real estate" — 🏠
 - [ ] `how-to-track-qr-code-scans` — "how to track qr code scans" — 📊
 - [ ] `qr-code-for-email-signup` — "qr code for email signup" — ✉️
@@ -38,6 +38,36 @@ table of contents, 4-6 FAQs, Article + FAQ JSON-LD (automatic via template).
 - [ ] `qr-code-vs-barcode` — "qr code vs barcode" — 🔍
 - [ ] `transparent-background-qr-code` — "qr code transparent background" — 🖼️
 - [ ] `qr-code-for-business-cards` — "qr code on business card" — 👔
+- [ ] `qr-code-for-attendance-tracking` — "qr code attendance system" — 📋
+- [ ] `qr-code-for-feedback-form` — "qr code for feedback form" — ⭐
+- [ ] `how-to-make-qr-code-for-audio` — "qr code for audio file" — 🎧
+- [ ] `qr-code-for-google-review` — "google review qr code" — ⭐
+- [ ] `qr-code-for-app-download` — "qr code for app download" — 📲
+- [ ] `how-to-scan-qr-code-iphone` — "how to scan qr code on iphone" — 📱
+- [ ] `qr-code-for-donations` — "qr code for donations" — ❤️
+- [ ] `how-to-create-qr-code-in-canva` — "how to make qr code in canva" — 🎨
+- [ ] `how-to-generate-qr-code-in-excel` — "how to generate qr code in excel" — 📑
+- [ ] `qr-code-for-google-docs` — "qr code for google docs" — 📄
+- [ ] `qr-code-for-food-truck` — "qr code for food truck" — 🌮
+- [ ] `qr-code-for-salon` — "qr code for salon" — 💇
+- [ ] `qr-code-pet-tag` — "qr code pet tag" — 🐾
+- [ ] `emergency-contact-qr-code` — "emergency contact qr code" — 🆘
+- [ ] `qr-code-for-classroom` — "qr code for classroom" — 🏫
+- [ ] `qr-code-scavenger-hunt` — "qr code scavenger hunt ideas" — 🗺️
+- [ ] `qr-code-on-resume` — "qr code on resume" — 💼
+- [ ] `how-to-scan-qr-code-on-pc` — "scan qr code on pc" — 💻
+- [ ] `qr-code-for-two-factor-auth` — "qr code two factor authentication" — 🔐
+- [ ] `qr-code-scam-safety` — "fake qr code scam" — ⚠️
+- [ ] `qr-code-for-airbnb` — "qr code for airbnb" — 🏡
+- [ ] `qr-code-for-tipping` — "qr code for tipping" — 💵
+- [ ] `qr-code-for-surveys` — "qr code survey" — 📝
+- [ ] `qr-code-for-museum` — "qr code for museum" — 🏛️
+- [ ] `qr-code-for-library` — "qr code for library" — 📚
+- [ ] `qr-code-for-etsy-shop` — "qr code for etsy" — 🛍️
+- [ ] `qr-code-for-lead-generation` — "qr code for lead generation" — 🎯
+- [ ] `qr-code-for-church` — "qr code for church" — ⛪
+- [ ] `qr-code-for-car-window` — "qr code on car window" — 🚗
+- [ ] `qr-code-for-parking-payment` — "qr code parking payment" — 🅿️
 
 ## Published
 

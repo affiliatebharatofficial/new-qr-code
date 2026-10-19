@@ -27,6 +27,7 @@ import ArticleInstagramProfileQrCode from '../../components/guides/ArticleInstag
 import ArticleWhatsappBusinessQrCode from '../../components/guides/ArticleWhatsappBusinessQrCode.astro';
 import ArticleQrCodeErrorCorrectionExplained from '../../components/guides/ArticleQrCodeErrorCorrectionExplained.astro';
 import ArticleQrCodeForEventTickets from '../../components/guides/ArticleQrCodeForEventTickets.astro';
+import ArticleWeddingQrCodeIdeas from '../../components/guides/ArticleWeddingQrCodeIdeas.astro';
 import GuidesHub from '../../components/guides/GuidesHub.astro';
 
 const { lang, slug } = Astro.params;
@@ -110,8 +111,9 @@ const isGuideInstagram = normalizedGuideSlug === 'instagram-profile-qr-code';
 const isGuideWhatsappBusiness = normalizedGuideSlug === 'whatsapp-business-qr-code';
 const isGuideErrorCorrection = normalizedGuideSlug === 'qr-code-error-correction-explained';
 const isGuideEventTickets = normalizedGuideSlug === 'qr-code-for-event-tickets';
+const isGuideWeddingQrCodeIdeas = normalizedGuideSlug === 'wedding-qr-code-ideas';
 const isGuidesIndex = currentSlug === 'guides';
-const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuideDoQrCodesExpire || isGuidePdf || isGuidePrintSize || isGuideYoutube || isGuideInstagram || isGuideWhatsappBusiness || isGuideErrorCorrection || isGuideEventTickets || isGuidesIndex;
+const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuideDoQrCodesExpire || isGuidePdf || isGuidePrintSize || isGuideYoutube || isGuideInstagram || isGuideWhatsappBusiness || isGuideErrorCorrection || isGuideEventTickets || isGuideWeddingQrCodeIdeas || isGuidesIndex;
 
 // Standard page content
 let content: ReturnType<typeof getLocalizedPageContent> = null;
@@ -350,5 +352,6 @@ if (!isSizeCalculator && !isPrintCalculator && !isGuide) {
 {isGuideWhatsappBusiness && <ArticleWhatsappBusinessQrCode locale={currentLocale} />}
 {isGuideErrorCorrection && <ArticleQrCodeErrorCorrectionExplained locale={currentLocale} />}
 {isGuideEventTickets && <ArticleQrCodeForEventTickets locale={currentLocale} />}
+{isGuideWeddingQrCodeIdeas && <ArticleWeddingQrCodeIdeas locale={currentLocale} />}
 
 
