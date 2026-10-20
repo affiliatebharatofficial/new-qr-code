@@ -56,6 +56,7 @@ export const GET: APIRoute = async () => {
     { path: 'guides/qr-code-error-correction-explained', priority: '0.7', changefreq: 'monthly' },
     { path: 'guides/qr-code-for-event-tickets', priority: '0.7', changefreq: 'monthly' },
     { path: 'guides/wedding-qr-code-ideas', priority: '0.7', changefreq: 'monthly' },
+    { path: 'guides/qr-code-for-real-estate', priority: '0.7', changefreq: 'monthly' },
     // Legal & Support & Company & Author
     { path: 'about', priority: '0.7', changefreq: 'monthly' },
     { path: 'about/firoz-khan', priority: '0.7', changefreq: 'monthly' },

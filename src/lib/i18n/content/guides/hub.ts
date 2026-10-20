@@ -414,6 +414,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '💒',
           },
+          {
+            slug: 'qr-code-for-real-estate',
+            title: 'QR Code for Real Estate: Lead Gen Guide (Free)',
+            desc: 'Turn for-sale signs, flyers, and open houses into leads: what to encode, print sizes, static vs dynamic codes, and free tracking — no sign-up.',
+            readTime: '9 min read',
+            icon: '🏠',
+          },
         ],
       };
   }

@@ -21,7 +21,7 @@ table of contents, 4-6 FAQs, Article + FAQ JSON-LD (automatic via template).
 - [x] `qr-code-error-correction-explained` — "qr code error correction levels" — 🛡️ (published 2026-10-17)
 - [x] `qr-code-for-event-tickets` — "qr code for event tickets" — 🎟️ (published 2026-10-18)
 - [x] `wedding-qr-code-ideas` — "qr code ideas for wedding" — 💒 (published 2026-10-19)
-- [ ] `qr-code-for-real-estate` — "qr code for real estate" — 🏠
+- [x] `qr-code-for-real-estate` — "qr code for real estate" — 🏠 (published 2026-10-20)
 - [ ] `how-to-track-qr-code-scans` — "how to track qr code scans" — 📊
 - [ ] `qr-code-for-email-signup` — "qr code for email signup" — ✉️
 - [ ] `bulk-qr-code-from-excel` — "bulk qr code generator excel" — 📑
