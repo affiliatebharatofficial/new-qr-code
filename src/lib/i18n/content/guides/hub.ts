@@ -421,6 +421,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '🏠',
           },
+          {
+            slug: 'how-to-track-qr-code-scans',
+            title: 'How to Track QR Code Scans (Free Methods, 2026)',
+            desc: 'Track QR code scans for free: UTM + GA4, link shorteners, and your own redirects — what works with static codes and when paid dynamic codes pay off.',
+            readTime: '10 min read',
+            icon: '📊',
+          },
         ],
       };
   }
