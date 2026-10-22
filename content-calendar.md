@@ -23,7 +23,7 @@ table of contents, 4-6 FAQs, Article + FAQ JSON-LD (automatic via template).
 - [x] `wedding-qr-code-ideas` — "qr code ideas for wedding" — 💒 (published 2026-10-19)
 - [x] `qr-code-for-real-estate` — "qr code for real estate" — 🏠 (published 2026-10-20)
 - [x] `how-to-track-qr-code-scans` — "how to track qr code scans" — 📊 (published 2026-10-21)
-- [ ] `qr-code-for-email-signup` — "qr code for email signup" — ✉️
+- [x] `qr-code-for-email-signup` — "qr code for email signup" — ✉️ (published 2026-10-22)
 - [ ] `bulk-qr-code-from-excel` — "bulk qr code generator excel" — 📑
 - [ ] `qr-code-design-best-practices` — "qr code design best practices" — ✨
 - [ ] `how-to-make-qr-code-for-zoom` — "qr code for zoom meeting" — 🎥

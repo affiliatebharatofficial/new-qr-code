@@ -30,6 +30,7 @@ import ArticleQrCodeForEventTickets from '../../components/guides/ArticleQrCodeF
 import ArticleWeddingQrCodeIdeas from '../../components/guides/ArticleWeddingQrCodeIdeas.astro';
 import ArticleQrCodeForRealEstate from '../../components/guides/ArticleQrCodeForRealEstate.astro';
 import ArticleHowToTrackQrCodeScans from '../../components/guides/ArticleHowToTrackQrCodeScans.astro';
+import ArticleQrCodeForEmailSignup from '../../components/guides/ArticleQrCodeForEmailSignup.astro';
 import GuidesHub from '../../components/guides/GuidesHub.astro';
 
 const { lang, slug } = Astro.params;
@@ -116,8 +117,9 @@ const isGuideEventTickets = normalizedGuideSlug === 'qr-code-for-event-tickets';
 const isGuideWeddingQrCodeIdeas = normalizedGuideSlug === 'wedding-qr-code-ideas';
 const isGuideQrCodeForRealEstate = normalizedGuideSlug === 'qr-code-for-real-estate';
 const isGuideHowToTrackQrCodeScans = normalizedGuideSlug === 'how-to-track-qr-code-scans';
+const isGuideQrCodeForEmailSignup = normalizedGuideSlug === 'qr-code-for-email-signup';
 const isGuidesIndex = currentSlug === 'guides';
-const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuideDoQrCodesExpire || isGuidePdf || isGuidePrintSize || isGuideYoutube || isGuideInstagram || isGuideWhatsappBusiness || isGuideErrorCorrection || isGuideEventTickets || isGuideWeddingQrCodeIdeas || isGuideQrCodeForRealEstate || isGuideHowToTrackQrCodeScans || isGuidesIndex;
+const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuideDoQrCodesExpire || isGuidePdf || isGuidePrintSize || isGuideYoutube || isGuideInstagram || isGuideWhatsappBusiness || isGuideErrorCorrection || isGuideEventTickets || isGuideWeddingQrCodeIdeas || isGuideQrCodeForRealEstate || isGuideHowToTrackQrCodeScans || isGuideQrCodeForEmailSignup || isGuidesIndex;
 
 // Standard page content
 let content: ReturnType<typeof getLocalizedPageContent> = null;
@@ -359,5 +361,6 @@ if (!isSizeCalculator && !isPrintCalculator && !isGuide) {
 {isGuideWeddingQrCodeIdeas && <ArticleWeddingQrCodeIdeas locale={currentLocale} />}
 {isGuideQrCodeForRealEstate && <ArticleQrCodeForRealEstate locale={currentLocale} />}
 {isGuideHowToTrackQrCodeScans && <ArticleHowToTrackQrCodeScans locale={currentLocale} />}
+{isGuideQrCodeForEmailSignup && <ArticleQrCodeForEmailSignup locale={currentLocale} />}
 
 

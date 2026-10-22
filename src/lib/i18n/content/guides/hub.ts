@@ -428,6 +428,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '10 min read',
             icon: '📊',
           },
+          {
+            slug: 'qr-code-for-email-signup',
+            title: 'QR Code for Email Signup: Grow Your List Offline (Free)',
+            desc: 'Turn foot traffic into subscribers: signup-form links, pre-filled mailto QR codes, best placements, incentives, and consent rules.',
+            readTime: '9 min read',
+            icon: '✉️',
+          },
         ],
       };
   }
