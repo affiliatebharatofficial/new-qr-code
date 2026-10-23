@@ -435,6 +435,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '✉️',
           },
+          {
+            slug: 'bulk-qr-code-from-excel',
+            title: 'Bulk QR Code from Excel: Generate Hundreds at Once',
+            desc: 'Prepare your spreadsheet, pick a batch method (dashboard tool or free Python script), and turn every row into a print-ready QR code.',
+            readTime: '8 min read',
+            icon: '📑',
+          },
         ],
       };
   }
