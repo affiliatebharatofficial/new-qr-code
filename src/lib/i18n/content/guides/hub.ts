@@ -442,6 +442,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '8 min read',
             icon: '📑',
           },
+          {
+            slug: 'qr-code-design-best-practices',
+            title: 'QR Code Design Best Practices: 2026 Guide (Free)',
+            desc: 'Brand your codes without breaking them: contrast, quiet zone, error correction, colors, logos, frames, CTAs, and print specs.',
+            readTime: '9 min read',
+            icon: '✨',
+          },
         ],
       };
   }

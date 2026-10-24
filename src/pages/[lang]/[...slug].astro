@@ -32,6 +32,7 @@ import ArticleQrCodeForRealEstate from '../../components/guides/ArticleQrCodeFor
 import ArticleHowToTrackQrCodeScans from '../../components/guides/ArticleHowToTrackQrCodeScans.astro';
 import ArticleQrCodeForEmailSignup from '../../components/guides/ArticleQrCodeForEmailSignup.astro';
 import ArticleBulkQrCodeFromExcel from '../../components/guides/ArticleBulkQrCodeFromExcel.astro';
+import ArticleQrCodeDesignBestPractices from '../../components/guides/ArticleQrCodeDesignBestPractices.astro';
 import GuidesHub from '../../components/guides/GuidesHub.astro';
 
 const { lang, slug } = Astro.params;
@@ -120,8 +121,9 @@ const isGuideQrCodeForRealEstate = normalizedGuideSlug === 'qr-code-for-real-est
 const isGuideHowToTrackQrCodeScans = normalizedGuideSlug === 'how-to-track-qr-code-scans';
 const isGuideQrCodeForEmailSignup = normalizedGuideSlug === 'qr-code-for-email-signup';
 const isGuideBulkQrCodeFromExcel = normalizedGuideSlug === 'bulk-qr-code-from-excel';
+const isGuideQrCodeDesignBestPractices = normalizedGuideSlug === 'qr-code-design-best-practices';
 const isGuidesIndex = currentSlug === 'guides';
-const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuideDoQrCodesExpire || isGuidePdf || isGuidePrintSize || isGuideYoutube || isGuideInstagram || isGuideWhatsappBusiness || isGuideErrorCorrection || isGuideEventTickets || isGuideWeddingQrCodeIdeas || isGuideQrCodeForRealEstate || isGuideHowToTrackQrCodeScans || isGuideQrCodeForEmailSignup || isGuideBulkQrCodeFromExcel || isGuidesIndex;
+const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuideDoQrCodesExpire || isGuidePdf || isGuidePrintSize || isGuideYoutube || isGuideInstagram || isGuideWhatsappBusiness || isGuideErrorCorrection || isGuideEventTickets || isGuideWeddingQrCodeIdeas || isGuideQrCodeForRealEstate || isGuideHowToTrackQrCodeScans || isGuideQrCodeForEmailSignup || isGuideBulkQrCodeFromExcel || isGuideQrCodeDesignBestPractices || isGuidesIndex;
 
 // Standard page content
 let content: ReturnType<typeof getLocalizedPageContent> = null;
@@ -365,5 +367,6 @@ if (!isSizeCalculator && !isPrintCalculator && !isGuide) {
 {isGuideHowToTrackQrCodeScans && <ArticleHowToTrackQrCodeScans locale={currentLocale} />}
 {isGuideQrCodeForEmailSignup && <ArticleQrCodeForEmailSignup locale={currentLocale} />}
 {isGuideBulkQrCodeFromExcel && <ArticleBulkQrCodeFromExcel locale={currentLocale} />}
+{isGuideQrCodeDesignBestPractices && <ArticleQrCodeDesignBestPractices locale={currentLocale} />}
 
 
