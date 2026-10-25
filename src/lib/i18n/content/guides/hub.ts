@@ -449,6 +449,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '✨',
           },
+          {
+            slug: 'how-to-make-qr-code-for-zoom',
+            title: 'How to Make a QR Code for a Zoom Meeting (Free)',
+            desc: 'Turn a Zoom invite link into a scannable code: full-link steps, passcode and waiting-room tips, sizing, and placement.',
+            readTime: '8 min read',
+            icon: '🎥',
+          },
         ],
       };
   }
