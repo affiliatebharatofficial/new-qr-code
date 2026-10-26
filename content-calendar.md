@@ -27,7 +27,7 @@ table of contents, 4-6 FAQs, Article + FAQ JSON-LD (automatic via template).
 - [x] `bulk-qr-code-from-excel` — "bulk qr code generator excel" — 📑 (published 2026-10-23)
 - [x] `qr-code-design-best-practices` — "qr code design best practices" — ✨ (published 2026-10-24)
 - [x] `how-to-make-qr-code-for-zoom` — "qr code for zoom meeting" — 🎥 (published 2026-10-25)
-- [ ] `spotify-playlist-qr-code` — "spotify qr code" — 🎵
+- [x] `spotify-playlist-qr-code` — "spotify qr code" — 🎵 (published 2026-10-26)
 - [ ] `telegram-channel-qr-code` — "telegram qr code" — ✈️
 - [ ] `qr-code-for-phone-number` — "qr code for phone number" — 📞
 - [ ] `cryptocurrency-qr-code` — "bitcoin qr code" — 🪙

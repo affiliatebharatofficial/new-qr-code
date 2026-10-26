@@ -456,6 +456,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '8 min read',
             icon: '🎥',
           },
+          {
+            slug: 'spotify-playlist-qr-code',
+            title: 'How to Make a Spotify QR Code for a Playlist (Free)',
+            desc: 'Turn any Spotify playlist into a scannable code: copy-link steps, Spotify Code vs QR code, privacy checks, and best placements.',
+            readTime: '8 min read',
+            icon: '🎵',
+          },
         ],
       };
   }
