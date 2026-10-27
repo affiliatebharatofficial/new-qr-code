@@ -35,6 +35,7 @@ import ArticleBulkQrCodeFromExcel from '../../components/guides/ArticleBulkQrCod
 import ArticleQrCodeDesignBestPractices from '../../components/guides/ArticleQrCodeDesignBestPractices.astro';
 import ArticleHowToMakeQrCodeForZoom from '../../components/guides/ArticleHowToMakeQrCodeForZoom.astro';
 import ArticleSpotifyPlaylistQrCode from '../../components/guides/ArticleSpotifyPlaylistQrCode.astro';
+import ArticleTelegramChannelQrCode from '../../components/guides/ArticleTelegramChannelQrCode.astro';
 import GuidesHub from '../../components/guides/GuidesHub.astro';
 
 const { lang, slug } = Astro.params;
@@ -126,8 +127,9 @@ const isGuideBulkQrCodeFromExcel = normalizedGuideSlug === 'bulk-qr-code-from-ex
 const isGuideQrCodeDesignBestPractices = normalizedGuideSlug === 'qr-code-design-best-practices';
 const isGuideHowToMakeQrCodeForZoom = normalizedGuideSlug === 'how-to-make-qr-code-for-zoom';
 const isGuideSpotifyPlaylistQrCode = normalizedGuideSlug === 'spotify-playlist-qr-code';
+const isGuideTelegramChannelQrCode = normalizedGuideSlug === 'telegram-channel-qr-code';
 const isGuidesIndex = currentSlug === 'guides';
-const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuideDoQrCodesExpire || isGuidePdf || isGuidePrintSize || isGuideYoutube || isGuideInstagram || isGuideWhatsappBusiness || isGuideErrorCorrection || isGuideEventTickets || isGuideWeddingQrCodeIdeas || isGuideQrCodeForRealEstate || isGuideHowToTrackQrCodeScans || isGuideQrCodeForEmailSignup || isGuideBulkQrCodeFromExcel || isGuideQrCodeDesignBestPractices || isGuideHowToMakeQrCodeForZoom || isGuideSpotifyPlaylistQrCode || isGuidesIndex;
+const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuideDoQrCodesExpire || isGuidePdf || isGuidePrintSize || isGuideYoutube || isGuideInstagram || isGuideWhatsappBusiness || isGuideErrorCorrection || isGuideEventTickets || isGuideWeddingQrCodeIdeas || isGuideQrCodeForRealEstate || isGuideHowToTrackQrCodeScans || isGuideQrCodeForEmailSignup || isGuideBulkQrCodeFromExcel || isGuideQrCodeDesignBestPractices || isGuideHowToMakeQrCodeForZoom || isGuideSpotifyPlaylistQrCode || isGuideTelegramChannelQrCode || isGuidesIndex;
 
 // Standard page content
 let content: ReturnType<typeof getLocalizedPageContent> = null;
@@ -374,5 +376,6 @@ if (!isSizeCalculator && !isPrintCalculator && !isGuide) {
 {isGuideQrCodeDesignBestPractices && <ArticleQrCodeDesignBestPractices locale={currentLocale} />}
 {isGuideHowToMakeQrCodeForZoom && <ArticleHowToMakeQrCodeForZoom locale={currentLocale} />}
 {isGuideSpotifyPlaylistQrCode && <ArticleSpotifyPlaylistQrCode locale={currentLocale} />}
+{isGuideTelegramChannelQrCode && <ArticleTelegramChannelQrCode locale={currentLocale} />}
 
 

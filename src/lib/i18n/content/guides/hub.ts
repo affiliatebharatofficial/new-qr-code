@@ -463,6 +463,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '8 min read',
             icon: '🎵',
           },
+          {
+            slug: 'telegram-channel-qr-code',
+            title: 'How to Make a Telegram QR Code for a Channel (Free)',
+            desc: 'Turn your channel link into a scannable code: public vs private links, copy-link steps, placements, and subscriber tips.',
+            readTime: '8 min read',
+            icon: '✈️',
+          },
         ],
       };
   }

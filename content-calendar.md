@@ -28,7 +28,7 @@ table of contents, 4-6 FAQs, Article + FAQ JSON-LD (automatic via template).
 - [x] `qr-code-design-best-practices` — "qr code design best practices" — ✨ (published 2026-10-24)
 - [x] `how-to-make-qr-code-for-zoom` — "qr code for zoom meeting" — 🎥 (published 2026-10-25)
 - [x] `spotify-playlist-qr-code` — "spotify qr code" — 🎵 (published 2026-10-26)
-- [ ] `telegram-channel-qr-code` — "telegram qr code" — ✈️
+- [x] `telegram-channel-qr-code` — "telegram qr code" — ✈️ (published 2026-10-27)
 - [ ] `qr-code-for-phone-number` — "qr code for phone number" — 📞
 - [ ] `cryptocurrency-qr-code` — "bitcoin qr code" — 🪙
 - [ ] `qr-code-for-gyms` — "qr code for gym" — 💪
