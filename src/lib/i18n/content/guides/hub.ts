@@ -470,6 +470,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '8 min read',
             icon: '✈️',
           },
+          {
+            slug: 'qr-code-for-phone-number',
+            title: 'How to Make a QR Code for a Phone Number (Free)',
+            desc: 'Turn any phone number into a scannable code: tel: link steps, country-code rules, call vs SMS vs vCard options, and print sizes.',
+            readTime: '8 min read',
+            icon: '📞',
+          },
         ],
       };
   }

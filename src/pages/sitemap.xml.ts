@@ -64,6 +64,7 @@ export const GET: APIRoute = async () => {
     { path: 'guides/how-to-make-qr-code-for-zoom', priority: '0.7', changefreq: 'monthly' },
     { path: 'guides/spotify-playlist-qr-code', priority: '0.7', changefreq: 'monthly' },
     { path: 'guides/telegram-channel-qr-code', priority: '0.7', changefreq: 'monthly' },
+    { path: 'guides/qr-code-for-phone-number', priority: '0.7', changefreq: 'monthly' },
     // Legal & Support & Company & Author
     { path: 'about', priority: '0.7', changefreq: 'monthly' },
     { path: 'about/firoz-khan', priority: '0.7', changefreq: 'monthly' },
