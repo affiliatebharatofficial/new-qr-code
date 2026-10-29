@@ -30,7 +30,7 @@ table of contents, 4-6 FAQs, Article + FAQ JSON-LD (automatic via template).
 - [x] `spotify-playlist-qr-code` — "spotify qr code" — 🎵 (published 2026-10-26)
 - [x] `telegram-channel-qr-code` — "telegram qr code" — ✈️ (published 2026-10-27)
 - [x] `qr-code-for-phone-number` — "qr code for phone number" — 📞 (published 2026-10-28)
-- [ ] `cryptocurrency-qr-code` — "bitcoin qr code" — 🪙
+- [x] `cryptocurrency-qr-code` — "bitcoin qr code" — 🪙 (published 2026-10-29)
 - [ ] `qr-code-for-gyms` — "qr code for gym" — 💪
 - [ ] `how-to-make-location-qr-code` — "qr code for google maps location" — 📍
 - [ ] `qr-code-for-product-packaging` — "qr code on packaging" — 📦

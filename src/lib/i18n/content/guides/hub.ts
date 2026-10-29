@@ -477,6 +477,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '8 min read',
             icon: '📞',
           },
+          {
+            slug: 'cryptocurrency-qr-code',
+            title: 'How to Make a Bitcoin QR Code (Free, No Sign-Up)',
+            desc: 'Make a free Bitcoin QR code: wallet address steps, BIP21 payment-request format, amount encoding, and safety checks.',
+            readTime: '9 min read',
+            icon: '🪙',
+          },
         ],
       };
   }
