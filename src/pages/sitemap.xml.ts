@@ -1,6 +1,5 @@
 import type { APIRoute } from 'astro';
-import { SUPPORTED_LOCALES, DEFAULT_LOCALE } from '../lib/i18n/config';
-import { getLocalizedPath, SITE_BASE_URL } from '../lib/i18n/routes';
+import { SITE_BASE_URL } from '../lib/i18n/routes';
 
 export const GET: APIRoute = async () => {
   const publicRoutes = [
@@ -80,21 +79,20 @@ export const GET: APIRoute = async () => {
     { path: 'contact', priority: '0.6', changefreq: 'monthly' },
   ];
 
-  // Generate URLs across all 7 supported languages
+  // English-only sitemap. Locale routes (/es/, /de/, ...) serve the same
+  // English content and canonicalize to the English URL, so listing them
+  // here would re-introduce the 7x duplicate-content problem.
   const allEntries: { loc: string; priority: string; changefreq: string; lastmod: string }[] = [];
   const today = new Date().toISOString().split('T')[0];
 
-  for (const locale of SUPPORTED_LOCALES) {
-    for (const r of publicRoutes) {
-      const locPath = getLocalizedPath(r.path ? `/${r.path}` : '/', locale);
-      const fullUrl = locPath === '/' ? `${SITE_BASE_URL}/` : `${SITE_BASE_URL}${locPath}`;
-      allEntries.push({
-        loc: fullUrl,
-        priority: locale === DEFAULT_LOCALE ? r.priority : (parseFloat(r.priority) * 0.9).toFixed(1),
-        changefreq: r.changefreq,
-        lastmod: today,
-      });
-    }
+  for (const r of publicRoutes) {
+    const fullUrl = r.path ? `${SITE_BASE_URL}/${r.path}` : `${SITE_BASE_URL}/`;
+    allEntries.push({
+      loc: fullUrl,
+      priority: r.priority,
+      changefreq: r.changefreq,
+      lastmod: today,
+    });
   }
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

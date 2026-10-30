@@ -3,7 +3,6 @@ import Navbar from '../components/layout/Navbar.astro';
 import Footer from '../components/layout/Footer.astro';
 import '../styles/global.css';
 import { extractLocaleFromPath, DEFAULT_LOCALE, type Locale } from '../lib/i18n/config';
-import { getHreflangTags } from '../lib/i18n/routes';
 
 interface Props {
   title: string;
@@ -71,15 +70,32 @@ function formatPageTitle(rawTitle: string): string {
 
 const pageTitle = formatPageTitle(title);
 
-// Self-referencing clean canonical URL
-const cleanPathname = currentPath === '/' ? '/' : currentPath.replace(/\/+$/, '');
-const cleanCanonical = canonical
-  ? (canonical.startsWith('http') ? canonical.replace(/\/+$/, '') : `${siteUrl}${canonical.replace(/\/+$/, '')}`)
-  : `${siteUrl}${cleanPathname}`;
+// Canonical always points to the English (default-locale) URL. Locale
+// routes (/es/, /de/, ...) serve identical English content, so a
+// self-referencing locale canonical would make Google index 7 copies of
+// every page. Explicit canonical props (e.g. from article components) are
+// normalized the same way, so no component needs its own locale handling.
+const englishPathname = cleanPath === '/' ? '/' : cleanPath.replace(/\/+$/, '');
+const normalizeCanonical = (value: string): string => {
+  const absolute = value.startsWith('http')
+    ? value
+    : `${siteUrl}${value.startsWith('/') ? '' : '/'}${value}`;
+  try {
+    const url = new URL(absolute);
+    const { cleanPath: stripped } = extractLocaleFromPath(url.pathname);
+    const strippedPath = stripped === '/' ? '/' : stripped.replace(/\/+$/, '');
+    return `${url.origin}${strippedPath}`;
+  } catch {
+    return absolute.replace(/\/+$/, '');
+  }
+};
+const cleanCanonical = canonical ? normalizeCanonical(canonical) : `${siteUrl}${englishPathname}`;
 const absoluteOgImage = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage.startsWith('/') ? '' : '/'}${ogImage}`;
 
-// Dynamic hreflang alternates for all supported locales + x-default
-const hreflangTags = getHreflangTags(currentPath);
+// No translated versions exist, so there are no locale hreflang alternates.
+// Only x-default -> the English canonical, to avoid false "this is a
+// Spanish/German version" claims for identical English content.
+const hreflangTags = [{ lang: 'x-default', href: cleanCanonical }];
 
 // Base Schema.org Structured Data with inLanguage, Creator & Publisher
 const creatorJsonLd = {
