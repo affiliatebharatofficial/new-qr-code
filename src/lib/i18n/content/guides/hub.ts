@@ -484,6 +484,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '🪙',
           },
+          {
+            slug: 'qr-code-for-gyms',
+            title: 'QR Code for Gym: Check-Ins, Classes & Sign-Ups (Free)',
+            desc: 'Put QR codes to work in your gym: check-ins, live class schedules, machine demos, sign-ups, payments, and Wi-Fi.',
+            readTime: '9 min read',
+            icon: '💪',
+          },
         ],
       };
   }
