@@ -32,7 +32,7 @@ table of contents, 4-6 FAQs, Article + FAQ JSON-LD (automatic via template).
 - [x] `qr-code-for-phone-number` — "qr code for phone number" — 📞 (published 2026-10-28)
 - [x] `cryptocurrency-qr-code` — "bitcoin qr code" — 🪙 (published 2026-10-29)
 - [x] `qr-code-for-gyms` — "qr code for gym" — 💪 (published 2026-10-30)
-- [ ] `how-to-make-location-qr-code` — "qr code for google maps location" — 📍
+- [x] `how-to-make-location-qr-code` — "qr code for google maps location" — 📍 (published 2026-10-31)
 - [ ] `qr-code-for-product-packaging` — "qr code on packaging" — 📦
 - [ ] `hotel-wifi-qr-code` — "hotel wifi qr code" — 🏨
 - [ ] `qr-code-vs-barcode` — "qr code vs barcode" — 🔍

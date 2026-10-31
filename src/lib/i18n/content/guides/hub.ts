@@ -491,6 +491,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '💪',
           },
+          {
+            slug: 'how-to-make-location-qr-code',
+            title: 'How to Make a Location QR Code (Google Maps, Free)',
+            desc: 'Send customers straight to your exact Google Maps pin: place-name vs coordinates, print sizes, and where to put the code.',
+            readTime: '8 min read',
+            icon: '📍',
+          },
         ],
       };
   }

@@ -39,6 +39,7 @@ import ArticleTelegramChannelQrCode from '../../components/guides/ArticleTelegra
 import ArticleQrCodeForPhoneNumber from '../../components/guides/ArticleQrCodeForPhoneNumber.astro';
 import ArticleCryptocurrencyQrCode from '../../components/guides/ArticleCryptocurrencyQrCode.astro';
 import ArticleQrCodeForGyms from '../../components/guides/ArticleQrCodeForGyms.astro';
+import ArticleHowToMakeLocationQrCode from '../../components/guides/ArticleHowToMakeLocationQrCode.astro';
 import GuidesHub from '../../components/guides/GuidesHub.astro';
 
 const { lang, slug } = Astro.params;
@@ -134,8 +135,9 @@ const isGuideTelegramChannelQrCode = normalizedGuideSlug === 'telegram-channel-q
 const isGuideQrCodeForPhoneNumber = normalizedGuideSlug === 'qr-code-for-phone-number';
 const isGuideCryptocurrencyQrCode = normalizedGuideSlug === 'cryptocurrency-qr-code';
 const isGuideQrCodeForGyms = normalizedGuideSlug === 'qr-code-for-gyms';
+const isGuideHowToMakeLocationQrCode = normalizedGuideSlug === 'how-to-make-location-qr-code';
 const isGuidesIndex = currentSlug === 'guides';
-const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuideDoQrCodesExpire || isGuidePdf || isGuidePrintSize || isGuideYoutube || isGuideInstagram || isGuideWhatsappBusiness || isGuideErrorCorrection || isGuideEventTickets || isGuideWeddingQrCodeIdeas || isGuideQrCodeForRealEstate || isGuideHowToTrackQrCodeScans || isGuideQrCodeForEmailSignup || isGuideBulkQrCodeFromExcel || isGuideQrCodeDesignBestPractices || isGuideHowToMakeQrCodeForZoom || isGuideSpotifyPlaylistQrCode || isGuideTelegramChannelQrCode || isGuideQrCodeForPhoneNumber || isGuideCryptocurrencyQrCode || isGuideQrCodeForGyms || isGuidesIndex;
+const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuideDoQrCodesExpire || isGuidePdf || isGuidePrintSize || isGuideYoutube || isGuideInstagram || isGuideWhatsappBusiness || isGuideErrorCorrection || isGuideEventTickets || isGuideWeddingQrCodeIdeas || isGuideQrCodeForRealEstate || isGuideHowToTrackQrCodeScans || isGuideQrCodeForEmailSignup || isGuideBulkQrCodeFromExcel || isGuideQrCodeDesignBestPractices || isGuideHowToMakeQrCodeForZoom || isGuideSpotifyPlaylistQrCode || isGuideTelegramChannelQrCode || isGuideQrCodeForPhoneNumber || isGuideCryptocurrencyQrCode || isGuideQrCodeForGyms || isGuideHowToMakeLocationQrCode || isGuidesIndex;
 
 // Standard page content
 let content: ReturnType<typeof getLocalizedPageContent> = null;
@@ -386,5 +388,6 @@ if (!isSizeCalculator && !isPrintCalculator && !isGuide) {
 {isGuideQrCodeForPhoneNumber && <ArticleQrCodeForPhoneNumber locale={currentLocale} />}
 {isGuideCryptocurrencyQrCode && <ArticleCryptocurrencyQrCode locale={currentLocale} />}
 {isGuideQrCodeForGyms && <ArticleQrCodeForGyms locale={currentLocale} />}
+{isGuideHowToMakeLocationQrCode && <ArticleHowToMakeLocationQrCode locale={currentLocale} />}
 
 
