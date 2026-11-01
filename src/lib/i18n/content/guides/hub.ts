@@ -498,6 +498,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '8 min read',
             icon: '📍',
           },
+          {
+            slug: 'qr-code-for-product-packaging',
+            title: 'QR Code on Packaging: Smart Ideas for Brands (Free)',
+            desc: 'What to link from a pack, print sizes, placement, and ideas that actually get scanned — for food, cosmetics, and retail.',
+            readTime: '9 min read',
+            icon: '📦',
+          },
         ],
       };
   }
