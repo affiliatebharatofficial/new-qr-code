@@ -505,6 +505,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '📦',
           },
+          {
+            slug: 'hotel-wifi-qr-code',
+            title: 'Hotel WiFi QR Code: Free Guest WiFi Sign-In (No App)',
+            desc: 'One scan connects hotel guests to WiFi — no password typing, no front-desk calls. Setup, print placements, and guest-network security.',
+            readTime: '9 min read',
+            icon: '🏨',
+          },
         ],
       };
   }

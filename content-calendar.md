@@ -34,7 +34,7 @@ table of contents, 4-6 FAQs, Article + FAQ JSON-LD (automatic via template).
 - [x] `qr-code-for-gyms` — "qr code for gym" — 💪 (published 2026-10-30)
 - [x] `how-to-make-location-qr-code` — "qr code for google maps location" — 📍 (published 2026-10-31)
 - [x] `qr-code-for-product-packaging` — "qr code on packaging" — 📦 (published 2026-11-01)
-- [ ] `hotel-wifi-qr-code` — "hotel wifi qr code" — 🏨
+- [x] `hotel-wifi-qr-code` — "hotel wifi qr code" — 🏨 (published 2026-11-02)
 - [ ] `qr-code-vs-barcode` — "qr code vs barcode" — 🔍
 - [ ] `transparent-background-qr-code` — "qr code transparent background" — 🖼️
 - [ ] `qr-code-for-business-cards` — "qr code on business card" — 👔
