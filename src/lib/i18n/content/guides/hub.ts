@@ -512,6 +512,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '🏨',
           },
+          {
+            slug: 'qr-code-vs-barcode',
+            title: 'QR Code vs Barcode: Key Differences Explained',
+            desc: 'Capacity, scan speed, cost, and durability compared — plus when to use each, and when to print both.',
+            readTime: '9 min read',
+            icon: '🔍',
+          },
         ],
       };
   }
