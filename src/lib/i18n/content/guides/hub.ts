@@ -519,6 +519,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '🔍',
           },
+          {
+            slug: 'transparent-background-qr-code',
+            title: 'QR Code Transparent Background: How to Make One Free',
+            desc: 'Make a QR code with a transparent background that blends into any design — PNG/SVG steps, contrast rules, and mistakes to avoid.',
+            readTime: '8 min read',
+            icon: '🖼️',
+          },
         ],
       };
   }

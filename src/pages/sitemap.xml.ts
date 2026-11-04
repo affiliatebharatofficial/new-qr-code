@@ -74,6 +74,7 @@ export const GET: APIRoute = async () => {
     { path: 'guides/qr-code-for-product-packaging', priority: '0.7', changefreq: 'monthly', lastmod: '2026-11-01' },
     { path: 'guides/hotel-wifi-qr-code', priority: '0.7', changefreq: 'monthly', lastmod: '2026-11-02' },
     { path: 'guides/qr-code-vs-barcode', priority: '0.7', changefreq: 'monthly', lastmod: '2026-11-03' },
+    { path: 'guides/transparent-background-qr-code', priority: '0.7', changefreq: 'monthly', lastmod: '2026-11-04' },
     // Legal & Support & Company & Author
     { path: 'about', priority: '0.7', changefreq: 'monthly', lastmod: '2026-09-23' },
     { path: 'about/firoz-khan', priority: '0.7', changefreq: 'monthly', lastmod: '2026-09-23' },
