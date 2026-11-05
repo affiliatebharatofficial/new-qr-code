@@ -37,7 +37,7 @@ table of contents, 4-6 FAQs, Article + FAQ JSON-LD (automatic via template).
 - [x] `hotel-wifi-qr-code` — "hotel wifi qr code" — 🏨 (published 2026-11-02)
 - [x] `qr-code-vs-barcode` — "qr code vs barcode" — 🔍 (published 2026-11-03)
 - [x] `transparent-background-qr-code` — "qr code transparent background" — 🖼️ (published 2026-11-04)
-- [ ] `qr-code-for-business-cards` — "qr code on business card" — 👔
+- [x] `qr-code-for-business-cards` — "qr code on business card" — 👔 (published 2026-11-05)
 - [ ] `qr-code-for-attendance-tracking` — "qr code attendance system" — 📋
 - [ ] `qr-code-for-feedback-form` — "qr code for feedback form" — ⭐
 - [ ] `how-to-make-qr-code-for-audio` — "qr code for audio file" — 🎧

@@ -526,6 +526,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '8 min read',
             icon: '🖼️',
           },
+          {
+            slug: 'qr-code-for-business-cards',
+            title: 'QR Code on Business Card: How to Add One (Free)',
+            desc: 'Put a QR code on your business card that gets scanned — vCard vs URL, size, placement, and print-proof testing.',
+            readTime: '9 min read',
+            icon: '👔',
+          },
         ],
       };
   }
