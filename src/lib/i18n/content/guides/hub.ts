@@ -533,6 +533,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '👔',
           },
+          {
+            slug: 'qr-code-for-attendance-tracking',
+            title: 'QR Code Attendance System: How to Track Attendance Free',
+            desc: 'Build a free QR code attendance system — setup steps, classroom and office workflows, spreadsheet tracking, and proxy-proofing.',
+            readTime: '9 min read',
+            icon: '📋',
+          },
         ],
       };
   }
