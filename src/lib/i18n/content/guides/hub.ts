@@ -540,6 +540,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '📋',
           },
+          {
+            slug: 'qr-code-for-feedback-form',
+            title: 'QR Code for Feedback Form: Get More Reviews Free',
+            desc: 'Create a QR code for a feedback form free — setup steps, form design that gets answers, best placements, and mistakes to avoid.',
+            readTime: '9 min read',
+            icon: '⭐',
+          },
         ],
       };
   }
