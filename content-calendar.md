@@ -40,7 +40,7 @@ table of contents, 4-6 FAQs, Article + FAQ JSON-LD (automatic via template).
 - [x] `qr-code-for-business-cards` — "qr code on business card" — 👔 (published 2026-11-05)
 - [x] `qr-code-for-attendance-tracking` — "qr code attendance system" — 📋 (published 2026-11-06)
 - [x] `qr-code-for-feedback-form` — "qr code for feedback form" — ⭐ (published 2026-11-07)
-- [ ] `how-to-make-qr-code-for-audio` — "qr code for audio file" — 🎧
+- [x] `how-to-make-qr-code-for-audio` — "qr code for audio file" — 🎧 (published 2026-11-08)
 - [ ] `qr-code-for-google-review` — "google review qr code" — ⭐
 - [ ] `qr-code-for-app-download` — "qr code for app download" — 📲
 - [ ] `how-to-scan-qr-code-iphone` — "how to scan qr code on iphone" — 📱

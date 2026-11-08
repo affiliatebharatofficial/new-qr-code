@@ -547,6 +547,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '⭐',
           },
+          {
+            slug: 'how-to-make-qr-code-for-audio',
+            title: 'How to Make a QR Code for Audio (Free, No Sign-Up)',
+            desc: 'Make a QR code for an audio file free — host your MP3, link it, and print a scannable code for songs, podcasts, and voice notes.',
+            readTime: '9 min read',
+            icon: '🎧',
+          },
         ],
       };
   }
