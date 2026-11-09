@@ -554,6 +554,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '🎧',
           },
+          {
+            slug: 'qr-code-for-google-review',
+            title: 'Google Review QR Code: Get More Reviews (Free)',
+            desc: 'Make a Google review QR code free — get your review link, turn it into a code, and print it to collect more 5-star reviews.',
+            readTime: '9 min read',
+            icon: '⭐',
+          },
         ],
       };
   }
