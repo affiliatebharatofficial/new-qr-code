@@ -561,6 +561,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '⭐',
           },
+          {
+            slug: 'qr-code-for-app-download',
+            title: 'QR Code for App Download: Get More Installs (Free)',
+            desc: 'Make a QR code for app download free — link it to the App Store or Google Play and turn offline attention into installs.',
+            readTime: '9 min read',
+            icon: '📲',
+          },
         ],
       };
   }
