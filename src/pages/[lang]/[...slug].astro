@@ -50,6 +50,7 @@ import ArticleQrCodeForFeedbackForm from '../../components/guides/ArticleQrCodeF
 import ArticleHowToMakeQrCodeForAudio from '../../components/guides/ArticleHowToMakeQrCodeForAudio.astro';
 import ArticleQrCodeForGoogleReview from '../../components/guides/ArticleQrCodeForGoogleReview.astro';
 import ArticleQrCodeForAppDownload from '../../components/guides/ArticleQrCodeForAppDownload.astro';
+import ArticleHowToScanQrCodeIphone from '../../components/guides/ArticleHowToScanQrCodeIphone.astro';
 import GuidesHub from '../../components/guides/GuidesHub.astro';
 
 const { lang, slug } = Astro.params;
@@ -156,8 +157,9 @@ const isGuideQrCodeForFeedbackForm = normalizedGuideSlug === 'qr-code-for-feedba
 const isGuideHowToMakeQrCodeForAudio = normalizedGuideSlug === 'how-to-make-qr-code-for-audio';
 const isGuideQrCodeForGoogleReview = normalizedGuideSlug === 'qr-code-for-google-review';
 const isGuideQrCodeForAppDownload = normalizedGuideSlug === 'qr-code-for-app-download';
+const isGuideHowToScanQrCodeIphone = normalizedGuideSlug === 'how-to-scan-qr-code-iphone';
 const isGuidesIndex = currentSlug === 'guides';
-const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuideDoQrCodesExpire || isGuidePdf || isGuidePrintSize || isGuideYoutube || isGuideInstagram || isGuideWhatsappBusiness || isGuideErrorCorrection || isGuideEventTickets || isGuideWeddingQrCodeIdeas || isGuideQrCodeForRealEstate || isGuideHowToTrackQrCodeScans || isGuideQrCodeForEmailSignup || isGuideBulkQrCodeFromExcel || isGuideQrCodeDesignBestPractices || isGuideHowToMakeQrCodeForZoom || isGuideSpotifyPlaylistQrCode || isGuideTelegramChannelQrCode || isGuideQrCodeForPhoneNumber || isGuideCryptocurrencyQrCode || isGuideQrCodeForGyms || isGuideHowToMakeLocationQrCode || isGuideQrCodeForProductPackaging || isGuideHotelWifiQrCode || isGuideQrCodeVsBarcode || isGuideTransparentBackgroundQrCode || isGuideQrCodeForBusinessCards || isGuideQrCodeForAttendanceTracking || isGuideQrCodeForFeedbackForm || isGuideHowToMakeQrCodeForAudio || isGuideQrCodeForGoogleReview || isGuideQrCodeForAppDownload || isGuidesIndex;
+const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuideDoQrCodesExpire || isGuidePdf || isGuidePrintSize || isGuideYoutube || isGuideInstagram || isGuideWhatsappBusiness || isGuideErrorCorrection || isGuideEventTickets || isGuideWeddingQrCodeIdeas || isGuideQrCodeForRealEstate || isGuideHowToTrackQrCodeScans || isGuideQrCodeForEmailSignup || isGuideBulkQrCodeFromExcel || isGuideQrCodeDesignBestPractices || isGuideHowToMakeQrCodeForZoom || isGuideSpotifyPlaylistQrCode || isGuideTelegramChannelQrCode || isGuideQrCodeForPhoneNumber || isGuideCryptocurrencyQrCode || isGuideQrCodeForGyms || isGuideHowToMakeLocationQrCode || isGuideQrCodeForProductPackaging || isGuideHotelWifiQrCode || isGuideQrCodeVsBarcode || isGuideTransparentBackgroundQrCode || isGuideQrCodeForBusinessCards || isGuideQrCodeForAttendanceTracking || isGuideQrCodeForFeedbackForm || isGuideHowToMakeQrCodeForAudio || isGuideQrCodeForGoogleReview || isGuideQrCodeForAppDownload || isGuideHowToScanQrCodeIphone || isGuidesIndex;
 
 // Standard page content
 let content: ReturnType<typeof getLocalizedPageContent> = null;
@@ -419,5 +421,6 @@ if (!isSizeCalculator && !isPrintCalculator && !isGuide) {
 {isGuideHowToMakeQrCodeForAudio && <ArticleHowToMakeQrCodeForAudio locale={currentLocale} />}
 {isGuideQrCodeForGoogleReview && <ArticleQrCodeForGoogleReview locale={currentLocale} />}
 {isGuideQrCodeForAppDownload && <ArticleQrCodeForAppDownload locale={currentLocale} />}
+{isGuideHowToScanQrCodeIphone && <ArticleHowToScanQrCodeIphone locale={currentLocale} />}
 
 

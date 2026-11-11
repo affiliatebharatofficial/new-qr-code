@@ -568,6 +568,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '📲',
           },
+          {
+            slug: 'how-to-scan-qr-code-iphone',
+            title: 'How to Scan a QR Code on iPhone (Free, No App Needed)',
+            desc: 'Learn how to scan a QR code on iPhone free — Camera app, Control Center Code Scanner, and Live Text for photos.',
+            readTime: '8 min read',
+            icon: '📱',
+          },
         ],
       };
   }
