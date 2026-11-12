@@ -44,7 +44,7 @@ table of contents, 4-6 FAQs, Article + FAQ JSON-LD (automatic via template).
 - [x] `qr-code-for-google-review` — "google review qr code" — ⭐ (published 2026-11-09)
 - [x] `qr-code-for-app-download` — "qr code for app download" — 📲 (published 2026-11-10)
 - [x] `how-to-scan-qr-code-iphone` — "how to scan qr code on iphone" — 📱 (published 2026-11-11)
-- [ ] `qr-code-for-donations` — "qr code for donations" — ❤️
+- [x] `qr-code-for-donations` — "qr code for donations" — ❤️ (published 2026-11-12)
 - [ ] `how-to-create-qr-code-in-canva` — "how to make qr code in canva" — 🎨
 - [ ] `how-to-generate-qr-code-in-excel` — "how to generate qr code in excel" — 📑
 - [ ] `qr-code-for-google-docs` — "qr code for google docs" — 📄

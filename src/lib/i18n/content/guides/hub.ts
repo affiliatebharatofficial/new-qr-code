@@ -575,6 +575,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '8 min read',
             icon: '📱',
           },
+          {
+            slug: 'qr-code-for-donations',
+            title: 'QR Code for Donations: Collect More Gifts (Free)',
+            desc: 'Make a QR code for donations free — link it to your fundraiser or giving page and collect gifts from any phone.',
+            readTime: '9 min read',
+            icon: '❤️',
+          },
         ],
       };
   }
