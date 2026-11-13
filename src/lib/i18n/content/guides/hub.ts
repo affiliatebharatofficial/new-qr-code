@@ -582,6 +582,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '❤️',
           },
+          {
+            slug: 'how-to-create-qr-code-in-canva',
+            title: 'How to Make a QR Code in Canva (Free, 2026 Guide)',
+            desc: 'Learn how to make a QR code in Canva free — step by step, plus static vs dynamic, colours, sizing, and adding a logo.',
+            readTime: '9 min read',
+            icon: '🎨',
+          },
         ],
       };
   }
