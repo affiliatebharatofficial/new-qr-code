@@ -589,6 +589,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '🎨',
           },
+          {
+            slug: 'how-to-generate-qr-code-in-excel',
+            title: 'How to Generate a QR Code in Excel (Free, 2026)',
+            desc: 'Learn how to generate a QR code in Excel free — the IMAGE formula, bulk codes from a column, VBA, and mistakes to avoid.',
+            readTime: '9 min read',
+            icon: '📑',
+          },
         ],
       };
   }
