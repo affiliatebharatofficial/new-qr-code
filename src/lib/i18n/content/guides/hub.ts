@@ -596,6 +596,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '📑',
           },
+          {
+            slug: 'qr-code-for-google-docs',
+            title: 'QR Code for Google Docs (Free, No Sign-Up)',
+            desc: 'Learn how to make a QR code for Google Docs free — set the share link, generate the code, and insert it into any document.',
+            readTime: '9 min read',
+            icon: '📄',
+          },
         ],
       };
   }
