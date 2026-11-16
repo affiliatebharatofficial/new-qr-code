@@ -603,6 +603,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '📄',
           },
+          {
+            slug: 'qr-code-for-food-truck',
+            title: 'QR Code for Food Truck: Free Menu & Ordering',
+            desc: 'Learn how to make a QR code for your food truck free — link your menu, take orders, collect payments and tips.',
+            readTime: '9 min read',
+            icon: '🌮',
+          },
         ],
       };
   }
