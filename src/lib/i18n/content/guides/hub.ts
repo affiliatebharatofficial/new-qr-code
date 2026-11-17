@@ -610,6 +610,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '🌮',
           },
+          {
+            slug: 'qr-code-for-salon',
+            title: 'QR Code for Salon: Free Bookings & Payments',
+            desc: 'Learn how to make a QR code for your salon free — take bookings, share your price list, collect payments and reviews.',
+            readTime: '9 min read',
+            icon: '💇',
+          },
         ],
       };
   }

@@ -49,7 +49,7 @@ table of contents, 4-6 FAQs, Article + FAQ JSON-LD (automatic via template).
 - [x] `how-to-generate-qr-code-in-excel` — "how to generate qr code in excel" — 📑 (published 2026-11-14)
 - [x] `qr-code-for-google-docs` — "qr code for google docs" — 📄 (published 2026-11-15)
 - [x] `qr-code-for-food-truck` — "qr code for food truck" — 🌮 (published 2026-11-16)
-- [ ] `qr-code-for-salon` — "qr code for salon" — 💇
+- [x] `qr-code-for-salon` — "qr code for salon" — 💇 (published 2026-11-17)
 - [ ] `qr-code-pet-tag` — "qr code pet tag" — 🐾
 - [ ] `emergency-contact-qr-code` — "emergency contact qr code" — 🆘
 - [ ] `qr-code-for-classroom` — "qr code for classroom" — 🏫

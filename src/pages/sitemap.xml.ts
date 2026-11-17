@@ -87,6 +87,7 @@ export const GET: APIRoute = async () => {
     { path: 'guides/how-to-generate-qr-code-in-excel', priority: '0.7', changefreq: 'monthly', lastmod: '2026-11-14' },
     { path: 'guides/qr-code-for-google-docs', priority: '0.7', changefreq: 'monthly', lastmod: '2026-11-15' },
     { path: 'guides/qr-code-for-food-truck', priority: '0.7', changefreq: 'monthly', lastmod: '2026-11-16' },
+    { path: 'guides/qr-code-for-salon', priority: '0.7', changefreq: 'monthly', lastmod: '2026-11-17' },
     // Legal & Support & Company & Author
     { path: 'about', priority: '0.7', changefreq: 'monthly', lastmod: '2026-09-23' },
     { path: 'about/firoz-khan', priority: '0.7', changefreq: 'monthly', lastmod: '2026-09-23' },

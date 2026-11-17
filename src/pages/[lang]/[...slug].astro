@@ -56,6 +56,7 @@ import ArticleHowToCreateQrCodeInCanva from '../../components/guides/ArticleHowT
 import ArticleHowToGenerateQrCodeInExcel from '../../components/guides/ArticleHowToGenerateQrCodeInExcel.astro';
 import ArticleQrCodeForGoogleDocs from '../../components/guides/ArticleQrCodeForGoogleDocs.astro';
 import ArticleQrCodeForFoodTruck from '../../components/guides/ArticleQrCodeForFoodTruck.astro';
+import ArticleQrCodeForSalon from '../../components/guides/ArticleQrCodeForSalon.astro';
 import GuidesHub from '../../components/guides/GuidesHub.astro';
 
 const { lang, slug } = Astro.params;
@@ -168,8 +169,9 @@ const isGuideHowToCreateQrCodeInCanva = normalizedGuideSlug === 'how-to-create-q
 const isGuideHowToGenerateQrCodeInExcel = normalizedGuideSlug === 'how-to-generate-qr-code-in-excel';
 const isGuideQrCodeForGoogleDocs = normalizedGuideSlug === 'qr-code-for-google-docs';
 const isGuideQrCodeForFoodTruck = normalizedGuideSlug === 'qr-code-for-food-truck';
+const isGuideQrCodeForSalon = normalizedGuideSlug === 'qr-code-for-salon';
 const isGuidesIndex = currentSlug === 'guides';
-const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuideDoQrCodesExpire || isGuidePdf || isGuidePrintSize || isGuideYoutube || isGuideInstagram || isGuideWhatsappBusiness || isGuideErrorCorrection || isGuideEventTickets || isGuideWeddingQrCodeIdeas || isGuideQrCodeForRealEstate || isGuideHowToTrackQrCodeScans || isGuideQrCodeForEmailSignup || isGuideBulkQrCodeFromExcel || isGuideQrCodeDesignBestPractices || isGuideHowToMakeQrCodeForZoom || isGuideSpotifyPlaylistQrCode || isGuideTelegramChannelQrCode || isGuideQrCodeForPhoneNumber || isGuideCryptocurrencyQrCode || isGuideQrCodeForGyms || isGuideHowToMakeLocationQrCode || isGuideQrCodeForProductPackaging || isGuideHotelWifiQrCode || isGuideQrCodeVsBarcode || isGuideTransparentBackgroundQrCode || isGuideQrCodeForBusinessCards || isGuideQrCodeForAttendanceTracking || isGuideQrCodeForFeedbackForm || isGuideHowToMakeQrCodeForAudio || isGuideQrCodeForGoogleReview || isGuideQrCodeForAppDownload || isGuideHowToScanQrCodeIphone || isGuideQrCodeForDonations || isGuideHowToCreateQrCodeInCanva || isGuideHowToGenerateQrCodeInExcel || isGuideQrCodeForGoogleDocs || isGuideQrCodeForFoodTruck || isGuidesIndex;
+const isGuide = isGuideWhatIsAQRCode || isGuideStaticVsDynamic || isGuideWiFi || isGuideVCard || isGuideRestaurant || isGuideLogo || isGuideScanAndroid || isGuideGoogleForm || isGuideUpiMerchant || isGuideDoQrCodesExpire || isGuidePdf || isGuidePrintSize || isGuideYoutube || isGuideInstagram || isGuideWhatsappBusiness || isGuideErrorCorrection || isGuideEventTickets || isGuideWeddingQrCodeIdeas || isGuideQrCodeForRealEstate || isGuideHowToTrackQrCodeScans || isGuideQrCodeForEmailSignup || isGuideBulkQrCodeFromExcel || isGuideQrCodeDesignBestPractices || isGuideHowToMakeQrCodeForZoom || isGuideSpotifyPlaylistQrCode || isGuideTelegramChannelQrCode || isGuideQrCodeForPhoneNumber || isGuideCryptocurrencyQrCode || isGuideQrCodeForGyms || isGuideHowToMakeLocationQrCode || isGuideQrCodeForProductPackaging || isGuideHotelWifiQrCode || isGuideQrCodeVsBarcode || isGuideTransparentBackgroundQrCode || isGuideQrCodeForBusinessCards || isGuideQrCodeForAttendanceTracking || isGuideQrCodeForFeedbackForm || isGuideHowToMakeQrCodeForAudio || isGuideQrCodeForGoogleReview || isGuideQrCodeForAppDownload || isGuideHowToScanQrCodeIphone || isGuideQrCodeForDonations || isGuideHowToCreateQrCodeInCanva || isGuideHowToGenerateQrCodeInExcel || isGuideQrCodeForGoogleDocs || isGuideQrCodeForFoodTruck || isGuideQrCodeForSalon || isGuidesIndex;
 
 // Standard page content
 let content: ReturnType<typeof getLocalizedPageContent> = null;
@@ -437,5 +439,6 @@ if (!isSizeCalculator && !isPrintCalculator && !isGuide) {
 {isGuideHowToGenerateQrCodeInExcel && <ArticleHowToGenerateQrCodeInExcel locale={currentLocale} />}
 {isGuideQrCodeForGoogleDocs && <ArticleQrCodeForGoogleDocs locale={currentLocale} />}
 {isGuideQrCodeForFoodTruck && <ArticleQrCodeForFoodTruck locale={currentLocale} />}
+{isGuideQrCodeForSalon && <ArticleQrCodeForSalon locale={currentLocale} />}
 
 
