@@ -617,6 +617,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '💇',
           },
+          {
+            slug: 'qr-code-pet-tag',
+            title: 'QR Code Pet Tag: Free Lost-Pet ID That Works',
+            desc: 'Learn how to make a QR code pet tag free — a scannable tag that shows your pet\'s name, your phone number and vet details if they get lost.',
+            readTime: '9 min read',
+            icon: '🐾',
+          },
         ],
       };
   }
