@@ -51,7 +51,7 @@ table of contents, 4-6 FAQs, Article + FAQ JSON-LD (automatic via template).
 - [x] `qr-code-for-food-truck` — "qr code for food truck" — 🌮 (published 2026-11-16)
 - [x] `qr-code-for-salon` — "qr code for salon" — 💇 (published 2026-11-17)
 - [x] `qr-code-pet-tag` — "qr code pet tag" — 🐾 (published 2026-11-18)
-- [ ] `emergency-contact-qr-code` — "emergency contact qr code" — 🆘
+- [x] `emergency-contact-qr-code` — "emergency contact qr code" — 🆘 (published 2026-11-19)
 - [ ] `qr-code-for-classroom` — "qr code for classroom" — 🏫
 - [ ] `qr-code-scavenger-hunt` — "qr code scavenger hunt ideas" — 🗺️
 - [ ] `qr-code-on-resume` — "qr code on resume" — 💼

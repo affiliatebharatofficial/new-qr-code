@@ -624,6 +624,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '🐾',
           },
+          {
+            slug: 'emergency-contact-qr-code',
+            title: 'Emergency Contact QR Code (Free, No Sign-Up)',
+            desc: 'Learn how to make a free emergency contact QR code — a scannable card that shows your ICE details, allergies and next of kin in seconds.',
+            readTime: '9 min read',
+            icon: '🆘',
+          },
         ],
       };
   }
