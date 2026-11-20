@@ -53,7 +53,6 @@ table of contents, 4-6 FAQs, Article + FAQ JSON-LD (automatic via template).
 - [x] `qr-code-pet-tag` — "qr code pet tag" — 🐾 (published 2026-11-18)
 - [x] `emergency-contact-qr-code` — "emergency contact qr code" — 🆘 (published 2026-11-19)
 - [x] `qr-code-for-classroom` — "qr code for classroom" — 🏫 (published 2026-11-20)
-- [ ] `qr-code-for-classroom` — "qr code for classroom" — 🏫
 - [ ] `qr-code-scavenger-hunt` — "qr code scavenger hunt ideas" — 🗺️
 - [ ] `qr-code-on-resume` — "qr code on resume" — 💼
 - [ ] `how-to-scan-qr-code-on-pc` — "scan qr code on pc" — 💻
