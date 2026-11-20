@@ -90,6 +90,7 @@ export const GET: APIRoute = async () => {
     { path: 'guides/qr-code-for-salon', priority: '0.7', changefreq: 'monthly', lastmod: '2026-11-17' },
     { path: 'guides/qr-code-pet-tag', priority: '0.7', changefreq: 'monthly', lastmod: '2026-11-18' },
     { path: 'guides/emergency-contact-qr-code', priority: '0.7', changefreq: 'monthly', lastmod: '2026-11-19' },
+    { path: 'guides/qr-code-for-classroom', priority: '0.7', changefreq: 'monthly', lastmod: '2026-11-20' },
     // Legal & Support & Company & Author
     { path: 'about', priority: '0.7', changefreq: 'monthly', lastmod: '2026-09-23' },
     { path: 'about/firoz-khan', priority: '0.7', changefreq: 'monthly', lastmod: '2026-09-23' },

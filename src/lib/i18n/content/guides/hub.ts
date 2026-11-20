@@ -631,6 +631,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '🆘',
           },
+          {
+            slug: 'qr-code-for-classroom',
+            title: 'QR Code for Classroom: Free Ideas for Teachers',
+            desc: 'Learn how to use a QR code for classroom teaching free — attendance, homework links, worksheets, reading corners and parent updates, no sign-up.',
+            readTime: '9 min read',
+            icon: '🏫',
+          },
         ],
       };
   }
