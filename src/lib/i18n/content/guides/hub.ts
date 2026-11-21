@@ -638,6 +638,13 @@ export function getGuideHubData(locale: Locale): GuideHubData {
             readTime: '9 min read',
             icon: '🏫',
           },
+          {
+            slug: 'qr-code-scavenger-hunt',
+            title: 'QR Code Scavenger Hunt Ideas (Free, Fun & Easy)',
+            desc: 'Fun QR code scavenger hunt ideas for kids, classrooms, parties and team building — make free codes, hide clues and run a hunt in under an hour.',
+            readTime: '9 min read',
+            icon: '🗺️',
+          },
         ],
       };
   }
